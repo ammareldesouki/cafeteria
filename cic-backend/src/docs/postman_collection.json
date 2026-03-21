@@ -1,0 +1,481 @@
+{
+  "info": {
+    "name": "CIC Backend - Favorites & Orders API",
+    "description": "Complete API collection for Favorites and Orders endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{SESSION_TOKEN}}",
+        "type": "string"
+      }
+    ]
+  },
+  "item": [
+    {
+      "name": "Favorites",
+      "item": [
+        {
+          "name": "Add Favorite",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemId\": \"{{MENU_ITEM_ID}}\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/favorites",
+              "host": ["{{BASE_URL}}"],
+              "path": ["favorites"]
+            },
+            "description": "Add a menu item to user's favorites. Validates that the item exists."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"itemId\": \"65a1b2c3d4e5f6g7h8i9j0k1\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/favorites",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["favorites"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k2\",\n  \"userId\": \"user123\",\n  \"itemId\": \"65a1b2c3d4e5f6g7h8i9j0k1\",\n  \"createdAt\": \"2024-01-13T12:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Favorites",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/favorites",
+              "host": ["{{BASE_URL}}"],
+              "path": ["favorites"]
+            },
+            "description": "Get all favorites for the authenticated user"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/favorites",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["favorites"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "[\n  {\n    \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k2\",\n    \"userId\": \"user123\",\n    \"itemId\": \"65a1b2c3d4e5f6g7h8i9j0k1\",\n    \"createdAt\": \"2024-01-13T12:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Remove Favorite",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/favorites/:itemId",
+              "host": ["{{BASE_URL}}"],
+              "path": ["favorites", ":itemId"],
+              "variable": [
+                {
+                  "key": "itemId",
+                  "value": "{{MENU_ITEM_ID}}",
+                  "description": "Menu item ID to remove from favorites"
+                }
+              ]
+            },
+            "description": "Remove a menu item from user's favorites"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/favorites/65a1b2c3d4e5f6g7h8i9j0k1",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["favorites", "65a1b2c3d4e5f6g7h8i9j0k1"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"success\": true\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Endpoints for managing user favorites"
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"itemIds\": [\"{{MENU_ITEM_ID}}\"],\n  \"total\": 29.99,\n  \"deliveryLocation\": \"123 Main St, Apt 4B\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/orders",
+              "host": ["{{BASE_URL}}"],
+              "path": ["orders"]
+            },
+            "description": "Create a new order. Validates all menu items exist. Sets status to 'pending' and paymentStatus to 'unpaid'."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"itemIds\": [\"65a1b2c3d4e5f6g7h8i9j0k1\", \"65a1b2c3d4e5f6g7h8i9j0k2\"],\n  \"total\": 29.99,\n  \"deliveryLocation\": \"123 Main St, Apt 4B\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/orders",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["orders"]
+                }
+              },
+              "status": "Created",
+              "code": 201,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k3\",\n  \"userId\": \"user123\",\n  \"userEmail\": \"user@example.com\",\n  \"itemIds\": [\"65a1b2c3d4e5f6g7h8i9j0k1\", \"65a1b2c3d4e5f6g7h8i9j0k2\"],\n  \"total\": 29.99,\n  \"deliveryLocation\": \"123 Main St, Apt 4B\",\n  \"status\": \"pending\",\n  \"paymentStatus\": \"unpaid\",\n  \"createdAt\": \"2024-01-13T12:00:00.000Z\",\n  \"updatedAt\": \"2024-01-13T12:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/orders",
+              "host": ["{{BASE_URL}}"],
+              "path": ["orders"]
+            },
+            "description": "Get all orders for the authenticated user (sorted by createdAt desc)"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/orders",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["orders"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "[\n  {\n    \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k3\",\n    \"userId\": \"user123\",\n    \"userEmail\": \"user@example.com\",\n    \"itemIds\": [\"item1\", \"item2\"],\n    \"total\": 29.99,\n    \"deliveryLocation\": \"123 Main St\",\n    \"status\": \"pending\",\n    \"paymentStatus\": \"unpaid\",\n    \"createdAt\": \"2024-01-13T12:00:00.000Z\",\n    \"updatedAt\": \"2024-01-13T12:00:00.000Z\"\n  }\n]"
+            }
+          ]
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BASE_URL}}/orders/:id",
+              "host": ["{{BASE_URL}}"],
+              "path": ["orders", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{ORDER_ID}}",
+                  "description": "Order ID"
+                }
+              ]
+            },
+            "description": "Get a specific order by ID. Verifies user ownership."
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{BASE_URL}}/orders/65a1b2c3d4e5f6g7h8i9j0k3",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["orders", "65a1b2c3d4e5f6g7h8i9j0k3"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k3\",\n  \"userId\": \"user123\",\n  \"userEmail\": \"user@example.com\",\n  \"itemIds\": [\"item1\", \"item2\"],\n  \"total\": 29.99,\n  \"deliveryLocation\": \"123 Main St\",\n  \"status\": \"pending\",\n  \"paymentStatus\": \"unpaid\",\n  \"createdAt\": \"2024-01-13T12:00:00.000Z\",\n  \"updatedAt\": \"2024-01-13T12:00:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/orders/:id/status",
+              "host": ["{{BASE_URL}}"],
+              "path": ["orders", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{ORDER_ID}}",
+                  "description": "Order ID"
+                }
+              ]
+            },
+            "description": "Update order status. Valid values: 'pending', 'completed', 'cancelled'"
+          },
+          "response": [
+            {
+              "name": "Success - Completed",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"completed\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/orders/65a1b2c3d4e5f6g7h8i9j0k3/status",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["orders", "65a1b2c3d4e5f6g7h8i9j0k3", "status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k3\",\n  \"userId\": \"user123\",\n  \"userEmail\": \"user@example.com\",\n  \"itemIds\": [\"item1\", \"item2\"],\n  \"total\": 29.99,\n  \"deliveryLocation\": \"123 Main St\",\n  \"status\": \"completed\",\n  \"paymentStatus\": \"unpaid\",\n  \"createdAt\": \"2024-01-13T12:00:00.000Z\",\n  \"updatedAt\": \"2024-01-13T12:05:00.000Z\"\n}"
+            },
+            {
+              "name": "Success - Cancelled",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"cancelled\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/orders/65a1b2c3d4e5f6g7h8i9j0k3/status",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["orders", "65a1b2c3d4e5f6g7h8i9j0k3", "status"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k3\",\n  \"status\": \"cancelled\",\n  \"updatedAt\": \"2024-01-13T12:10:00.000Z\"\n}"
+            }
+          ]
+        },
+        {
+          "name": "Update Payment Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Cookie",
+                "value": "better-auth.session_token={{SESSION_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentStatus\": \"paid\"\n}"
+            },
+            "url": {
+              "raw": "{{BASE_URL}}/orders/:id/payment",
+              "host": ["{{BASE_URL}}"],
+              "path": ["orders", ":id", "payment"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "{{ORDER_ID}}",
+                  "description": "Order ID"
+                }
+              ]
+            },
+            "description": "Update payment status. Valid values: 'paid', 'unpaid'"
+          },
+          "response": [
+            {
+              "name": "Success",
+              "originalRequest": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paymentStatus\": \"paid\"\n}"
+                },
+                "url": {
+                  "raw": "{{BASE_URL}}/orders/65a1b2c3d4e5f6g7h8i9j0k3/payment",
+                  "host": ["{{BASE_URL}}"],
+                  "path": ["orders", "65a1b2c3d4e5f6g7h8i9j0k3", "payment"]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [],
+              "body": "{\n  \"_id\": \"65a1b2c3d4e5f6g7h8i9j0k3\",\n  \"userId\": \"user123\",\n  \"userEmail\": \"user@example.com\",\n  \"itemIds\": [\"item1\", \"item2\"],\n  \"total\": 29.99,\n  \"deliveryLocation\": \"123 Main St\",\n  \"status\": \"pending\",\n  \"paymentStatus\": \"paid\",\n  \"createdAt\": \"2024-01-13T12:00:00.000Z\",\n  \"updatedAt\": \"2024-01-13T12:15:00.000Z\"\n}"
+            }
+          ]
+        }
+      ],
+      "description": "Endpoints for managing orders"
+    },
+    {
+      "name": "Helper Endpoints",
+      "item": [
+        {
+          "name": "Get Menu Items",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/menu",
+              "host": ["{{BASE_URL}}"],
+              "path": ["menu"]
+            },
+            "description": "Get all menu items to find valid item IDs for testing"
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/health",
+              "host": ["{{BASE_URL}}"],
+              "path": ["health"]
+            },
+            "description": "Check if server is running"
+          },
+          "response": []
+        }
+      ],
+      "description": "Helper endpoints for testing"
+    }
+  ],
+  "variable": [
+    {
+      "key": "BASE_URL",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "SESSION_TOKEN",
+      "value": "YOUR_SESSION_TOKEN_HERE",
+      "type": "string"
+    },
+    {
+      "key": "MENU_ITEM_ID",
+      "value": "REPLACE_WITH_VALID_MENU_ITEM_ID",
+      "type": "string"
+    },
+    {
+      "key": "ORDER_ID",
+      "value": "REPLACE_WITH_VALID_ORDER_ID",
+      "type": "string"
+    }
+  ]
+}
