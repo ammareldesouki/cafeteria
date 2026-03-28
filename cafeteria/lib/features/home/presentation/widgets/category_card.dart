@@ -123,7 +123,7 @@ class _CategoryCardState extends State<CategoryCard>
                             style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Color(0xff3E2522),
                               letterSpacing: -0.3,
                             ),
                           ),
@@ -132,7 +132,7 @@ class _CategoryCardState extends State<CategoryCard>
                             widget.subtitle,
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.white.withOpacity(0.82),
+                              color:Color(0xff3E2522),
                             ),
                           ),
                         ],

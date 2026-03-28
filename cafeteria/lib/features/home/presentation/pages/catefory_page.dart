@@ -115,7 +115,7 @@ class _CategoryPageState extends State<CategoryPage> {
 
                       if (_controller.position.hasContentDimensions) {
                         final page = _controller.page ?? currentIndex.toDouble();
-                        value = (1 - ((page - index).abs() * 0.2))
+                        value = (1 - ((page - index).abs() * 0.05))
                             .clamp(0.85, 1.0);
                       }
 

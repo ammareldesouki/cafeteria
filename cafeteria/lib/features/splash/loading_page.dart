@@ -19,7 +19,7 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _navigate() async {
     await Future.delayed(const Duration(seconds: 2));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, RouteNames.roleSelection);
+      Navigator.pushReplacementNamed(context, RouteNames.signIn);
     }
   }
 

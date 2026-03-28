@@ -113,8 +113,9 @@ class _HomePageState extends State<HomePage> {
                               state.coldDrinks,
                             ),
                             gradientColors: const [
-                              Color(0xFFD4C5A9),
-                              Color(0xFF8B7355),
+                              Color(0xFFB68F60),
+                              Color(0xFFF5F5DC),
+                              Color(0xFF3E2522)
                             ],
                             decorIcon: Icons.ac_unit_rounded,
                           ),
@@ -129,8 +130,9 @@ class _HomePageState extends State<HomePage> {
                               state.hotDrinks,
                             ),
                             gradientColors: const [
-                              Color(0xFFC4A882),
-                              Color(0xFF6B4226),
+                              Color(0xFFB68F60),
+                              Color(0xFFF5F5DC),
+                              Color(0xFF3E2522)
                             ],
                             decorIcon: Icons.local_fire_department_rounded,
                           ),
@@ -145,18 +147,19 @@ class _HomePageState extends State<HomePage> {
                               state.sideItems,
                             ),
                             gradientColors: const [
-                              Color(0xFFBBA98A),
-                              Color(0xFF7A5C3A),
+                              Color(0xFFB68F60),
+                              Color(0xFFF5F5DC),
+                              Color(0xFF3E2522)
                             ],
                             decorIcon: Icons.dinner_dining_rounded,
                           ),
                           const SizedBox(height: 28),
 
-                          _StatsRow(
-                            coldCount: state.coldDrinks.length,
-                            hotCount: state.hotDrinks.length,
-                            sideCount: state.sideItems.length,
-                          ),
+                          // _StatsRow(
+                          //   coldCount: state.coldDrinks.length,
+                          //   hotCount: state.hotDrinks.length,
+                          //   sideCount: state.sideItems.length,
+                          // ),
                         ],
                       ],
                   ],
@@ -247,94 +250,94 @@ class _SimpleHeader extends StatelessWidget {
     );
   }
 }
-
-class _StatsRow extends StatelessWidget {
-  final int coldCount;
-  final int hotCount;
-  final int sideCount;
-
-  const _StatsRow({
-    required this.coldCount,
-    required this.hotCount,
-    required this.sideCount,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        _StatChip(
-          label: 'Cold',
-          count: coldCount,
-          color: const Color(0xFF5B8FD4),
-        ),
-        const SizedBox(width: 10),
-        _StatChip(
-          label: 'Hot',
-          count: hotCount,
-          color: const Color(0xFFD47B3F),
-        ),
-        const SizedBox(width: 10),
-        _StatChip(
-          label: 'Sides',
-          count: sideCount,
-          color: const Color(0xFF8B7355),
-        ),
-      ],
-    );
-  }
-}
-
-class _StatChip extends StatelessWidget {
-  final String label;
-  final int count;
-  final Color color;
-
-  const _StatChip({
-    required this.label,
-    required this.count,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.04),
-              blurRadius: 8,
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: color,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: const TextStyle(
-                fontSize: 12,
-                color: Color(0xFF9E8E82),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//
+// class _StatsRow extends StatelessWidget {
+//   final int coldCount;
+//   final int hotCount;
+//   final int sideCount;
+//
+//   const _StatsRow({
+//     required this.coldCount,
+//     required this.hotCount,
+//     required this.sideCount,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         _StatChip(
+//           label: 'Cold',
+//           count: coldCount,
+//           color: const Color(0xFF5B8FD4),
+//         ),
+//         const SizedBox(width: 10),
+//         _StatChip(
+//           label: 'Hot',
+//           count: hotCount,
+//           color: const Color(0xFFD47B3F),
+//         ),
+//         const SizedBox(width: 10),
+//         _StatChip(
+//           label: 'Sides',
+//           count: sideCount,
+//           color: const Color(0xFF8B7355),
+//         ),
+//       ],
+//     );
+//   }
+// }
+//
+// class _StatChip extends StatelessWidget {
+//   final String label;
+//   final int count;
+//   final Color color;
+//
+//   const _StatChip({
+//     required this.label,
+//     required this.count,
+//     required this.color,
+//   });
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Expanded(
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(vertical: 14),
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(16),
+//           boxShadow: [
+//             BoxShadow(
+//               color: Colors.black.withOpacity(0.04),
+//               blurRadius: 8,
+//             ),
+//           ],
+//         ),
+//         child: Column(
+//           children: [
+//             Text(
+//               '$count',
+//               style: TextStyle(
+//                 fontSize: 20,
+//                 fontWeight: FontWeight.bold,
+//                 color: color,
+//               ),
+//             ),
+//             const SizedBox(height: 2),
+//             Text(
+//               label,
+//               style: const TextStyle(
+//                 fontSize: 12,
+//                 color: Color(0xFF9E8E82),
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 class _ErrorView extends StatelessWidget {
   final String message;

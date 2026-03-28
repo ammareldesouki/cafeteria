@@ -136,34 +136,23 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       const SizedBox(height: 16),
 
+                        Align(
+                          alignment: AlignmentGeometry.centerRight,
+                            child: Text("Forget Password ?",style:  TextStyle(fontSize: 15,))),
+
+                      const SizedBox(height: 16),
+
 
 
                       // ── Sign Up button ─────────────────────────────────
                       PrimaryButton(
-                        label: 'Sign In',
+                        label: 'Log In',
                         isLoading: isLoading,
                         onTap: _onSignIn,
                       ),
                       const SizedBox(height: 20),
 
                       // ── Divider ────────────────────────────────────────
-                      Row(
-                        children: const [
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              'Or continue with',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF9E9E9E),
-                              ),
-                            ),
-                          ),
-                          Expanded(child: Divider()),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
 
 
 
@@ -175,14 +164,14 @@ class _SignInPageState extends State<SignInPage> {
                               Navigator.pushReplacementNamed(context,RouteNames.signUp),
                           child: RichText(
                             text: const TextSpan(
-                              text: 'If You Don\'t Have An Account? ',
+                              text: ' Don\'t Have An Account ? ',
                               style: TextStyle(
                                 color: Color(0xFF9E9E9E),
                                 fontSize: 13,
                               ),
                               children: [
                                 TextSpan(
-                                  text: 'Sign Up',
+                                  text: 'Create Account',
                                   style: TextStyle(
                                     color: Color(0xFF3B1A08),
                                     fontWeight: FontWeight.w600,

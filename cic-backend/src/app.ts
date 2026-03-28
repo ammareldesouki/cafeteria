@@ -13,6 +13,7 @@ import {
 import router from "@/routes";
 import { ErrorMiddleware } from "@middlewares/error.middleware";
 import { NotFoundMiddleware } from "@middlewares/notFound.middleware";
+import cartRouter from "@/routes/cart.routes";
 import { stream } from "@utils/logger";
 
 const app = express();
@@ -22,7 +23,7 @@ const apiPrefix = "/api/v1";
 /* trust proxy */
 app.set("trust proxy", 1);
 
-/* middlewares */
+/* rate limit */
 app.use(
   rateLimit({
     windowMs: 60_000,
@@ -52,6 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 
 /* routes - all under /api/v1 */
 app.use(apiPrefix, router);
+app.use(`${apiPrefix}/cart`, cartRouter); // ← cart routes
 
 /* errors */
 app.use(NotFoundMiddleware);
