@@ -9,6 +9,8 @@ class UserModel extends UserEntity {
     required super.role,
     required super.createdAt,
     required super.updatedAt,
+    required super.phoneNumber,
+    required super.gender
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
@@ -20,6 +22,9 @@ class UserModel extends UserEntity {
       role: map['role'] ?? 'user',
       createdAt: map['createdAt'] ?? '',
       updatedAt: map['updatedAt'] ?? '',
+      phoneNumber: map['phoneNumber'] ?? '',
+      gender: map['gender'] ?? '',
+
     );
   }
 
@@ -31,5 +36,7 @@ class UserModel extends UserEntity {
         'role': role,
         'createdAt': createdAt,
         'updatedAt': updatedAt,
+        'phoneNumber': phoneNumber,
+        'gender': gender,
       };
 }

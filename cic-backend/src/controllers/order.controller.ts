@@ -8,38 +8,33 @@ import { OrderStatus, PaymentStatus } from "@/types/order.types";
 import { handleServiceError } from "@/middlewares/serviceErrorHandler.middleware";
 
 /**
- * Create a new order
+ * Create a new order from cart
  * POST /orders
  */
 export const createOrder = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
-    const userEmail = (req as any).user.email;
-    const { itemIds, total, deliveryLocation } = req.body;
+	try {
+		const userId = (req as any).user.id;
+		const userEmail = (req as any).user.email;
+		const deliveryLocation = req.body.deliveryLocation as string | undefined;
 
-    // Call service
-    const order = await orderService.createOrder(
-      userId,
-      userEmail,
-      itemIds,
-      total,
-      deliveryLocation,
-    );
+		const order = await orderService.createOrderFromCart(
+			userId,
+			userEmail,
+			deliveryLocation,
+		);
 
-    // Return response
-    res.status(201).json(order);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		res.status(201).json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };
 
 /**
@@ -47,22 +42,22 @@ export const createOrder = async (
  * GET /orders
  */
 export const getUserOrders = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
+	try {
+		// Parse input
+		const userId = (req as any).user.id;
 
-    // Call service
-    const orders = await orderService.getUserOrders(userId);
+		// Call service
+		const orders = await orderService.getUserOrders(userId);
 
-    // Return response
-    res.json(orders);
-  } catch (err) {
-    next(err);
-  }
+		// Return response
+		res.json(orders);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -70,27 +65,27 @@ export const getUserOrders = async (
  * GET /orders/:id
  */
 export const getOrderById = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
-    const id = req.params.id as string;
+	try {
+		// Parse input
+		const userId = (req as any).user.id;
+		const id = req.params.id as string;
 
-    // Call service
-    const order = await orderService.getOrderById(id, userId);
+		// Call service
+		const order = await orderService.getOrderById(id, userId);
 
-    // Return response
-    res.json(order);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		// Return response
+		res.json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };
 
 /**
@@ -98,32 +93,32 @@ export const getOrderById = async (
  * PATCH /orders/:id/status
  */
 export const updateOrderStatus = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
-    const id = req.params.id as string;
-    const { status } = req.body;
+	try {
+		// Parse input
+		const userId = (req as any).user.id;
+		const id = req.params.id as string;
+		const { status } = req.body;
 
-    // Call service
-    const order = await orderService.updateOrderStatus(
-      id,
-      userId,
-      status as OrderStatus,
-    );
+		// Call service
+		const order = await orderService.updateOrderStatus(
+			id,
+			userId,
+			status as OrderStatus,
+		);
 
-    // Return response
-    res.json(order);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		// Return response
+		res.json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };
 
 /**
@@ -131,30 +126,52 @@ export const updateOrderStatus = async (
  * PATCH /orders/:id/payment
  */
 export const updateOrderPayment = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
-    const id = req.params.id as string;
-    const { paymentStatus } = req.body;
+	try {
+		const userId = (req as any).user.id;
+		const id = req.params.id as string;
+		const { paymentStatus } = req.body;
 
-    // Call service
-    const order = await orderService.updateOrderPayment(
-      id,
-      userId,
-      paymentStatus as PaymentStatus,
-    );
+		const order = await orderService.updateOrderPayment(
+			id,
+			userId,
+			paymentStatus as PaymentStatus,
+		);
 
-    // Return response
-    res.json(order);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		res.json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
+};
+
+/**
+ * Cancel order
+ * POST /orders/:id/cancel
+ */
+export const cancelOrder = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const userId = (req as any).user.id;
+		const id = req.params.id as string;
+
+		const order = await orderService.cancelOrder(id, userId);
+
+		res.json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };

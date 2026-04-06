@@ -11,27 +11,27 @@ import { handleServiceError } from "@/middlewares/serviceErrorHandler.middleware
  * POST /favorites
  */
 export const addFavorite = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
-    const { itemId } = req.body;
+	try {
+		// Parse input
+		const userId = (req as any).user.id;
+		const { itemId } = req.body;
 
-    // Call service
-    const favorite = await favoriteService.addFavorite(userId, itemId);
+		// Call service
+		const favorite = await favoriteService.addFavorite(userId, itemId);
 
-    // Return response
-    res.status(201).json(favorite);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		// Return response
+		res.status(201).json(favorite);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };
 
 /**
@@ -39,22 +39,22 @@ export const addFavorite = async (
  * GET /favorites
  */
 export const getFavorites = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
+	try {
+		// Parse input
+		const userId = (req as any).user.id;
 
-    // Call service
-    const favorites = await favoriteService.getUserFavorites(userId);
+		// Call service
+		const favorites = await favoriteService.getUserFavorites(userId);
 
-    // Return response
-    res.json(favorites);
-  } catch (err) {
-    next(err);
-  }
+		// Return response
+		res.json(favorites);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -62,25 +62,25 @@ export const getFavorites = async (
  * DELETE /favorites/:itemId
  */
 export const removeFavorite = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const userId = (req as any).user.id;
-    const itemId = req.params.itemId as string;
+	try {
+		// Parse input
+		const userId = (req as any).user.id;
+		const itemId = req.params.itemId as string;
 
-    // Call service
-    const result = await favoriteService.removeFavorite(userId, itemId);
+		// Call service
+		const result = await favoriteService.removeFavorite(userId, itemId);
 
-    // Return response
-    res.json(result);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		// Return response
+		res.json(result);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };

@@ -10,14 +10,14 @@ import { analyticsService } from "@/services/analytics.service";
  * GET /admin/analytics
  */
 export const getDashboardAnalytics = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    const analytics = await analyticsService.getDashboardAnalytics();
-    res.json(analytics);
-  } catch (err) {
-    next(err);
-  }
+	try {
+		const analytics = await analyticsService.getDashboardAnalytics();
+		res.json(analytics);
+	} catch (err) {
+		next(err);
+	}
 };

@@ -1,428 +1,428 @@
 {
-  "info": {
-    "name": "CIC Backend - Admin Dashboard API",
-    "description": "Admin-only endpoints for dashboard, wallet, and order management",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "0"
-  },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{ADMIN_SESSION_TOKEN}}",
-        "type": "string"
-      }
-    ]
-  },
-  "item": [
-    {
-      "name": "Dashboard Analytics",
-      "item": [
-        {
-          "name": "Get Dashboard Analytics",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/analytics",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "analytics"]
-            },
-            "description": "Get dashboard summary: active orders, total orders, total revenue, pending revenue"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{BASE_URL}}/admin/analytics",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["admin", "analytics"]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "body": "{\n  \"activeOrders\": 5,\n  \"totalOrders\": 150,\n  \"totalRevenue\": 4500.00,\n  \"pendingRevenue\": 350.00\n}"
-            }
-          ]
-        }
-      ],
-      "description": "Dashboard analytics endpoints"
-    },
-    {
-      "name": "Order Management",
-      "item": [
-        {
-          "name": "Get All Orders (No Filter)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1",
-                  "description": "Page number (default: 1)"
-                },
-                {
-                  "key": "limit",
-                  "value": "10",
-                  "description": "Items per page (1-1000, default: 10)"
-                }
-              ]
-            },
-            "description": "Get all orders with pagination (no filters)"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{BASE_URL}}/admin/orders?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["admin", "orders"],
-                  "query": [
-                    { "key": "page", "value": "1" },
-                    { "key": "limit", "value": "10" }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "body": "{\n  \"data\": [\n    {\n      \"_id\": \"order1\",\n      \"userId\": \"user123\",\n      \"userEmail\": \"user@example.com\",\n      \"itemIds\": [\"item1\", \"item2\"],\n      \"total\": 29.99,\n      \"deliveryLocation\": \"123 Main St\",\n      \"status\": \"pending\",\n      \"paymentStatus\": \"unpaid\",\n      \"createdAt\": \"2024-01-13T12:00:00Z\",\n      \"updatedAt\": \"2024-01-13T12:00:00Z\"\n    }\n  ],\n  \"totalCount\": 150,\n  \"page\": 1,\n  \"limit\": 10,\n  \"totalPages\": 15\n}"
-            }
-          ]
-        },
-        {
-          "name": "Get Orders by User ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders?page=1&limit=10&userId={{USER_ID}}",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders"],
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                {
-                  "key": "userId",
-                  "value": "{{USER_ID}}",
-                  "description": "Filter by specific user"
-                }
-              ]
-            },
-            "description": "Get all orders for a specific user"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Unpaid Orders",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders?page=1&limit=10&paymentStatus=unpaid",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders"],
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                {
-                  "key": "paymentStatus",
-                  "value": "unpaid",
-                  "description": "Filter by payment status: paid | unpaid"
-                }
-              ]
-            },
-            "description": "Get all unpaid orders"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Pending Orders",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders?page=1&limit=10&status=pending",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders"],
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "10" },
-                {
-                  "key": "status",
-                  "value": "pending",
-                  "description": "Filter by status: pending | completed | cancelled"
-                }
-              ]
-            },
-            "description": "Get all pending orders"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Orders (Combined Filters)",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders?page=1&limit=100&userId={{USER_ID}}&paymentStatus=unpaid&status=pending",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders"],
-              "query": [
-                { "key": "page", "value": "1" },
-                { "key": "limit", "value": "100" },
-                { "key": "userId", "value": "{{USER_ID}}" },
-                { "key": "paymentStatus", "value": "unpaid" },
-                { "key": "status", "value": "pending" }
-              ]
-            },
-            "description": "Get orders with multiple filters combined"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Order - Mark Completed & Paid",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"completed\",\n  \"paymentStatus\": \"paid\"\n}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders/:id",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "{{ORDER_ID}}",
-                  "description": "Order ID to update"
-                }
-              ]
-            },
-            "description": "Update order status and payment status (both delivered and paid)"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Order - Delivered Unpaid (Credit)",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"completed\",\n  \"paymentStatus\": \"unpaid\"\n}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders/:id",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "{{ORDER_ID}}"
-                }
-              ]
-            },
-            "description": "Mark order as delivered but unpaid (customer owes money - credit)"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Order - Mark Paid Only",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"paymentStatus\": \"paid\"\n}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders/:id",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "{{ORDER_ID}}"
-                }
-              ]
-            },
-            "description": "Update only payment status (e.g., customer paid for previously unpaid order)"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Order - Cancel",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"cancelled\"\n}"
-            },
-            "url": {
-              "raw": "{{BASE_URL}}/admin/orders/:id",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "orders", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "{{ORDER_ID}}"
-                }
-              ]
-            },
-            "description": "Cancel an order"
-          },
-          "response": []
-        }
-      ],
-      "description": "Admin order management with pagination and filters"
-    },
-    {
-      "name": "Wallet Management",
-      "item": [
-        {
-          "name": "Get Wallet Balance",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/wallet",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "wallet"]
-            },
-            "description": "Get cafeteria wallet balance only (fast query)"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{BASE_URL}}/admin/wallet",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["admin", "wallet"]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "body": "{\n  \"balance\": 2500.00,\n  \"updatedAt\": \"2024-01-13T12:00:00Z\"\n}"
-            }
-          ]
-        },
-        {
-          "name": "Get Wallet Details with Transactions",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{BASE_URL}}/admin/wallet/details?page=1&limit=10",
-              "host": ["{{BASE_URL}}"],
-              "path": ["admin", "wallet", "details"],
-              "query": [
-                {
-                  "key": "page",
-                  "value": "1",
-                  "description": "Page number"
-                },
-                {
-                  "key": "limit",
-                  "value": "10",
-                  "description": "Transactions per page (1-1000)"
-                }
-              ]
-            },
-            "description": "Get wallet balance with transaction history (paginated)"
-          },
-          "response": [
-            {
-              "name": "Success",
-              "originalRequest": {
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{BASE_URL}}/admin/wallet/details?page=1&limit=10",
-                  "host": ["{{BASE_URL}}"],
-                  "path": ["admin", "wallet", "details"],
-                  "query": [
-                    { "key": "page", "value": "1" },
-                    { "key": "limit", "value": "10" }
-                  ]
-                }
-              },
-              "status": "OK",
-              "code": 200,
-              "_postman_previewlanguage": "json",
-              "header": [],
-              "body": "{\n  \"balance\": 2500.00,\n  \"updatedAt\": \"2024-01-13T12:00:00Z\",\n  \"transactions\": {\n    \"data\": [\n      {\n        \"_id\": \"txn1\",\n        \"orderId\": \"order123\",\n        \"amount\": 29.99,\n        \"type\": \"credit\",\n        \"description\": \"Payment received for order order123\",\n        \"createdAt\": \"2024-01-13T12:00:00Z\"\n      },\n      {\n        \"_id\": \"txn2\",\n        \"orderId\": \"order124\",\n        \"amount\": 45.50,\n        \"type\": \"debit\",\n        \"description\": \"Order order124 delivered unpaid (credit)\",\n        \"createdAt\": \"2024-01-13T11:00:00Z\"\n      }\n    ],\n    \"totalCount\": 500,\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 50\n  }\n}"
-            }
-          ]
-        }
-      ],
-      "description": "Cafeteria wallet and transaction ledger"
-    }
-  ],
-  "variable": [
-    {
-      "key": "BASE_URL",
-      "value": "http://localhost:3001/api/v1",
-      "type": "string"
-    },
-    {
-      "key": "ADMIN_SESSION_TOKEN",
-      "value": "YOUR_ADMIN_SESSION_TOKEN",
-      "type": "string",
-      "description": "Session token for user with admin role"
-    },
-    {
-      "key": "USER_ID",
-      "value": "REPLACE_WITH_USER_ID",
-      "type": "string"
-    },
-    {
-      "key": "ORDER_ID",
-      "value": "REPLACE_WITH_ORDER_ID",
-      "type": "string"
-    }
-  ]
+	"info": {
+		"name": "CIC Backend - Admin Dashboard API",
+		"description": "Admin-only endpoints for dashboard, wallet, and order management",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "0"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{ADMIN_SESSION_TOKEN}}",
+				"type": "string"
+			}
+		]
+	},
+	"item": [
+		{
+			"name": "Dashboard Analytics",
+			"item": [
+				{
+					"name": "Get Dashboard Analytics",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/analytics",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "analytics"]
+						},
+						"description": "Get dashboard summary: active orders, total orders, total revenue, pending revenue"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/admin/analytics",
+									"host": ["{{BASE_URL}}"],
+									"path": ["admin", "analytics"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"body": "{\n  \"activeOrders\": 5,\n  \"totalOrders\": 150,\n  \"totalRevenue\": 4500.00,\n  \"pendingRevenue\": 350.00\n}"
+						}
+					]
+				}
+			],
+			"description": "Dashboard analytics endpoints"
+		},
+		{
+			"name": "Order Management",
+			"item": [
+				{
+					"name": "Get All Orders (No Filter)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders?page=1&limit=10",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number (default: 1)"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Items per page (1-1000, default: 10)"
+								}
+							]
+						},
+						"description": "Get all orders with pagination (no filters)"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/admin/orders?page=1&limit=10",
+									"host": ["{{BASE_URL}}"],
+									"path": ["admin", "orders"],
+									"query": [
+										{ "key": "page", "value": "1" },
+										{ "key": "limit", "value": "10" }
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"body": "{\n  \"data\": [\n    {\n      \"_id\": \"order1\",\n      \"userId\": \"user123\",\n      \"userEmail\": \"user@example.com\",\n      \"itemIds\": [\"item1\", \"item2\"],\n      \"total\": 29.99,\n      \"deliveryLocation\": \"123 Main St\",\n      \"status\": \"pending\",\n      \"paymentStatus\": \"unpaid\",\n      \"createdAt\": \"2024-01-13T12:00:00Z\",\n      \"updatedAt\": \"2024-01-13T12:00:00Z\"\n    }\n  ],\n  \"totalCount\": 150,\n  \"page\": 1,\n  \"limit\": 10,\n  \"totalPages\": 15\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Orders by User ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders?page=1&limit=10&userId={{USER_ID}}",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{
+									"key": "userId",
+									"value": "{{USER_ID}}",
+									"description": "Filter by specific user"
+								}
+							]
+						},
+						"description": "Get all orders for a specific user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Unpaid Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders?page=1&limit=10&paymentStatus=unpaid",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{
+									"key": "paymentStatus",
+									"value": "unpaid",
+									"description": "Filter by payment status: paid | unpaid"
+								}
+							]
+						},
+						"description": "Get all unpaid orders"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Orders",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders?page=1&limit=10&status=pending",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "10" },
+								{
+									"key": "status",
+									"value": "pending",
+									"description": "Filter by status: pending | completed | cancelled"
+								}
+							]
+						},
+						"description": "Get all pending orders"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Orders (Combined Filters)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders?page=1&limit=100&userId={{USER_ID}}&paymentStatus=unpaid&status=pending",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders"],
+							"query": [
+								{ "key": "page", "value": "1" },
+								{ "key": "limit", "value": "100" },
+								{ "key": "userId", "value": "{{USER_ID}}" },
+								{ "key": "paymentStatus", "value": "unpaid" },
+								{ "key": "status", "value": "pending" }
+							]
+						},
+						"description": "Get orders with multiple filters combined"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order - Mark Completed & Paid",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"completed\",\n  \"paymentStatus\": \"paid\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders/:id",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{ORDER_ID}}",
+									"description": "Order ID to update"
+								}
+							]
+						},
+						"description": "Update order status and payment status (both delivered and paid)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order - Delivered Unpaid (Credit)",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"completed\",\n  \"paymentStatus\": \"unpaid\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders/:id",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{ORDER_ID}}"
+								}
+							]
+						},
+						"description": "Mark order as delivered but unpaid (customer owes money - credit)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order - Mark Paid Only",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"paymentStatus\": \"paid\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders/:id",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{ORDER_ID}}"
+								}
+							]
+						},
+						"description": "Update only payment status (e.g., customer paid for previously unpaid order)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Order - Cancel",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"status\": \"cancelled\"\n}"
+						},
+						"url": {
+							"raw": "{{BASE_URL}}/admin/orders/:id",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "orders", ":id"],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{ORDER_ID}}"
+								}
+							]
+						},
+						"description": "Cancel an order"
+					},
+					"response": []
+				}
+			],
+			"description": "Admin order management with pagination and filters"
+		},
+		{
+			"name": "Wallet Management",
+			"item": [
+				{
+					"name": "Get Wallet Balance",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/wallet",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "wallet"]
+						},
+						"description": "Get cafeteria wallet balance only (fast query)"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/admin/wallet",
+									"host": ["{{BASE_URL}}"],
+									"path": ["admin", "wallet"]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"body": "{\n  \"balance\": 2500.00,\n  \"updatedAt\": \"2024-01-13T12:00:00Z\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get Wallet Details with Transactions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}/admin/wallet/details?page=1&limit=10",
+							"host": ["{{BASE_URL}}"],
+							"path": ["admin", "wallet", "details"],
+							"query": [
+								{
+									"key": "page",
+									"value": "1",
+									"description": "Page number"
+								},
+								{
+									"key": "limit",
+									"value": "10",
+									"description": "Transactions per page (1-1000)"
+								}
+							]
+						},
+						"description": "Get wallet balance with transaction history (paginated)"
+					},
+					"response": [
+						{
+							"name": "Success",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{BASE_URL}}/admin/wallet/details?page=1&limit=10",
+									"host": ["{{BASE_URL}}"],
+									"path": ["admin", "wallet", "details"],
+									"query": [
+										{ "key": "page", "value": "1" },
+										{ "key": "limit", "value": "10" }
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"body": "{\n  \"balance\": 2500.00,\n  \"updatedAt\": \"2024-01-13T12:00:00Z\",\n  \"transactions\": {\n    \"data\": [\n      {\n        \"_id\": \"txn1\",\n        \"orderId\": \"order123\",\n        \"amount\": 29.99,\n        \"type\": \"credit\",\n        \"description\": \"Payment received for order order123\",\n        \"createdAt\": \"2024-01-13T12:00:00Z\"\n      },\n      {\n        \"_id\": \"txn2\",\n        \"orderId\": \"order124\",\n        \"amount\": 45.50,\n        \"type\": \"debit\",\n        \"description\": \"Order order124 delivered unpaid (credit)\",\n        \"createdAt\": \"2024-01-13T11:00:00Z\"\n      }\n    ],\n    \"totalCount\": 500,\n    \"page\": 1,\n    \"limit\": 10,\n    \"totalPages\": 50\n  }\n}"
+						}
+					]
+				}
+			],
+			"description": "Cafeteria wallet and transaction ledger"
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "http://localhost:3001/api/v1",
+			"type": "string"
+		},
+		{
+			"key": "ADMIN_SESSION_TOKEN",
+			"value": "YOUR_ADMIN_SESSION_TOKEN",
+			"type": "string",
+			"description": "Session token for user with admin role"
+		},
+		{
+			"key": "USER_ID",
+			"value": "REPLACE_WITH_USER_ID",
+			"type": "string"
+		},
+		{
+			"key": "ORDER_ID",
+			"value": "REPLACE_WITH_ORDER_ID",
+			"type": "string"
+		}
+	]
 }

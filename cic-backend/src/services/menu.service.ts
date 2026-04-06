@@ -6,22 +6,22 @@
 import { menuRepository } from "@/repositories/menu.repository";
 
 export const menuService = {
-  async getAllMenuItems() {
-    const items = await menuRepository.findAll();
+	async getAllMenuItems() {
+		const items = await menuRepository.findAll();
 
-    return items.map((item: any) => ({
-      ...item,
-      in_stock: item?.in_stock !== false,
-    }));
-  },
+		return items.map((item: any) => ({
+			...item,
+			in_stock: item?.in_stock !== false,
+		}));
+	},
 
-  async updateItemStock(itemId: string, inStock: boolean) {
-    const updated = await menuRepository.updateItemStock(itemId, inStock);
+	async updateItemStock(itemId: string, inStock: boolean) {
+		const updated = await menuRepository.updateItemStock(itemId, inStock);
 
-    if (!updated) {
-      throw new Error("Menu item not found");
-    }
+		if (!updated) {
+			throw new Error("Menu item not found");
+		}
 
-    return updated;
-  },
+		return updated;
+	},
 };

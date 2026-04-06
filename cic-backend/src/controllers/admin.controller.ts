@@ -2,33 +2,51 @@
  * Controller Layer - Admin Order Management HTTP Handler
  * Parse HTTP input → Call service → Return HTTP response
  */
-import { Request, Response, NextFunction } from "express";
+import type { Request, Response, NextFunction } from "express";
 import { orderService } from "@/services/order.service";
 import { OrderStatus, PaymentStatus } from "@/types/order.types";
 import { handleServiceError } from "@/middlewares/serviceErrorHandler.middleware";
+
+interface Pagination {
+	page: number;
+	limit: number;
+}
+
+interface OrderFilters {
+	userId?: string;
+	paymentStatus?: PaymentStatus;
+	status?: OrderStatus;
+}
+
+interface RequestWithPagination extends Request {
+	pagination?: Pagination;
+	filters?: OrderFilters;
+}
 
 /**
  * Get all orders with filters and pagination
  * GET /admin/orders?page=1&limit=10&userId=&paymentStatus=&status=
  */
 export const getAllOrders = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input (validated and parsed by middleware)
-    const { page, limit } = (req as any).pagination;
-    const filters = (req as any).filters;
+	try {
+		const reqWithPagination = req as RequestWithPagination;
+		if (!reqWithPagination.pagination || !reqWithPagination.filters) {
+			res.status(400).json({ message: "Missing pagination or filters" });
+			return;
+		}
+		const { page, limit } = reqWithPagination.pagination;
+		const filters = reqWithPagination.filters;
 
-    // Call service
-    const result = await orderService.getAllOrders(filters, page, limit);
+		const result = await orderService.getAllOrders(filters, page, limit);
 
-    // Return response
-    res.json(result);
-  } catch (err) {
-    next(err);
-  }
+		res.json(result);
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -36,34 +54,30 @@ export const getAllOrders = async (
  * PATCH /admin/orders/:id
  */
 export const updateOrder = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input
-    const orderId = req.params.id as string;
-    const { status, paymentStatus } = req.body;
+	try {
+		const orderId = req.params.id as string;
+		const { status, paymentStatus } = req.body;
 
-    // Build updates object
-    const updates: any = {};
-    if (status !== undefined) {
-      updates.status = status as OrderStatus;
-    }
-    if (paymentStatus !== undefined) {
-      updates.paymentStatus = paymentStatus as PaymentStatus;
-    }
+		const updates: { status?: OrderStatus; paymentStatus?: PaymentStatus } = {};
+		if (status !== undefined) {
+			updates.status = status as OrderStatus;
+		}
+		if (paymentStatus !== undefined) {
+			updates.paymentStatus = paymentStatus as PaymentStatus;
+		}
 
-    // Call service
-    const order = await orderService.updateOrderByAdmin(orderId, updates);
+		const order = await orderService.updateOrderByAdmin(orderId, updates);
 
-    // Return response
-    res.json(order);
-  } catch (err) {
-    try {
-      handleServiceError(err, res);
-    } catch (unhandledErr) {
-      next(unhandledErr);
-    }
-  }
+		res.json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
 };

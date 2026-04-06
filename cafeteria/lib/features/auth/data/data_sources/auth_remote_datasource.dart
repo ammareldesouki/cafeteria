@@ -8,6 +8,8 @@ abstract class AuthRemoteDataSource {
   Future<AuthResponseModel> signUpWithEmail({
     required String email,
     required String password,
+    required String phoneNumber,
+    required String gender,
   });
   Future<AuthResponseModel> signIn({
     required String email,
@@ -26,13 +28,16 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
 
   @override
   Future<AuthResponseModel> signUpWithEmail({
+
     required String email,
     required String password,
+    required String phoneNumber,
+    required String gender,
   }) async {
     try {
       final response = await _dioHandler.dio.post(
         EndPoints.signUp,
-        data: {'email': email, 'password': password},
+        data: {'email': email, 'password': password, 'phoneNumber': phoneNumber, 'gender': gender},
       );
       final model = AuthResponseModel.fromMap(response.data);
 

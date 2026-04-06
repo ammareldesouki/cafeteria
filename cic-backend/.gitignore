@@ -59,11 +59,3 @@ ecosystem.config.js.bak
 
 # TypeScript
 *.tsbuildinfo
-
-
-#env
-# Environment variables
-.env
-.env.local
-.env.development
-.env.production

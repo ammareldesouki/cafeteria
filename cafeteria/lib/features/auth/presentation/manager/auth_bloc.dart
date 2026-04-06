@@ -62,6 +62,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final result = await _signUpWithEmail(
       email: event.email,
       password: event.password,
+      phoneNumber: event.phoneNumber,
+      gender: event.gender,
     );
     result.fold(
       (failure) => emit(AuthFailureState(

@@ -5,13 +5,13 @@
 import { Router } from "express";
 import { requireAuth } from "@/middlewares/auth/requireAuth.middleware";
 import {
-  validateItemIdBody,
-  validateItemIdParam,
+	validateItemIdBody,
+	validateItemIdParam,
 } from "@/middlewares/validation";
 import {
-  addFavorite,
-  getFavorites,
-  removeFavorite,
+	addFavorite,
+	getFavorites,
+	removeFavorite,
 } from "@/controllers/favorite.controller";
 
 const router = Router();
@@ -20,10 +20,10 @@ const router = Router();
 router.post("/favorites", requireAuth, validateItemIdBody, addFavorite);
 router.get("/favorites", requireAuth, getFavorites);
 router.delete(
-  "/favorites/:itemId",
-  requireAuth,
-  validateItemIdParam,
-  removeFavorite,
+	"/favorites/:itemId",
+	requireAuth,
+	validateItemIdParam,
+	removeFavorite,
 );
 
 export default router;

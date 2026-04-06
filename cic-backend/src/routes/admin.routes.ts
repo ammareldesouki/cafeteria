@@ -5,9 +5,9 @@
 import { Router } from "express";
 import { requireAdmin } from "@/middlewares/auth/requireAdmin.middleware";
 import {
-  validatePagination,
-  validateOrderFilters,
-  validateAdminOrderUpdate,
+	validatePagination,
+	validateOrderFilters,
+	validateAdminOrderUpdate,
 } from "@/middlewares/validation";
 import { getAllOrders, updateOrder } from "@/controllers/admin.controller";
 import walletRoutes from "./wallet.routes";
@@ -17,13 +17,18 @@ const router = Router();
 
 // Admin order management
 router.get(
-  "/orders",
-  requireAdmin,
-  validatePagination,
-  validateOrderFilters,
-  getAllOrders,
+	"/orders",
+	requireAdmin,
+	validatePagination,
+	validateOrderFilters,
+	getAllOrders,
 );
-router.patch("/orders/:id", requireAdmin, validateAdminOrderUpdate, updateOrder);
+router.patch(
+	"/orders/:id",
+	requireAdmin,
+	validateAdminOrderUpdate,
+	updateOrder,
+);
 
 // Mount sub-routes
 router.use(walletRoutes);

@@ -20,13 +20,18 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Either<Failure, AuthResponseEntity>> signUpWithEmail({
+
     required String email,
     required String password,
+    required String phoneNumber,
+    required String gender,
   }) async {
     try {
       final result = await _remote.signUpWithEmail(
         email: email,
         password: password,
+        phoneNumber: phoneNumber,
+        gender: gender,
       );
       await _persistSession(result);
       return Right(result);

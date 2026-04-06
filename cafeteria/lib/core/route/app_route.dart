@@ -1,5 +1,5 @@
 import 'package:cafeteria/core/route/route_name.dart';
-import 'package:cafeteria/features/home/presentation/pages/catefory_page.dart';
+import 'package:cafeteria/features/home/presentation/pages/category_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -8,7 +8,10 @@ import '../../features/auth/presentation/manager/auth_bloc.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/role_selection_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
+import '../../features/favourite/presentation/manager/favourite_bloc.dart';
 import '../../features/home/presentation/manager/home_bloc.dart';
+import '../../features/cart/presentation/manager/cart_bloc.dart';
+import '../../features/cart/presentation/manager/cart_event.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/layout/bottom_navegation_bar.dart';
 import '../../features/splash/loading_page.dart';
@@ -46,7 +49,16 @@ class AppRouter {
     ),
   );
       case RouteNames.category:
-        return _buildRoute(const CategoryPage(), settings);
+        return _buildRoute(
+          MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: sl<FavouriteBloc>()),
+              BlocProvider.value(value: sl<CartBloc>()),
+            ],
+            child: const CategoryPage(),
+          ),
+          settings,
+        );
         case RouteNames.layout
         :return _buildRoute(const CBottomNavigationBar( role: 'user', userName: '', userId: '',), settings);
 

@@ -1,67 +1,171 @@
-import { z } from "zod";
-import type { Request, Response, NextFunction } from "express";
+ /**
+ * Validation Middleware - Cart Input Validation
+ * Validates request data before reaching controllers
+ */
+import { Request, Response, NextFunction } from "express";
 
-const mongoIdRegex = /^[a-f\d]{24}$/i;
+export const validateAddCartItem = (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	let { menuItemId, variantName, quantity, note } = req.body || {};
 
-const addItemSchema = z.object({
-  menuItemId: z.string().regex(mongoIdRegex, "Invalid menuItemId"),
-  quantity: z.coerce
-    .number()
-    .int("quantity must be an integer")
-    .min(1, "quantity must be at least 1")
-    .max(99, "quantity cannot exceed 99"),
-  // Required only when the item hasVariants: true — enforced in the service layer
-  // since we need to check the DB to know if variants are required
-  variantName: z.string().min(1, "variantName cannot be empty").optional(),
-  notes: z.string().max(200).optional(),
-});
+	if (variantName === null) {
+		variantName = undefined;
+		req.body.variantName = undefined;
+	} else if (typeof variantName === "string") {
+		variantName = variantName.trim() === "" ? undefined : variantName.trim();
+		req.body.variantName = variantName;
+	}
 
-const updateItemSchema = z.object({
-  quantity: z.coerce
-    .number()
-    .int("quantity must be an integer")
-    .min(1, "quantity must be at least 1")
-    .max(99, "quantity cannot exceed 99"),
-  notes: z.string().max(200).optional(),
-});
+	if (note === null) {
+		note = undefined;
+		req.body.note = undefined;
+	} else if (typeof note === "string") {
+		note = note.trim() === "" ? undefined : note.trim();
+		req.body.note = note;
+	}
 
-const menuItemIdParamSchema = z.object({
-  menuItemId: z.string().regex(mongoIdRegex, "Invalid menuItemId"),
-});
+	if (!menuItemId || typeof menuItemId !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "menuItemId is required and must be a string",
+		});
+	}
 
-function validateBody<T extends z.ZodTypeAny>(schema: T) {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const result = schema.safeParse(req.body);
-    if (!result.success) {
-      res.status(400).json({
-        success: false,
-        message: "Validation error",
-        errors: result.error.flatten().fieldErrors,
-      });
-      return;
-    }
-    req.body = result.data;
-    next();
-  };
-}
+	if (variantName !== undefined && typeof variantName !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "variantName must be a string if provided",
+		});
+	}
 
-function validateParams<T extends z.ZodTypeAny>(schema: T) {
-  return (req: Request, res: Response, next: NextFunction): void => {
-    const result = schema.safeParse(req.params);
-    if (!result.success) {
-      res.status(400).json({
-        success: false,
-        message: "Invalid parameter",
-        errors: result.error.flatten().fieldErrors,
-      });
-      return;
-    }
-    next();
-  };
-}
+	if (note !== undefined && typeof note !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "note must be a string if provided",
+		});
+	}
 
-export const cartValidation = {
-  addItem: validateBody(addItemSchema),
-  updateItem: validateBody(updateItemSchema),
-  menuItemIdParam: validateParams(menuItemIdParamSchema),
+	if (quantity === undefined || typeof quantity !== "number") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "quantity is required and must be a number",
+		});
+	}
+
+	if (!Number.isInteger(quantity) || quantity <= 0) {
+		return res.status(400).json({
+			error: "INVALID_QUANTITY",
+			message: "quantity must be a positive integer",
+		});
+	}
+
+	next();
+};
+
+export const validateUpdateCartItem = (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	const { itemId } = req.params || {};
+	let { variantName, quantity, note } = req.body || {};
+
+	if (variantName === null) {
+		variantName = undefined;
+		req.body.variantName = undefined;
+	} else if (typeof variantName === "string") {
+		variantName = variantName.trim() === "" ? undefined : variantName.trim();
+		req.body.variantName = variantName;
+	}
+
+	if (note === null) {
+		note = undefined;
+		req.body.note = undefined;
+	} else if (typeof note === "string") {
+		note = note.trim() === "" ? undefined : note.trim();
+		req.body.note = note;
+	}
+
+	if (!itemId || typeof itemId !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "itemId parameter is required and must be a string",
+		});
+	}
+
+	if (variantName !== undefined && typeof variantName !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "variantName must be a string if provided",
+		});
+	}
+
+	if (note !== undefined && typeof note !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "note must be a string if provided",
+		});
+	}
+
+	if (quantity === undefined || typeof quantity !== "number") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "quantity is required and must be a number",
+		});
+	}
+
+	if (!Number.isInteger(quantity) || quantity <= 0) {
+		return res.status(400).json({
+			error: "INVALID_QUANTITY",
+			message: "quantity must be a positive integer",
+		});
+	}
+
+	next();
+};
+
+export const validateRemoveCartItem = (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	const { itemId } = req.params || {};
+	let variantName = req.query.variantName as string | undefined;
+	let note = req.query.note as string | undefined;
+
+	if (typeof variantName === "string") {
+		variantName = variantName.trim() === "" ? undefined : variantName.trim();
+		req.query.variantName = variantName;
+	}
+
+	if (typeof note === "string") {
+		note = note.trim() === "" ? undefined : note.trim();
+		req.query.note = note;
+	}
+
+	if (!itemId || typeof itemId !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "itemId parameter is required and must be a string",
+		});
+	}
+
+	if (variantName !== undefined && typeof variantName !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "variantName must be a string if provided",
+		});
+	}
+
+	if (note !== undefined && typeof note !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "note must be a string if provided",
+		});
+	}
+
+	next();
 };

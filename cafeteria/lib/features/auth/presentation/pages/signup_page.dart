@@ -1,4 +1,5 @@
 import 'package:cafeteria/core/route/route_name.dart';
+import 'package:cafeteria/core/utils/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -14,10 +15,12 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
+  String _selectedGender = 'male'; // default
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
+  final _phoneNumberController = TextEditingController();
 
   @override
   void dispose() {
@@ -33,6 +36,10 @@ class _SignupPageState extends State<SignupPage> {
             SignUpWithEmailEvent(
               email: _emailController.text,
               password: _passwordController.text,
+              phoneNumber: _phoneNumberController.text,
+              gender: _selectedGender,
+
+
             ),
           );
     }
@@ -53,7 +60,7 @@ class _SignupPageState extends State<SignupPage> {
         if (state is AuthSuccess) {
           Navigator.pushReplacementNamed(
   context,
-  '/home',
+  RouteNames.layout,
   arguments: {
     'userName': state.response.user.name.isNotEmpty
         ? state.response.user.name
@@ -163,6 +170,102 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 24),
 
+
+                      AppTextField(
+                        label: 'Phone Number',
+                        controller:_phoneNumberController,
+                        isPassword: true,
+                        validator: Validator.validatePhoneNumber
+                      ),
+                      const SizedBox(height: 16),
+
+                      Text(
+                        'Gender',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedGender = 'male';
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _selectedGender == 'male'
+                                        ? const Color(0xFF3B1A08)
+                                        : Colors.grey.shade300,
+                                    width: 1.5,
+                                  ),
+                                  color: _selectedGender == 'male'
+                                      ? const Color(0xFF3B1A08).withOpacity(0.05)
+                                      : Colors.white,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Male',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: _selectedGender == 'male'
+                                          ? const Color(0xFF3B1A08)
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedGender = 'female';
+                                });
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(
+                                    color: _selectedGender == 'female'
+                                        ? const Color(0xFF3B1A08)
+                                        : Colors.grey.shade300,
+                                    width: 1.5,
+                                  ),
+                                  color: _selectedGender == 'female'
+                                      ? const Color(0xFF3B1A08).withOpacity(0.05)
+                                      : Colors.white,
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'Female',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w500,
+                                      color: _selectedGender == 'female'
+                                          ? const Color(0xFF3B1A08)
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 12),
                       // ── Sign Up button ─────────────────────────────────
                       PrimaryButton(
                         label: 'Sign Up',

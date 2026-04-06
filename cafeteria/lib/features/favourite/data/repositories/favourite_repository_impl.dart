@@ -1,6 +1,6 @@
 import '../../domain/entities/favourite_entity.dart';
 import '../../domain/repositories/favourite_repository.dart';
-import '../datasources/favourite_remote_datasource.dart';
+import '../data_sources/favourite_remote_datasource.dart';
 
 class FavouriteRepositoryImpl implements FavouriteRepository {
   final FavouriteRemoteDataSource remoteDataSource;

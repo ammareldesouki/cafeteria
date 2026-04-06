@@ -47,8 +47,19 @@ class _SignInPageState extends State<SignInPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
-          // Navigate to home / dashboard after successful sign-up
-          Navigator.pushReplacementNamed(context, RouteNames.layout);
+
+          Navigator.pushReplacementNamed(
+            context,
+            RouteNames.layout,
+            arguments: {
+              'userName': state.response.user.name.isNotEmpty
+                  ? state.response.user.name
+                  : state.response.user.email.split('@').first,
+              'userId': state.response.user.id,
+            },
+          );
+
+
         } else if (state is AuthFailureState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -109,15 +120,7 @@ class _SignInPageState extends State<SignInPage> {
                         hint: 'you@example.com',
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return 'Email is required';
-                          }
-                          if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
-                            return 'Enter a valid email';
-                          }
-                          return null;
-                        },
+
                       ),
                       const SizedBox(height: 16),
 

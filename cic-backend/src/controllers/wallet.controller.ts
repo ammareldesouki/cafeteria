@@ -10,22 +10,22 @@ import { walletService } from "@/services/wallet.service";
  * GET /admin/wallet
  */
 export const getWalletBalance = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Call service
-    const wallet = await walletService.getWalletBalance();
+	try {
+		// Call service
+		const wallet = await walletService.getWalletBalance();
 
-    // Return response
-    res.json({
-      balance: wallet.balance,
-      updatedAt: wallet.updatedAt,
-    });
-  } catch (err) {
-    next(err);
-  }
+		// Return response
+		res.json({
+			balance: wallet.balance,
+			updatedAt: wallet.updatedAt,
+		});
+	} catch (err) {
+		next(err);
+	}
 };
 
 /**
@@ -33,20 +33,20 @@ export const getWalletBalance = async (
  * GET /admin/wallet/details?page=1&limit=10
  */
 export const getWalletDetails = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  try {
-    // Parse input (validated and parsed by middleware)
-    const { page, limit } = (req as any).pagination;
+	try {
+		// Parse input (validated and parsed by middleware)
+		const { page, limit } = (req as any).pagination;
 
-    // Call service
-    const details = await walletService.getWalletDetails(page, limit);
+		// Call service
+		const details = await walletService.getWalletDetails(page, limit);
 
-    // Return response
-    res.json(details);
-  } catch (err) {
-    next(err);
-  }
+		// Return response
+		res.json(details);
+	} catch (err) {
+		next(err);
+	}
 };

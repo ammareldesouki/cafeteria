@@ -6,3 +6,4 @@ export * from "./order.validation";
 export * from "./user.validation";
 export * from "./favorite.validation";
 export * from "./wallet.validation";
+export * from "./cart.validation";

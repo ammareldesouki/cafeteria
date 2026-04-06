@@ -4,21 +4,21 @@ import { connectDB } from "@config/db";
 import { PORT } from "@config/env";
 
 const start = async () => {
-  await connectDB();
+	await connectDB();
 
-  const server = app.listen(PORT || 3001, () => {
-    console.log(`🚀 Server running on port ${PORT || 3001}`);
-  });
+	const server = app.listen(PORT || 3001, () => {
+		console.log(`🚀 Server running on port ${PORT || 3001}`);
+	});
 
-  ["SIGINT", "SIGTERM"].forEach((signal) => {
-    process.on(signal, () => {
-      console.log(`Received ${signal}, closing server...`);
-      server.close(() => process.exit(0));
-    });
-  });
+	["SIGINT", "SIGTERM"].forEach((signal) => {
+		process.on(signal, () => {
+			console.log(`Received ${signal}, closing server...`);
+			server.close(() => process.exit(0));
+		});
+	});
 };
 
 start().catch((err) => {
-  console.error("❌ Server startup error:", err);
-  process.exit(1);
+	console.error("❌ Server startup error:", err);
+	process.exit(1);
 });

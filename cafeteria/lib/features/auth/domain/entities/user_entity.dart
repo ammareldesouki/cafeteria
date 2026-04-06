@@ -8,6 +8,9 @@ class UserEntity extends Equatable {
   final String role;
   final String createdAt;
   final String updatedAt;
+  final String phoneNumber;
+  final String gender;
+
 
   const UserEntity({
     required this.id,
@@ -17,6 +20,8 @@ class UserEntity extends Equatable {
     required this.role,
     required this.createdAt,
     required this.updatedAt,
+    required this.phoneNumber,
+    required this.gender,
   });
 
   @override

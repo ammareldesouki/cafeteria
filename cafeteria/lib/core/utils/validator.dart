@@ -74,12 +74,9 @@ class Validator {
     }
 
     final String phone = val.trim();
-
-    final RegExp canadaRegex = RegExp(r'^\+1[2-9][0-9]{9}$');
-    final RegExp ukRegex = RegExp(r'^\+44[1-9][0-9]{9}$');
-
-    if (!canadaRegex.hasMatch(phone) && !ukRegex.hasMatch(phone)) {
-      return 'Enter a valid Canadian (+1XXXXXXXXXX) or UK (+44XXXXXXXXXX) phone number';
+    final RegExp egyptRegex = RegExp(r'^(?:\+20|0)(10|11|12|15)[0-9]{8}$');
+    if (!egyptRegex.hasMatch(phone)) {
+      return 'Enter a valid Egypt  (e.g. +20123456789) phone number';
     }
 
     return null;

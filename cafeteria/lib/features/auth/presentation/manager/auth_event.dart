@@ -10,8 +10,11 @@ abstract class AuthEvent extends Equatable {
 class SignUpWithEmailEvent extends AuthEvent {
   final String email;
   final String password;
+  final String phoneNumber;
+  final String gender;
 
-  const SignUpWithEmailEvent({required this.email, required this.password});
+
+  const SignUpWithEmailEvent({required this.email, required this.password, required this.phoneNumber, required this.gender});
 
   @override
   List<Object?> get props => [email, password];

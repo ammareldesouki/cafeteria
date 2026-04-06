@@ -7,6 +7,7 @@ import favoriteRoutes from "./favorite.routes";
 import orderRoutes from "./order.routes";
 import adminRoutes from "./admin.routes";
 import cafeteriaRoutes from "./cafeteria.routes";
+import cartRoute from "./cart.route";
 
 const router = Router();
 
@@ -18,5 +19,6 @@ router.use(favoriteRoutes);
 router.use(orderRoutes);
 router.use("/admin", adminRoutes);
 router.use(cafeteriaRoutes);
+router.use("/cart", cartRoute);
 
 export default router;

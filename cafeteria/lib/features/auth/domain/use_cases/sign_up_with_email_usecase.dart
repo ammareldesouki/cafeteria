@@ -11,7 +11,9 @@ class SignUpWithEmailUseCase {
   Future<Either<Failure, AuthResponseEntity>> call({
     required String email,
     required String password,
+    required String phoneNumber,
+    required String gender,
   }) {
-    return _repository.signUpWithEmail(email: email, password: password);
+    return _repository.signUpWithEmail(email: email, password: password, phoneNumber: phoneNumber, gender: gender);
   }
 }

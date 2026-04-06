@@ -3,7 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/constants/colors.dart';
 import '../auth/di/injaction.dart';
+import '../cart/presentation/manager/cart_bloc.dart';
+import '../cart/presentation/manager/cart_event.dart';
 import '../cart/presentation/pages/cart_page.dart';
+import '../favourite/presentation/manager/favourite_bloc.dart';
+import '../favourite/presentation/manager/favourite_event.dart';
 import '../favourite/presentation/pages/favorite_screen.dart';
 import '../home/presentation/manager/home_bloc.dart';
 import '../home/presentation/pages/home_page.dart';
@@ -40,9 +44,15 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
   Widget _buildUserLayout() {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => sl<HomeBloc>()..add(const FetchMenuEvent()),
+        BlocProvider.value(
+          value: sl<HomeBloc>()..add(const FetchMenuEvent()),
         ),
+        BlocProvider.value(
+          value: sl<FavouriteBloc>()..add(GetFavouritesEvent()),
+        ),
+        BlocProvider.value(
+          value: sl<CartBloc>()..add(GetCartEvent())),
+
       ],
       child: Scaffold(
         backgroundColor: const Color(0xFFF8F4F0),
@@ -53,7 +63,7 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
               userName: widget.userName,
               userId: widget.userId,
             ),
-            const FavouritePage(),
+            const FavPage(),
             const CartPage(),
             const OrderPage(),
           ],

@@ -7,32 +7,32 @@ import { Request, Response, NextFunction } from "express";
  * Validate itemId in request body
  */
 export const validateItemIdBody = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  const { itemId } = req.body;
+	const { itemId } = req.body;
 
-  if (!itemId || typeof itemId !== "string") {
-    return res.status(400).json({ message: "Invalid itemId" });
-  }
+	if (!itemId || typeof itemId !== "string") {
+		return res.status(400).json({ message: "Invalid itemId" });
+	}
 
-  next();
+	next();
 };
 
 /**
  * Validate itemId in request params
  */
 export const validateItemIdParam = (
-  req: Request,
-  res: Response,
-  next: NextFunction,
+	req: Request,
+	res: Response,
+	next: NextFunction,
 ) => {
-  const { itemId } = req.params;
+	const { itemId } = req.params;
 
-  if (!itemId || typeof itemId !== "string") {
-    return res.status(400).json({ message: "Invalid itemId" });
-  }
+	if (!itemId || typeof itemId !== "string") {
+		return res.status(400).json({ message: "Invalid itemId" });
+	}
 
-  next();
+	next();
 };

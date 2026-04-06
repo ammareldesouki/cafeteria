@@ -1,5 +1,5 @@
-import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'package:cafeteria/core/network/dio_handler.dart';
+import 'package:dio/dio.dart';
 import '../models/favourite_model.dart';
 
 abstract class FavouriteRemoteDataSource {
@@ -9,60 +9,32 @@ abstract class FavouriteRemoteDataSource {
 }
 
 class FavouriteRemoteDataSourceImpl implements FavouriteRemoteDataSource {
-  final http.Client client;
-  final String baseUrl;
-  final String token; // pass your auth token here
+  final NetworkDioHandler _dioHandler; // inject the same Dio instance your app already uses
 
-  FavouriteRemoteDataSourceImpl({
-    required this.client,
-    required this.baseUrl,
-    required this.token,
-  });
-
-  Map<String, String> get _headers => {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer $token',
-      };
+  FavouriteRemoteDataSourceImpl(this._dioHandler);
 
   @override
   Future<List<FavouriteModel>> getFavourites() async {
-    final response = await client.get(
-      Uri.parse('$baseUrl/favorites'),
-      headers: _headers,
-    );
+    final response = await _dioHandler.dio.get('/favorites');
 
-    if (response.statusCode == 200) {
-      final List<dynamic> data = json.decode(response.body) as List<dynamic>;
-      return data
-          .map((e) => FavouriteModel.fromJson(e as Map<String, dynamic>))
-          .toList();
-    } else {
-      throw Exception('Failed to fetch favourites: ${response.statusCode}');
-    }
+    // response.data is already decoded by Dio as List<dynamic>
+    final List<dynamic> data = response.data as List<dynamic>;
+
+    return data
+        .map((e) => FavouriteModel.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
 
   @override
   Future<void> addFavourite(String itemId) async {
-    final response = await client.post(
-      Uri.parse('$baseUrl/favorites'),
-      headers: _headers,
-      body: json.encode({'itemId': itemId}),
+    await _dioHandler.dio.post(
+      '/favorites',
+      data: {'itemId': itemId},
     );
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      throw Exception('Failed to add favourite: ${response.statusCode}');
-    }
   }
 
   @override
   Future<void> removeFavourite(String itemId) async {
-    final response = await client.delete(
-      Uri.parse('$baseUrl/favorites/$itemId'),
-      headers: _headers,
-    );
-
-    if (response.statusCode != 200 && response.statusCode != 204) {
-      throw Exception('Failed to remove favourite: ${response.statusCode}');
-    }
+    await _dioHandler.dio.delete('/favorites/$itemId');
   }
 }

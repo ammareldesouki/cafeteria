@@ -1,5 +1,14 @@
 import 'package:equatable/equatable.dart';
 
+class VariantEntity extends Equatable {
+  final String name;
+
+  const VariantEntity({required this.name});
+
+  @override
+  List<Object?> get props => [name];
+}
+
 class MenuItemEntity extends Equatable {
   final String id;
   final String mongoId;
@@ -9,6 +18,8 @@ class MenuItemEntity extends Equatable {
   final String category;
   final String description;
   final bool inStock;
+  final bool hasVariants;
+  final List<VariantEntity>? variants;
 
   const MenuItemEntity({
     required this.id,
@@ -19,6 +30,8 @@ class MenuItemEntity extends Equatable {
     required this.category,
     required this.description,
     required this.inStock,
+    this.hasVariants = false,
+    this.variants,
   });
 
   @override

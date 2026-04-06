@@ -12,29 +12,36 @@ class FavouriteModel extends FavouriteEntity {
   });
 
   factory FavouriteModel.fromJson(Map<String, dynamic> json) {
-    // The API returns the favourite doc; item details may be nested
-    final item = json['item'] as Map<String, dynamic>? ?? json;
+    // API nests all item details inside the "item" key
+    final item = (json['item'] as Map<String, dynamic>?) ?? {};
 
     return FavouriteModel(
-      id: json['_id'] as String? ?? '',
-      itemId: (json['itemId'] ?? item['_id'] ?? '') as String,
-      name: (item['name'] ?? '') as String,
-      image: (item['image'] ?? '') as String,
-      price: ((item['price'] ?? 0) as num).toDouble(),
-      description: (item['description'] ?? '') as String,
-      category: (item['category'] ?? '') as String,
+      id: _str(json['_id']),
+      itemId: _str(json['itemId']),
+      name: _str(item['name']),
+      image: _str(item['image']),
+      price: (item['price'] as num? ?? 0).toDouble(),
+      description: _str(item['description']),
+      category: _str(item['category']),
     );
   }
 
+  /// Safe string extractor — never throws on unexpected types
+  static String _str(dynamic value) {
+    if (value == null) return '';
+    if (value is String) return value;
+    return value.toString();
+  }
+
   Map<String, dynamic> toJson() => {
-        '_id': id,
-        'itemId': itemId,
-        'item': {
-          'name': name,
-          'image': image,
-          'price': price,
-          'description': description,
-          'category': category,
-        },
-      };
+    '_id': id,
+    'itemId': itemId,
+    'item': {
+      'name': name,
+      'image': image,
+      'price': price,
+      'description': description,
+      'category': category,
+    },
+  };
 }
