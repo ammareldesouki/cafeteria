@@ -18,7 +18,9 @@ export enum PaymentStatus {
 
 export interface OrderItem {
 	menuItemId: ObjectId;
+	menuItemName?: string;
 	variantName?: string;
+	note?: string;
 	quantity: number;
 	unitPrice: number;
 }

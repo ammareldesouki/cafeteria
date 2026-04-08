@@ -22,12 +22,19 @@ import '../data/data_sources/auth_local_datasource.dart';
 import '../data/data_sources/auth_remote_datasource.dart';
 import '../data/repositories/auth_repository_impl.dart';
 import '../domain/repositories/auth_repository.dart';
+import '../domain/use_cases/get_user_profile_usecase.dart';
 import '../domain/use_cases/sign_in_with_email_usesace.dart';
+import '../domain/use_cases/sign_out_usecase.dart';
 import '../domain/use_cases/sign_up_with_email_usecase.dart';
 import '../domain/use_cases/sign_up_with_google_usecase.dart';
 import '../domain/use_cases/sign_up_with_microsoft_usecase.dart';
 import '../presentation/manager/auth_bloc.dart';
 import '../../cart/presentation/manager/cart_bloc.dart';
+import '../../order/data/data_sources/order_remote_datasource.dart';
+import '../../order/data/repositories/order_repository_impl.dart';
+import '../../order/domain/repositories/order_repository.dart';
+import '../../order/domain/use_cases/order_usecases.dart';
+import '../../order/presentation/manager/order_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -43,7 +50,6 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton<AuthRemoteDataSource>(
         () => AuthRemoteDataSourceImpl(sl()),
   );
-
   sl.registerLazySingleton<AuthLocalDataSource>(
         () => AuthLocalDataSourceImpl(sl()),
   );
@@ -58,32 +64,35 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => SignUpWithGoogleUseCase(sl()));
   sl.registerLazySingleton(() => SignUpWithMicrosoftUseCase(sl()));
   sl.registerLazySingleton(() => SignInUseCase(sl()));
+  sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
+  sl.registerLazySingleton(() => SignOutUseCase(sl()));
 
-sl.registerLazySingleton<CartRemoteDataSource>(
-  () => CartRemoteDataSourceImpl(sl()),
-);
-/// ---- Cart Repo ───────────────────────────
+  /// ── Cart DataSource ─────────────────────
+  sl.registerLazySingleton<CartRemoteDataSource>(
+    () => CartRemoteDataSourceImpl(sl()),
+  );
+
+  /// ── Cart Repo ───────────────────────────
   sl.registerLazySingleton<CartRepository>(
         () => CartRepositoryImpl(sl()),
   );
 
-  ///--- Cart dataSource
-  /// ── Favourite DataSource ✅
+  /// ── Favourite DataSource ────────────────
   sl.registerLazySingleton<FavouriteRemoteDataSource>(
-        () => FavouriteRemoteDataSourceImpl( sl()),
+        () => FavouriteRemoteDataSourceImpl(sl()),
   );
 
-  /// ── Favourite Repo ✅
+  /// ── Favourite Repo ──────────────────────
   sl.registerLazySingleton<FavouriteRepository>(
         () => FavouriteRepositoryImpl(sl()),
   );
 
-  /// ── Favourite UseCases ✅
+  /// ── Favourite UseCases ──────────────────
   sl.registerLazySingleton(() => GetFavouritesUseCase(sl()));
   sl.registerLazySingleton(() => AddFavouriteUseCase(sl()));
   sl.registerLazySingleton(() => RemoveFavouriteUseCase(sl()));
 
-  /// ── Favourite Bloc ✅🔥
+  /// ── Favourite Bloc ──────────────────────
   sl.registerLazySingleton(
         () => FavouriteBloc(
       getFavouritesUseCase: sl(),
@@ -91,7 +100,6 @@ sl.registerLazySingleton<CartRemoteDataSource>(
       removeFavouriteUseCase: sl(),
     ),
   );
-
 
   /// ── Home DataSource ─────────────────────
   sl.registerLazySingleton<HomeRemoteDataSource>(
@@ -116,23 +124,48 @@ sl.registerLazySingleton<CartRemoteDataSource>(
       signUpWithEmail: sl(),
       signUpWithGoogle: sl(),
       signUpWithMicrosoft: sl(),
+      getUserProfile: sl(),
+      signOut: sl(),
     ),
   );
-  ///---------Cart use case
-    sl.registerLazySingleton(() => GetCartUseCase(sl()));
-    sl.registerLazySingleton(() => AddCartItemUseCase(sl()));
-    sl.registerLazySingleton(() => UpdateCartItemUseCase(sl()));
-    sl.registerLazySingleton(() => RemoveCartItemUseCase(sl()));
-    sl.registerLazySingleton(() => ClearCartUseCase(sl()));
-  
-    // --- Cart Bloc ---
-    sl.registerLazySingleton(() => CartBloc(
-      getCartUseCase: sl(),
-      addCartItemUseCase: sl(),
-      updateCartItemUseCase: sl(),
-      removeCartItemUseCase: sl(),
-      clearCartUseCase: sl(),
-    ));
 
+  /// ── Cart UseCases ───────────────────────
+  sl.registerLazySingleton(() => GetCartUseCase(sl()));
+  sl.registerLazySingleton(() => AddCartItemUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateCartItemUseCase(sl()));
+  sl.registerLazySingleton(() => RemoveCartItemUseCase(sl()));
+  sl.registerLazySingleton(() => ClearCartUseCase(sl()));
 
+  /// ── Cart Bloc ───────────────────────────
+  sl.registerLazySingleton(() => CartBloc(
+    getCartUseCase: sl(),
+    addCartItemUseCase: sl(),
+    updateCartItemUseCase: sl(),
+    removeCartItemUseCase: sl(),
+    clearCartUseCase: sl(),
+  ));
+
+  /// ── Order DataSource ────────────────────
+  sl.registerLazySingleton<OrderRemoteDataSource>(
+    () => OrderRemoteDataSourceImpl(sl()),
+  );
+
+  /// ── Order Repo ──────────────────────────
+  sl.registerLazySingleton<OrderRepository>(
+    () => OrderRepositoryImpl(sl()),
+  );
+
+  /// ── Order UseCases ──────────────────────
+  sl.registerLazySingleton(() => CreateOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetOrdersUseCase(sl()));
+  sl.registerLazySingleton(() => GetOrderByIdUseCase(sl()));
+  sl.registerLazySingleton(() => CancelOrderUseCase(sl()));
+
+  /// ── Order Bloc ──────────────────────────
+  sl.registerLazySingleton(() => OrderBloc(
+    createOrderUseCase: sl(),
+    getOrdersUseCase: sl(),
+    getOrderByIdUseCase: sl(),
+    cancelOrderUseCase: sl(),
+  ));
 }

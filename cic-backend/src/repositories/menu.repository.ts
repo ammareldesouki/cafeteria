@@ -19,11 +19,17 @@ export interface MenuItem {
 	description?: string;
 	price: number;
 	stock: number;
+	/**
+	 * Whether this item's stock should be tracked/validated.
+	 * - true (default): finite stock, validated on cart add/update and order creation
+	 * - false: unlimited supply (hot drinks, made-to-order items)
+	 */
+	trackStock: boolean;
 	hasVariants: boolean;
 	variants?: MenuItemVariant[];
 	createdAt: Date;
 	updatedAt: Date;
-	image?: string; // ✅ إضافة حقل الصورة
+	image?: string;
 }
 
 export const menuRepository = {

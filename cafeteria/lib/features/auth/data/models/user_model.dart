@@ -10,12 +10,15 @@ class UserModel extends UserEntity {
     required super.createdAt,
     required super.updatedAt,
     required super.phoneNumber,
-    required super.gender
+    required super.gender,
+    required super.totalOrders,
+    required super.completedOrders,
+    required super.balance,
   });
 
   factory UserModel.fromMap(Map<String, dynamic> map) {
     return UserModel(
-      id: map['id'] ?? '',
+      id: map['id'] ?? (map['userId'] ?? ''),
       name: map['name'] ?? '',
       email: map['email'] ?? '',
       emailVerified: map['emailVerified'] ?? false,
@@ -24,7 +27,9 @@ class UserModel extends UserEntity {
       updatedAt: map['updatedAt'] ?? '',
       phoneNumber: map['phoneNumber'] ?? '',
       gender: map['gender'] ?? '',
-
+      totalOrders: map['totalOrders'] ?? 0,
+      completedOrders: map['completedOrders'] ?? 0,
+      balance: (map['balance'] as num?)?.toDouble() ?? 0.0,
     );
   }
 
@@ -38,5 +43,8 @@ class UserModel extends UserEntity {
         'updatedAt': updatedAt,
         'phoneNumber': phoneNumber,
         'gender': gender,
+        'totalOrders': totalOrders,
+        'completedOrders': completedOrders,
+        'balance': balance,
       };
 }

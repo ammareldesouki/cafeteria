@@ -22,7 +22,6 @@ class _FavPageState extends State<FavPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
       body: SafeArea(
         child: BlocBuilder<FavouriteBloc, FavouriteState>(
           builder: (context, state) {

@@ -11,14 +11,15 @@ import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/favourite/presentation/manager/favourite_bloc.dart';
 import '../../features/home/presentation/manager/home_bloc.dart';
 import '../../features/cart/presentation/manager/cart_bloc.dart';
-import '../../features/cart/presentation/manager/cart_event.dart';
+
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/layout/bottom_navegation_bar.dart';
+import '../../features/order/presentation/manager/order_bloc.dart';
+import '../../features/order/presentation/pages/checkout_page.dart';
 import '../../features/splash/loading_page.dart';
 
 
 class AppRouter {
-
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -59,10 +60,24 @@ class AppRouter {
           ),
           settings,
         );
-        case RouteNames.layout
-        :return _buildRoute(const CBottomNavigationBar( role: 'user', userName: '', userId: '',), settings);
 
+      case RouteNames.checkout:
+        return _buildRoute(
+          MultiBlocProvider(
+            providers: [
+              BlocProvider.value(value: sl<OrderBloc>()),
+              BlocProvider.value(value: sl<CartBloc>()),
+            ],
+            child: const CheckoutPage(),
+          ),
+          settings,
+        );
 
+      case RouteNames.layout:
+        return _buildRoute(
+          const CBottomNavigationBar(role: 'user', userName: '', userId: ''),
+          settings,
+        );
 
     case RouteNames.signIn:
       return _buildRoute(BlocProvider(

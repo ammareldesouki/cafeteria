@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
+
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
@@ -62,7 +62,6 @@ class _HomePageState extends State<HomePage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _SimpleHeader(userName: widget.userName),
                     const SizedBox(height: 20),
 
                     WelcomeBanner(userName: widget.userName),
@@ -173,83 +172,6 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _SimpleHeader extends StatelessWidget {
-  final String userName;
-
-  const _SimpleHeader({required this.userName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: const BoxDecoration(
-            color: Color(0xFF3B1A08),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(
-            Icons.person_rounded,
-            color: Colors.white,
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          userName,
-          style: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A1A1A),
-          ),
-        ),
-        const SizedBox(width: 2),
-        const Icon(
-          Icons.keyboard_arrow_down_rounded,
-          size: 20,
-          color: Color(0xFF9E8E82),
-        ),
-        const Spacer(),
-        Stack(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.06),
-                    blurRadius: 8,
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.notifications_none_rounded,
-                size: 20,
-                color: Color(0xFF3B1A08),
-              ),
-            ),
-            Positioned(
-              right: 8,
-              top: 8,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFE85B3A),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
 //
 // class _StatsRow extends StatelessWidget {
 //   final int coldCount;

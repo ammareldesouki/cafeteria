@@ -12,6 +12,8 @@ class MenuItemModel extends MenuItemEntity {
     required super.inStock,
     super.hasVariants,
     super.variants,
+    super.stock,
+    super.trackStock,
   });
 
   factory MenuItemModel.fromMap(Map<String, dynamic> map) {
@@ -39,6 +41,8 @@ class MenuItemModel extends MenuItemEntity {
       inStock: map['inStock'] ?? map['in_stock'] ?? false,
       hasVariants: map['hasVariants'] ?? false,
       variants: variants,
+      stock: (map['stock'] as num?)?.toInt(),
+      trackStock: map['trackStock'] ?? true,
     );
   }
 }

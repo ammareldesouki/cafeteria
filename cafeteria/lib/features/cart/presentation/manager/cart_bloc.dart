@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../domain/entities/cart_entity.dart';
 import '../../domain/use_cases/cart_usecases.dart';
@@ -35,6 +36,36 @@ class CartBloc extends Bloc<CartEvent, CartState> {
     return null;
   }
 
+  /// Extract a user-friendly error message from exceptions.
+  /// Handles DioException specifically to parse the backend error body.
+  String _friendlyError(Object e) {
+    if (e is DioException) {
+      final data = e.response?.data;
+      if (data is Map<String, dynamic>) {
+        // Backend wraps errors as { success: false, error: { code, message } }
+        final errorObj = data['error'];
+        if (errorObj is Map<String, dynamic>) {
+          final msg = errorObj['message']?.toString() ?? '';
+          // Make INSUFFICIENT_STOCK more user-friendly
+          if (msg.contains('Insufficient stock')) {
+            final details = errorObj['data'];
+            if (details is Map<String, dynamic>) {
+              final available = details['available'] ?? 0;
+              return 'Not enough stock. Only $available available.';
+            }
+            return 'Not enough stock available.';
+          }
+          if (msg.isNotEmpty) return msg;
+        }
+        // Simple { message: "..." } format
+        final msg = data['message']?.toString();
+        if (msg != null && msg.isNotEmpty) return msg;
+      }
+      return e.message ?? 'Network error';
+    }
+    return e.toString();
+  }
+
   // ── handlers ───────────────────────────────────────────────────────────────
 
   Future<void> _onGetCart(GetCartEvent event, Emitter<CartState> emit) async {
@@ -43,7 +74,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       final cart = await getCartUseCase();
       emit(CartLoaded(cart));
     } catch (e) {
-      emit(CartError(e.toString()));
+      emit(CartError(_friendlyError(e)));
     }
   }
 
@@ -76,7 +107,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       final freshCart = await getCartUseCase();
       emit(CartLoaded(freshCart));
     } catch (e) {
-      emit(CartError(e.toString()));
+      emit(CartError(_friendlyError(e)));
       if (current != null) emit(CartLoaded(current));
     }
   }
@@ -97,7 +128,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       final freshCart = await getCartUseCase();
       emit(CartLoaded(freshCart));
     } catch (e) {
-      emit(CartError(e.toString()));
+      emit(CartError(_friendlyError(e)));
       if (current != null) emit(CartLoaded(current));
     }
   }
@@ -117,7 +148,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       final freshCart = await getCartUseCase();
       emit(CartLoaded(freshCart));
     } catch (e) {
-      emit(CartError(e.toString()));
+      emit(CartError(_friendlyError(e)));
       if (current != null) emit(CartLoaded(current));
     }
   }
@@ -131,7 +162,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
       final freshCart = await getCartUseCase();
       emit(CartLoaded(freshCart));
     } catch (e) {
-      emit(CartError(e.toString()));
+      emit(CartError(_friendlyError(e)));
       if (current != null) emit(CartLoaded(current));
     }
   }

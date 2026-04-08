@@ -45,7 +45,6 @@ class _CategoryPageState extends State<CategoryPage> {
     args['products'] as List<MenuItemEntity>;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -70,16 +69,12 @@ class _CategoryPageState extends State<CategoryPage> {
             const SizedBox(height: 10),
             Text(
               category,
-              style: const TextStyle(
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF3B1A08),
-              ),
+              style:  Theme.of(context).textTheme.titleLarge
             ),
             const SizedBox(height: 6),
-            const Text(
+             Text(
               "Swipe to browse items",
-              style: TextStyle(fontSize: 15, color: Color(0xFF8B7355)),
+              style:   Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 20),
             Padding(
@@ -168,88 +163,126 @@ class _ProductCard extends StatelessWidget {
   final MenuItemEntity item;
   const _ProductCard({required this.item});
 
+  /// true when the item tracks stock AND has 0 available
+  bool get _isOutOfStock =>
+      item.trackStock && item.stock != null && item.stock! <= 0;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _showCustomizeSheet(context),
+      onTap: _isOutOfStock ? null : () => _showCustomizeSheet(context),
       child: Stack(
         children: [
-          Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(28),
-              border: Border.all(color: const Color(0xFFC9A97E), width: 1.4),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.brown.withOpacity(0.12),
-                  blurRadius: 14,
-                  offset: const Offset(0, 8),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.topRight,
-                    child: FavouriteToggleButton(itemId: item.mongoId),
+          Opacity(
+            opacity: _isOutOfStock ? 0.55 : 1.0,
+            child: Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: const Color(0xFFC9A97E), width: 1.4),
+                color:  Theme.of(context).colorScheme.surface,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.brown.withOpacity(0.12),
+                    blurRadius: 14,
+                    offset: const Offset(0, 8),
                   ),
-                ),
-                const SizedBox(height: 30),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
-                  child: item.image.isNotEmpty
-                      ? Image.network(
-                    item.image,
-                    width: 140,
-                    height: 140,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => _placeholderImage(),
-                  )
-                      : _placeholderImage(),
-                ),
-                const SizedBox(height: 22),
-                Text(
-                  item.name,
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF3B1A08),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.topRight,
+                      child: FavouriteToggleButton(itemId: item.mongoId),
+                    ),
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${item.price.toStringAsFixed(0)} L.E',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF3B1A08),
+                  const SizedBox(height: 30),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(24),
+                    child: item.image.isNotEmpty
+                        ? Image.network(
+                      item.image,
+                      width: 140,
+                      height: 140,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => _placeholderImage(),
+                    )
+                        : _placeholderImage(),
                   ),
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  child: Text(
-                    item.description,
+                  const SizedBox(height: 22),
+                  Text(
+                    item.name,
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF3B1A08),
+                    ),
                     textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 13, color: Color(0xFF8B7355)),
                   ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  "Tap to customize and add to cart",
-                  style: TextStyle(fontSize: 12, color: Color(0xFF9E8E82)),
-                ),
-                const SizedBox(height: 16),
-              ],
+                  const SizedBox(height: 8),
+                  Text(
+                    '${item.price.toStringAsFixed(0)} L.E',
+                    style: const TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                      color: Color(0xFF3B1A08),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      item.description,
+                      textAlign: TextAlign.center,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 13, color: Color(0xFF8B7355)),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    _isOutOfStock
+                        ? 'Out of Stock'
+                        : 'Tap to customize and add to cart',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: _isOutOfStock
+                          ? const Color(0xFFE57373)
+                          : const Color(0xFF9E8E82),
+                      fontWeight:
+                          _isOutOfStock ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
+              ),
             ),
           ),
+          // ── Out-of-Stock badge ──
+          if (_isOutOfStock)
+            Positioned(
+              top: 16,
+              left: 16,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE57373),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Text(
+                  'Sold Out',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
         ],
       ),
     );
@@ -311,6 +344,16 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
 
   double get _totalPrice => item.price * _quantity;
 
+  /// Max quantity allowed.
+  /// Tracked items: capped at available stock.
+  /// Untracked (hot drinks): capped at 99.
+  int get _maxQuantity {
+    if (!item.trackStock) return 99;
+    return item.stock ?? 0;
+  }
+
+  bool get _isOutOfStock => item.trackStock && _maxQuantity <= 0;
+
   @override
   void dispose() {
     _noteController.dispose();
@@ -365,8 +408,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
       child: Container(
         padding:
         EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFF3E8),
+        decoration:  BoxDecoration(
+          color:   Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SingleChildScrollView(
@@ -397,13 +440,10 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                         size: 20, color: Color(0xFF3B1A08)),
                   ),
                   const SizedBox(width: 12),
-                  const Text(
+                   Text(
                     "Customize Your Order",
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 17,
-                        color: Color(0xFF3B1A08)),
-                  ),
+                    style:  Theme.of(context).textTheme.titleLarge),
+
                 ],
               ),
 
@@ -413,7 +453,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
               Container(
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.surface,
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: const Color(0xFFE8D7BF)),
                 ),
@@ -436,20 +476,12 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                         children: [
                           Text(
                             item.name,
-                            style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF3B1A08),
-                            ),
+                              style: Theme.of(context).textTheme.bodyMedium
                           ),
                           const SizedBox(height: 4),
                           Text(
                             '${item.price.toStringAsFixed(0)} L.E',
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF8B7355),
-                              fontWeight: FontWeight.w600,
-                            ),
+                              style: Theme.of(context).textTheme.titleLarge
                           ),
                         ],
                       ),
@@ -458,17 +490,17 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                     BlocBuilder<FavouriteBloc, FavouriteState>(
                       builder: (context, state) {
                         final cubit = context.read<FavouriteBloc>();
-                        final isFav = _isFav(state, item.id);
+                        final isFav = _isFav(state, item.mongoId);
                         final isLoading = state is FavouriteActionLoading &&
-                            state.itemId == item.id;
+                            state.itemId == item.mongoId;
                         return GestureDetector(
                           onTap: isLoading
                               ? null
                               : () {
                             if (isFav) {
-                              cubit.add(RemoveFavouriteEvent(item.id));
+                              cubit.add(RemoveFavouriteEvent(item.mongoId));
                             } else {
-                              cubit.add(AddFavouriteEvent(item.id));
+                              cubit.add(AddFavouriteEvent(item.mongoId));
                             }
                           },
                           child: AnimatedSwitcher(
@@ -534,10 +566,31 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                   ),
                   _QtyButton(
                     icon: Icons.add,
-                    onTap: () => setState(() => _quantity++),
+                    onTap: _quantity < _maxQuantity
+                        ? () => setState(() => _quantity++)
+                        : null,
                   ),
                 ],
               ),
+              // ── Stock indicator ──
+              if (item.trackStock && item.stock != null)
+                Padding(
+                  padding: const EdgeInsets.only(top: 6),
+                  child: Text(
+                    item.stock! <= 5
+                        ? 'Only ${item.stock} left in stock'
+                        : '${item.stock} available',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: item.stock! <= 5
+                          ? const Color(0xFFE57373)
+                          : const Color(0xFF8B7355),
+                      fontWeight: item.stock! <= 5
+                          ? FontWeight.w600
+                          : FontWeight.normal,
+                    ),
+                  ),
+                ),
 
               // Variants
               if (_hasVariants) ...[
@@ -658,7 +711,9 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                     width: double.infinity,
                     height: 54,
                     child: ElevatedButton(
-                      onPressed: _canAddToCart && !isAdding ? _addToCart : null,
+                      onPressed: _canAddToCart && !isAdding && !_isOutOfStock
+                          ? _addToCart
+                          : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _canAddToCart
                             ? const Color(0xFF3B1A08)
@@ -730,7 +785,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
 
 class _QtyButton extends StatelessWidget {
   final IconData icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   const _QtyButton({required this.icon, required this.onTap});
 
   @override

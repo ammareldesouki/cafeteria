@@ -1,9 +1,11 @@
 import { cartRepository } from "@/repositories/cart.repository";
 import { menuRepository } from "@/repositories/menu.repository";
+import { stockService } from "@/services/stock.service";
 import {
 	InvalidQuantityError,
 	ItemNotFoundError,
 	CartItemNotFoundError,
+	InsufficientStockError,
 } from "@/utils/errors";
 import { ObjectId } from "mongodb";
 
@@ -11,12 +13,16 @@ export interface CartItemResponse {
 	id: string;
 	menuItemId: string;
 	menuItemName: string;
-	image?: string; // ✅ الصورة
+	image?: string;
 	variantName?: string;
 	note?: string;
 	quantity: number;
 	unitPrice: number;
 	subtotal: number;
+	/** Available stock. null = unlimited (hot drinks). */
+	stock: number | null;
+	/** Whether stock is tracked for this item. */
+	trackStock: boolean;
 }
 
 export interface CartResponse {
@@ -42,7 +48,9 @@ export const cartService = {
 	},
 
 	/**
-	 * Add item
+	 * Add item — validates stock before adding to cart.
+	 * For tracked items: ensures (existing cart qty + new qty) <= available stock.
+	 * For untracked items (hot drinks): no limit (capped at 99 as sanity check).
 	 */
 	async addItem(
 		userId: string,
@@ -60,14 +68,57 @@ export const cartService = {
 			throw new ItemNotFoundError(menuItemId);
 		}
 
+		// ── Stock validation ──────────────────────────────────────────────
+		const trackStock = menuItem.trackStock !== false;
+
+		if (trackStock) {
+			// Get how many of this exact item+variant are already in cart
+			const existingCartItem = await cartRepository.getItem(
+				userId,
+				new ObjectId(menuItemId),
+				variantName,
+				note,
+			);
+			const existingQty = existingCartItem?.quantity ?? 0;
+			const totalRequested = existingQty + quantity;
+
+			// Get available stock
+			const stockInfo = await stockService.getAvailableStock(
+				menuItemId,
+				variantName,
+			);
+			const available = stockInfo.available ?? 0;
+
+			if (totalRequested > available) {
+				throw new InsufficientStockError(
+					menuItemId,
+					totalRequested,
+					available,
+				);
+			}
+		} else {
+			// Sanity cap for unlimited items
+			const existingCartItem = await cartRepository.getItem(
+				userId,
+				new ObjectId(menuItemId),
+				variantName,
+				note,
+			);
+			const existingQty = existingCartItem?.quantity ?? 0;
+			if (existingQty + quantity > 99) {
+				throw new InvalidQuantityError(
+					existingQty + quantity,
+					"maximum 99 per item",
+				);
+			}
+		}
+
 		await cartRepository.addItem(
 			userId,
 			new ObjectId(menuItemId),
 			variantName,
 			quantity,
 			note,
-			
-			 
 		);
 
 		const cartItem = await cartRepository.getItem(
@@ -81,21 +132,31 @@ export const cartService = {
 			throw new CartItemNotFoundError(menuItemId);
 		}
 
+		// Get stock info for response
+		const stockInfo = await stockService.getAvailableStock(
+			menuItemId,
+			variantName,
+		);
+
 		return {
 			id: cartItem.menuItemId.toString(),
 			menuItemId,
 			menuItemName: menuItem.name,
-			image: menuItem.image, // ✅ الصورة من المنيو
+			image: menuItem.image,
 			...(variantName && { variantName }),
 			...(note && { note }),
 			quantity: cartItem.quantity,
 			unitPrice: menuItem.price,
 			subtotal: menuItem.price * cartItem.quantity,
+			stock: stockInfo.available,
+			trackStock: stockInfo.trackStock,
 		};
 	},
 
 	/**
-	 * Update quantity
+	 * Update quantity — validates new quantity against stock.
+	 * For tracked items: ensures new qty <= available stock.
+	 * For untracked items: capped at 99.
 	 */
 	async updateItemQuantity(
 		userId: string,
@@ -113,6 +174,25 @@ export const cartService = {
 			throw new ItemNotFoundError(menuItemId);
 		}
 
+		// ── Stock validation ──────────────────────────────────────────────
+		const trackStock = menuItem.trackStock !== false;
+
+		if (trackStock) {
+			const stockInfo = await stockService.getAvailableStock(
+				menuItemId,
+				variantName,
+			);
+			const available = stockInfo.available ?? 0;
+
+			if (quantity > available) {
+				throw new InsufficientStockError(menuItemId, quantity, available);
+			}
+		} else {
+			if (quantity > 99) {
+				throw new InvalidQuantityError(quantity, "maximum 99 per item");
+			}
+		}
+
 		await cartRepository.updateItemQuantity(
 			userId,
 			new ObjectId(menuItemId),
@@ -121,16 +201,24 @@ export const cartService = {
 			note,
 		);
 
+		// Get stock info for response
+		const stockInfo = await stockService.getAvailableStock(
+			menuItemId,
+			variantName,
+		);
+
 		return {
 			id: menuItemId,
 			menuItemId,
 			menuItemName: menuItem.name,
-			image: menuItem.image, // ✅ الصورة
+			image: menuItem.image,
 			...(variantName && { variantName }),
 			...(note && { note }),
 			quantity,
 			unitPrice: menuItem.price,
 			subtotal: menuItem.price * quantity,
+			stock: stockInfo.available,
+			trackStock: stockInfo.trackStock,
 		};
 	},
 
@@ -170,7 +258,7 @@ export const cartService = {
 	},
 
 	/**
-	 * Format response (🔥 أهم جزء)
+	 * Format response — includes stock info per item
 	 */
 	async formatCartResponse(cart: {
 		_id?: ObjectId;
@@ -199,16 +287,24 @@ export const cartService = {
 			totalItems += item.quantity;
 			totalPrice += subtotal;
 
+			// Get stock info per item
+			const stockInfo = await stockService.getAvailableStock(
+				item.menuItemId.toString(),
+				item.variantName,
+			);
+
 			formattedItems.push({
 				id: item.menuItemId.toString(),
 				menuItemId: item.menuItemId.toString(),
 				menuItemName: menuItem.name,
-				image: menuItem.image, // ✅ الحل هنا
+				image: menuItem.image,
 				...(item.variantName && { variantName: item.variantName }),
 				...(item.note && { note: item.note }),
 				quantity: item.quantity,
 				unitPrice,
 				subtotal,
+				stock: stockInfo.available,
+				trackStock: stockInfo.trackStock,
 			});
 		}
 

@@ -47,15 +47,32 @@ export const orderService = {
 
 		const reservations = await stockService.reserveStockBatch(stockItems);
 
-		const orderItems: OrderItem[] = reservations.map((res) => ({
-			menuItemId:
-				typeof res.menuItemId === "string"
-					? new ObjectId(res.menuItemId)
-					: res.menuItemId,
-			...(res.variantName && { variantName: res.variantName }),
-			quantity: res.quantity,
-			unitPrice: res.unitPrice,
-		}));
+		// Build order items with names and notes from the cart
+		const orderItems: OrderItem[] = [];
+		for (let i = 0; i < reservations.length; i++) {
+			const res = reservations[i];
+			const cartItem = cart.items[i];
+
+			// Look up item name from menu
+			const { menuRepository } = await import(
+				"@/repositories/menu.repository"
+			);
+			const menuItem = await menuRepository.findById(
+				cartItem.menuItemId.toString(),
+			);
+
+			orderItems.push({
+				menuItemId:
+					typeof res.menuItemId === "string"
+						? new ObjectId(res.menuItemId)
+						: res.menuItemId,
+				menuItemName: menuItem?.name,
+				...(res.variantName && { variantName: res.variantName }),
+				...(cartItem?.note && { note: cartItem.note }),
+				quantity: res.quantity,
+				unitPrice: res.unitPrice,
+			});
+		}
 
 		const totalPrice = orderItems.reduce(
 			(sum, item) => sum + item.unitPrice * item.quantity,

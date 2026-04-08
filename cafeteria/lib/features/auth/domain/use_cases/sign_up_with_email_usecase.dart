@@ -13,7 +13,8 @@ class SignUpWithEmailUseCase {
     required String password,
     required String phoneNumber,
     required String gender,
+    required String name,
   }) {
-    return _repository.signUpWithEmail(email: email, password: password, phoneNumber: phoneNumber, gender: gender);
+    return _repository.signUpWithEmail(email: email, password: password, phoneNumber: phoneNumber, gender: gender, name: name);
   }
 }

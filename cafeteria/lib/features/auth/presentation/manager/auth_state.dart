@@ -28,3 +28,13 @@ class AuthFailureState extends AuthState {
   @override
   List<Object?> get props => [message];
 }
+class UserProfileLoaded extends AuthState {
+  final UserEntity user;
+
+  const UserProfileLoaded(this.user);
+
+  @override
+  List<Object?> get props => [user];
+}
+
+class UserSignedOut extends AuthState {}

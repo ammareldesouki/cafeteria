@@ -105,4 +105,116 @@ class AppTheme {
       ),
     );
   }
+
+
+
+  static ThemeData get dark {
+    const Color darkBackground = Color(0xFF121212);
+    const Color darkSurface = Color(0xFF1E1E1E);
+    const Color darkCard = Color(0xFF2A2A2A);
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: darkBackground,
+
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: primary,
+        brightness: Brightness.dark,
+        primary: primary,
+        surface: darkSurface,
+      ),
+
+      // ── AppBar ─────────────────────────────────────────
+      appBarTheme: const AppBarTheme(
+        backgroundColor: darkBackground,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: false,
+      ),
+
+      // ── ElevatedButton ────────────────────────────────
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: primary,
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          elevation: 0,
+          textStyle: const TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+
+      // ── OutlinedButton ────────────────────────────────
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          foregroundColor: Colors.white,
+          side: const BorderSide(color: Colors.white24),
+          minimumSize: const Size.fromHeight(50),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          textStyle: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
+
+      // ── InputDecoration ───────────────────────────────
+      inputDecorationTheme: InputDecorationTheme(
+        filled: true,
+        fillColor: darkCard,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.white24),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.white24),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: primary, width: 1.5),
+        ),
+        hintStyle: const TextStyle(color: Colors.white54, fontSize: 14),
+      ),
+
+      // ── Text ──────────────────────────────────────────
+      textTheme: const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        titleLarge: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+          color: Colors.white,
+        ),
+        bodyMedium: TextStyle(
+          fontSize: 14,
+          color: Colors.white70,
+        ),
+        labelSmall: TextStyle(
+          fontSize: 12,
+          color: Colors.white54,
+        ),
+      ),
+
+      // ── Card / Surface ────────────────────────────────
+      cardColor: darkCard,
+      dividerColor: Colors.white12,
+    );
+  }
+
 }

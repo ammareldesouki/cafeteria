@@ -1,3 +1,4 @@
+import 'package:cafeteria/features/auth/domain/entities/user_entity.dart';
 import 'package:dartz/dartz.dart';
 import '../../../../core/failure/failure.dart';
 import '../entities/auth_response_entity.dart';
@@ -9,6 +10,7 @@ abstract class AuthRepository {
     required String password,
     required String phoneNumber,
     required String gender,
+    required String name,
   });
 
 
@@ -29,4 +31,10 @@ abstract class AuthRepository {
   Future<Either<Failure, AuthResponseEntity>> signUpWithMicrosoft({
     required String accessToken,
   });
+
+  /// Get current user profile with balance and order counts.
+  Future<Either<Failure, UserEntity>> getUserProfile();
+
+  /// Sign out the current user.
+  Future<Either<Failure, void>> signOut();
 }

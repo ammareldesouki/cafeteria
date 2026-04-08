@@ -53,6 +53,7 @@ dependencies:
   shared_preferences: ^2.3.2
   aad_oauth: ^1.0.1
   flutter_bloc: ^9.1.1
+  intl: ^0.19.0
   mocktail: ^1.0.4
 dev_dependencies:
   flutter_launcher_icons: ^0.13.1

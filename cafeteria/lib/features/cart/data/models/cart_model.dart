@@ -11,6 +11,8 @@ class CartItemModel extends CartItemEntity {
     required super.quantity,
     required super.unitPrice,
     required super.subtotal,
+    super.stock,
+    super.trackStock,
   });
 
   factory CartItemModel.fromJson(Map<String, dynamic> json) => CartItemModel(
@@ -18,23 +20,28 @@ class CartItemModel extends CartItemEntity {
     menuItemId: json['menuItemId'] as String,
     menuItemName: json['menuItemName'] as String,
     image: json['image'] as String? ?? '',
-    variantName: json['variantName'] as String?, // ✅ الصح
+    variantName: json['variantName'] as String?,
     note: json['note'] as String?,
     quantity: (json['quantity'] as num).toInt(),
     unitPrice: (json['unitPrice'] as num).toDouble(),
     subtotal: (json['subtotal'] as num).toDouble(),
+    stock: (json['stock'] as num?)?.toInt(),
+    trackStock: json['trackStock'] as bool? ?? true,
   );
+
   Map<String, dynamic> toJson() => {
-        'id': id,
-        'menuItemId': menuItemId,
-        'menuItemName': menuItemName,
-        'image': image,
-        if (variantName != null) 'variantName': variantName,
-        if (note != null) 'note': note,
-        'quantity': quantity,
-        'unitPrice': unitPrice,
-        'subtotal': subtotal,
-      };
+    'id': id,
+    'menuItemId': menuItemId,
+    'menuItemName': menuItemName,
+    'image': image,
+    if (variantName != null) 'variantName': variantName,
+    if (note != null) 'note': note,
+    'quantity': quantity,
+    'unitPrice': unitPrice,
+    'subtotal': subtotal,
+    if (stock != null) 'stock': stock,
+    'trackStock': trackStock,
+  };
 }
 
 class CartModel extends CartEntity {

@@ -21,6 +21,13 @@ class MenuItemEntity extends Equatable {
   final bool hasVariants;
   final List<VariantEntity>? variants;
 
+  /// Available stock count. null means unlimited (hot drinks).
+  final int? stock;
+
+  /// Whether stock is tracked for this item.
+  /// false = hot drinks / made-to-order (no stock limit).
+  final bool trackStock;
+
   const MenuItemEntity({
     required this.id,
     required this.mongoId,
@@ -32,6 +39,8 @@ class MenuItemEntity extends Equatable {
     required this.inStock,
     this.hasVariants = false,
     this.variants,
+    this.stock,
+    this.trackStock = true,
   });
 
   @override

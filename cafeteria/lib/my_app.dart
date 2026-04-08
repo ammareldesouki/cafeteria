@@ -13,7 +13,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'OnTheWay',
       debugShowCheckedModeBanner: false,
+      themeMode: ThemeMode.system,
       theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       initialRoute: RouteNames.Splash,
       onGenerateRoute: AppRouter.generateRoute,
     );

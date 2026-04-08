@@ -12,9 +12,10 @@ class SignUpWithEmailEvent extends AuthEvent {
   final String password;
   final String phoneNumber;
   final String gender;
+  final String name;
 
 
-  const SignUpWithEmailEvent({required this.email, required this.password, required this.phoneNumber, required this.gender});
+  const SignUpWithEmailEvent({required this.email, required this.password, required this.phoneNumber, required this.gender, required this.name});
 
   @override
   List<Object?> get props => [email, password];
@@ -39,5 +40,13 @@ class SignUpWithGoogleEvent extends AuthEvent {
 
 class SignUpWithMicrosoftEvent extends AuthEvent {
   const SignUpWithMicrosoftEvent();
+}
+
+class GetUserInfoEvent extends AuthEvent {
+  const GetUserInfoEvent();
+}
+
+class SignOutEvent extends AuthEvent {
+  const SignOutEvent();
 }
 

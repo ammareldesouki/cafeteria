@@ -5,6 +5,8 @@
 import { Request, Response, NextFunction } from "express";
 import { userService } from "@/services/user.service";
 import { balanceService } from "@/services/balance.service";
+import { orderRepository } from "@/repositories/order.repository";
+import { OrderStatus } from "@/types/order.types";
 import { handleServiceError } from "@/middlewares/serviceErrorHandler.middleware";
 import { logger } from "@/utils/logger";
 
@@ -27,10 +29,21 @@ export const getUserProfile = async (
 
 		const { balance } = await balanceService.getBalance();
 
+		// Fetch order counts
+		const [totalOrders, completedOrders] = await Promise.all([
+			orderRepository.countWithFilters({ userId }),
+			orderRepository.countWithFilters({
+				userId,
+				status: OrderStatus.DELIVERED, // Assuming DELIVERED is the final successful state as per screenshots
+			}),
+		]);
+
 		res.json({
 			data: {
-				id: userId,
+				...req.user,
 				balance,
+				totalOrders,
+				completedOrders,
 			},
 			meta: { timestamp: new Date().toISOString() },
 		});

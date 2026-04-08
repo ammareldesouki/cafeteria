@@ -21,6 +21,7 @@ class _SignupPageState extends State<SignupPage> {
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _phoneNumberController = TextEditingController();
+  final _nameController = TextEditingController();
 
   @override
   void dispose() {
@@ -34,10 +35,12 @@ class _SignupPageState extends State<SignupPage> {
     if (_formKey.currentState?.validate() ?? false) {
       context.read<AuthBloc>().add(
             SignUpWithEmailEvent(
+
               email: _emailController.text,
               password: _passwordController.text,
               phoneNumber: _phoneNumberController.text,
               gender: _selectedGender,
+              name: _nameController.text,
 
 
             ),
@@ -122,6 +125,10 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                       const SizedBox(height: 28),
+
+
+                      AppTextField(label: "Name", controller: _nameController,hint: "Enter Name",),
+                      const SizedBox(height: 16),
 
                       // ── Email ──────────────────────────────────────────
                       AppTextField(

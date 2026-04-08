@@ -9,6 +9,12 @@ class CartItemEntity {
   final double unitPrice;
   final double subtotal;
 
+  /// Available stock. null = unlimited (hot drinks, trackStock: false).
+  final int? stock;
+
+  /// Whether stock is tracked for this item.
+  final bool trackStock;
+
   const CartItemEntity({
     required this.id,
     required this.menuItemId,
@@ -19,6 +25,8 @@ class CartItemEntity {
     required this.quantity,
     required this.unitPrice,
     required this.subtotal,
+    this.stock,
+    this.trackStock = true,
   });
 }
 

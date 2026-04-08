@@ -22,7 +22,6 @@ class _CartPageState extends State<CartPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F4F0),
       body: SafeArea(
         child: BlocConsumer<CartBloc, CartState>(
           listener: (context, state) {
@@ -77,7 +76,11 @@ class _CartPageState extends State<CartPage> {
                 _CartFooter(
                   totalPrice: cart.totalPrice,
                   onCheckout: () {
-                    // TODO: Navigate to checkout
+                    Navigator.pushNamed(
+                      context,
+                      '/checkout',
+                      arguments: {'cart': cart},
+                    );
                   },
                   onClear: () {
                     context.read<CartBloc>().add(ClearCartEvent());

@@ -6,7 +6,10 @@ import 'package:aad_oauth/model/config.dart';
 
 
 import '../../domain/entities/auth_response_entity.dart';
+import '../../domain/entities/user_entity.dart';
+import '../../domain/use_cases/get_user_profile_usecase.dart';
 import '../../domain/use_cases/sign_in_with_email_usesace.dart';
+import '../../domain/use_cases/sign_out_usecase.dart';
 import '../../domain/use_cases/sign_up_with_email_usecase.dart';
 import '../../domain/use_cases/sign_up_with_google_usecase.dart';
 import '../../domain/use_cases/sign_up_with_microsoft_usecase.dart';
@@ -19,6 +22,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignUpWithGoogleUseCase _signUpWithGoogle;
   final SignUpWithMicrosoftUseCase _signUpWithMicrosoft;
   final SignInUseCase _signIn;
+  final GetUserProfileUseCase _getUserProfile;
+  final SignOutUseCase _signOut;
 
 
 
@@ -42,13 +47,19 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required SignUpWithGoogleUseCase signUpWithGoogle,
     required SignUpWithMicrosoftUseCase signUpWithMicrosoft,
     required SignInUseCase signIn,
+    required GetUserProfileUseCase getUserProfile,
+    required SignOutUseCase signOut,
   })  : _signUpWithEmail = signUpWithEmail,
         _signUpWithGoogle = signUpWithGoogle,
         _signUpWithMicrosoft = signUpWithMicrosoft,
         _signIn = signIn,
+        _getUserProfile = getUserProfile,
+        _signOut = signOut,
         super(AuthInitial()) {
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);
     on<SignInEvent>(_onSsignIn);
+    on<GetUserInfoEvent>(_onGetUserInfo);
+    on<SignOutEvent>(_onSignOut);
     // on<SignUpWithGoogleEvent>(_onSignUpWithGoogle);
     // on<SignUpWithMicrosoftEvent>(_onSignUpWithMicrosoft);
   }
@@ -64,6 +75,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       password: event.password,
       phoneNumber: event.phoneNumber,
       gender: event.gender,
+      name: event.name,
     );
     result.fold(
       (failure) => emit(AuthFailureState(
@@ -86,6 +98,34 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         failure.messageEn ?? failure.messageAr ?? 'Sign up failed',
       )),
           (response) => emit(AuthSuccess(response)),
+    );
+  }
+
+  Future<void> _onGetUserInfo(
+    GetUserInfoEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    final result = await _getUserProfile();
+    result.fold(
+      (failure) => emit(AuthFailureState(
+        failure.messageEn ?? failure.messageAr ?? 'Failed to fetch profile',
+      )),
+      (user) => emit(UserProfileLoaded(user)),
+    );
+  }
+
+  Future<void> _onSignOut(
+    SignOutEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    final result = await _signOut();
+    result.fold(
+      (failure) => emit(AuthFailureState(
+        failure.messageEn ?? failure.messageAr ?? 'Logout failed',
+      )),
+      (_) => emit(UserSignedOut()),
     );
   }
 

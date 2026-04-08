@@ -31,12 +31,23 @@ class _CartItemCardState extends State<CartItemCard> {
 
   void _updateQuantity(BuildContext context, int newQty) {
     if (newQty < 1) return;
+    // Cap at available stock for tracked items
+    final maxQty = _maxQuantity;
+    if (newQty > maxQty) return;
     context.read<CartBloc>().add(UpdateCartItemEvent(
           itemId: widget.item.id,
           quantity: newQty,
           variantName: widget.item.variantName,
           note: _noteController.text,
         ));
+  }
+
+  /// Max quantity the user can set.
+  /// Tracked items: capped at available stock.
+  /// Untracked (hot drinks): capped at 99.
+  int get _maxQuantity {
+    if (!widget.item.trackStock) return 99;
+    return widget.item.stock ?? 0;
   }
 
   void _removeItem(BuildContext context) {
@@ -179,7 +190,8 @@ class _CartItemCardState extends State<CartItemCard> {
                     // Qty +
                     _QtyButton(
                       icon: Icons.add,
-                      onTap: isLoading
+                      onTap: isLoading ||
+                              widget.item.quantity >= _maxQuantity
                           ? null
                           : () => _updateQuantity(
                               context, widget.item.quantity + 1),
@@ -198,6 +210,29 @@ class _CartItemCardState extends State<CartItemCard> {
                     ),
                   ],
                 ),
+
+                // ── Stock indicator ────────────────────────────────────────
+                if (widget.item.trackStock && widget.item.stock != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        widget.item.stock! <= 5
+                            ? 'Only ${widget.item.stock} left'
+                            : '${widget.item.stock} in stock',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: widget.item.stock! <= 5
+                              ? const Color(0xFFE57373)
+                              : const Color(0xFF8B7355),
+                          fontWeight: widget.item.stock! <= 5
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                      ),
+                    ),
+                  ),
 
                 // ── Optional: variants selector (shown when item has a variant) ──
                 if (widget.item.variantName != null) ...[
