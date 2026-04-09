@@ -17,10 +17,10 @@ import '../../features/layout/bottom_navegation_bar.dart';
 import '../../features/order/presentation/manager/order_bloc.dart';
 import '../../features/order/presentation/pages/checkout_page.dart';
 import '../../features/splash/loading_page.dart';
-
+import '../../features/admin/presentation/manager/admin_bloc.dart';
+import '../../features/admin/presentation/pages/cafeteria_panel_page.dart';
 
 class AppRouter {
-
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case RouteNames.Splash:
@@ -38,7 +38,17 @@ class AppRouter {
           ),
           settings,
         );
-        case RouteNames.home:
+      case RouteNames.layout:
+        final args = settings.arguments as Map<String, String>? ?? {};
+        return MaterialPageRoute(
+          builder: (_) => CBottomNavigationBar(
+            role: args['role'] ?? 'user',
+            userName: args['userName'] ?? 'User',
+            userId: args['userId'] ?? '',
+          ),
+        );
+
+      case RouteNames.home:
           final args = settings.arguments as Map<String, String>? ?? {};
   return MaterialPageRoute(
     builder: (_) => BlocProvider.value(
@@ -79,7 +89,16 @@ class AppRouter {
           settings,
         );
 
-    case RouteNames.signIn:
+      case RouteNames.cafeteriaPanel:
+        return _buildRoute(
+          BlocProvider.value(
+            value: sl<AdminBloc>(),
+            child: const CafeteriaPanelPage(),
+          ),
+          settings,
+        );
+
+      case RouteNames.signIn:
       return _buildRoute(BlocProvider(
         create: (_) => sl<AuthBloc>(),
         child: const SignInPage(),

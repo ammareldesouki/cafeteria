@@ -28,6 +28,8 @@ export interface OrderItem {
 export interface Order {
 	_id?: ObjectId;
 	userId: string;
+	username?: string;
+	userPhone?: string;
 	userEmail: string;
 	items: OrderItem[];
 	totalPrice: number;

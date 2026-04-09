@@ -28,8 +28,8 @@ export const analyticsRepository = {
 	async getTotalRevenue(): Promise<number> {
 		const result = await collection
 			.aggregate([
-				{ $match: { paymentStatus: PaymentStatus.PAID } },
-				{ $group: { _id: null, total: { $sum: "$total" } } },
+				{ $match: { status: { $ne: OrderStatus.CANCELLED } } },
+				{ $group: { _id: null, total: { $sum: "$totalPrice" } } },
 			])
 			.toArray();
 
@@ -42,8 +42,8 @@ export const analyticsRepository = {
 	async getPendingRevenue(): Promise<number> {
 		const result = await collection
 			.aggregate([
-				{ $match: { paymentStatus: PaymentStatus.UNPAID } },
-				{ $group: { _id: null, total: { $sum: "$total" } } },
+				{ $match: { paymentStatus: PaymentStatus.UNPAID, status: { $ne: OrderStatus.CANCELLED } } },
+				{ $group: { _id: null, total: { $sum: "$totalPrice" } } },
 			])
 			.toArray();
 

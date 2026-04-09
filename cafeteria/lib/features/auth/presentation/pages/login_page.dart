@@ -56,6 +56,7 @@ class _SignInPageState extends State<SignInPage> {
                   ? state.response.user.name
                   : state.response.user.email.split('@').first,
               'userId': state.response.user.id,
+              'role': state.response.user.role,
             },
           );
 

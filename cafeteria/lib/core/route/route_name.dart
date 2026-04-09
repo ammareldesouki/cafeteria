@@ -16,6 +16,5 @@ abstract class RouteNames {
   static const String itemDetail='/item-detail';
   static const String checkout='/checkout';
   static const String layout="/layout";
-
-
+  static const String cafeteriaPanel = "/cafeteriaPanel";
 }

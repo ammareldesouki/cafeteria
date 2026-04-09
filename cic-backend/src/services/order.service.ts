@@ -21,6 +21,7 @@ import {
 	EmptyCartError,
 } from "@/utils/errors";
 import { ObjectId } from "mongodb";
+import mongoose from "mongoose";
 
 export const orderService = {
 	/**
@@ -32,6 +33,8 @@ export const orderService = {
 		userId: string,
 		userEmail: string,
 		deliveryLocation?: string,
+		username?: string,         // 4th
+		userPhone?: string,
 	): Promise<Order> {
 		const cart = await cartRepository.findByUserId(userId);
 
@@ -79,8 +82,15 @@ export const orderService = {
 			0,
 		);
 
+		const userDoc = await mongoose.connection.collection("user").findOne({ id: userId });
+
+		       console.log(userDoc);
+
+		
 		const order: Order = {
 			userId,
+			username,
+			userPhone,
 			userEmail,
 			items: orderItems,
 			totalPrice,
@@ -99,7 +109,7 @@ export const orderService = {
 		);
 
 		await cartRepository.clearCart(userId);
-
+       console.log(userDoc?.name);
 		return createdOrder;
 	},
 
@@ -227,6 +237,7 @@ export const orderService = {
 		}));
 
 		await stockService.restoreStockBatch(stockItems);
+		await walletService.recordRefund(orderId, order.totalPrice);
 
 		const updated = await orderRepository.updateStatus(
 			orderId,
@@ -309,6 +320,18 @@ export const orderService = {
 			if (!updated) {
 				throw new Error("Failed to update order status");
 			}
+			
+			// Handle admin cancellation
+			if (updates.status === OrderStatus.CANCELLED && originalStatus !== OrderStatus.CANCELLED) {
+				const stockItems = order.items.map((item) => ({
+					menuItemId: item.menuItemId.toString(),
+					variantName: item.variantName,
+					quantity: item.quantity,
+				}));
+				await stockService.restoreStockBatch(stockItems);
+				await walletService.recordRefund(orderId, order.totalPrice);
+			}
+
 			Object.assign(order, updated);
 		}
 
@@ -362,6 +385,10 @@ export const orderService = {
 		) {
 			await walletService.recordPayment(orderId, finalOrder.totalPrice);
 		}
+		
+		// If order was cancelled and had payment, we already handled refund above based on the status change block.
+		// However if they mark it PAID *and* CANCELLED at the same time, we might have conflicting logic.
+		// The simplest approach is we assume cancel takes precedence for the refund logic embedded above.
 
 		return finalOrder;
 	},

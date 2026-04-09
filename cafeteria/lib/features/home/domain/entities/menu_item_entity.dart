@@ -2,11 +2,12 @@ import 'package:equatable/equatable.dart';
 
 class VariantEntity extends Equatable {
   final String name;
+  final int? stock;
 
-  const VariantEntity({required this.name});
+  const VariantEntity({required this.name, this.stock});
 
   @override
-  List<Object?> get props => [name];
+  List<Object?> get props => [name, stock];
 }
 
 class MenuItemEntity extends Equatable {

@@ -24,6 +24,8 @@ class OrderModel extends OrderEntity {
   const OrderModel({
     required super.id,
     required super.userId,
+    super.userName,
+    super.userPhone,
     required super.userEmail,
     required super.items,
     required super.totalPrice,
@@ -39,6 +41,8 @@ class OrderModel extends OrderEntity {
     return OrderModel(
       id: json['_id']?.toString() ?? '',
       userId: json['userId']?.toString() ?? '',
+      userName: json['username']?.toString(),
+      userPhone: json['userPhone']?.toString(),
       userEmail: json['userEmail']?.toString() ?? '',
       items: rawItems
           .map((e) => OrderItemModel.fromJson(e as Map<String, dynamic>))

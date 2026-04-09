@@ -40,7 +40,10 @@ class _CheckoutPageState extends State<CheckoutPage> {
   @override
   Widget build(BuildContext context) {
     final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    ModalRoute
+        .of(context)!
+        .settings
+        .arguments as Map<String, dynamic>;
     final cart = args['cart'] as CartEntity;
 
     return BlocListener<OrderBloc, OrderState>(
@@ -72,7 +75,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         }
       },
       child: Scaffold(
-          body: SafeArea(
+        body: SafeArea(
           child: Column(
             children: [
               // ── Header ──
@@ -84,7 +87,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       backgroundColor: Color(0xFF3B1A08),
                       radius: 20,
                       child:
-                          Icon(Icons.person, color: Colors.white, size: 20),
+                      Icon(Icons.person, color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 10),
                     const Text(
@@ -117,7 +120,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border:
-                                Border.all(color: const Color(0xFFE8D7BF)),
+                            Border.all(color: const Color(0xFFE8D7BF)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -131,20 +134,22 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 ),
                               ),
                               const SizedBox(height: 16),
-                              ...cart.items.map((item) => Padding(
+                              ...cart.items.map((item) =>
+                                  Padding(
                                     padding:
-                                        const EdgeInsets.only(bottom: 12),
+                                    const EdgeInsets.only(bottom: 12),
                                     child: Row(
                                       crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      CrossAxisAlignment.start,
                                       children: [
                                         Expanded(
                                           child: Column(
                                             crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                '${item.quantity}x ${item.menuItemName}',
+                                                '${item.quantity}x ${item
+                                                    .menuItemName}',
                                                 style: const TextStyle(
                                                   fontSize: 14,
                                                   fontWeight: FontWeight.w600,
@@ -170,7 +175,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                     fontSize: 11,
                                                     color: Color(0xFF8B7355),
                                                     fontStyle:
-                                                        FontStyle.italic,
+                                                    FontStyle.italic,
                                                   ),
                                                 ),
                                               ],
@@ -178,7 +183,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                           ),
                                         ),
                                         Text(
-                                          '${item.subtotal.toStringAsFixed(2)} L.E',
+                                          '${item.subtotal.toStringAsFixed(
+                                              2)} L.E',
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
@@ -192,7 +198,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   const Text(
                                     'Total',
@@ -226,7 +232,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(20),
                             border:
-                                Border.all(color: const Color(0xFFE8D7BF)),
+                            Border.all(color: const Color(0xFFE8D7BF)),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +249,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                               TextFormField(
                                 controller: _locationController,
                                 validator: (value) {
-                                  if (value == null || value.trim().isEmpty) {
+                                  if (value == null || value
+                                      .trim()
+                                      .isEmpty) {
                                     return 'Please enter a delivery location';
                                   }
                                   return null;
@@ -251,33 +259,6 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 style: const TextStyle(
                                   fontSize: 14,
                                   color: Color(0xFF3B1A08),
-                                ),
-                                decoration: InputDecoration(
-                                  hintText: 'e.g. Room 302, Building A',
-                                  hintStyle: const TextStyle(
-                                      color: Color(0xFFBCA999)),
-                                  filled: true,
-                                  fillColor: const Color(0xFFFAF7F4),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFD9C7B8)),
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFD9C7B8)),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFF3B1A08), width: 1.5),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(14),
-                                    borderSide: const BorderSide(
-                                        color: Color(0xFFE57373)),
-                                  ),
                                 ),
                               ),
                             ],
@@ -295,7 +276,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(24)),
+                  BorderRadius.vertical(top: Radius.circular(24)),
                   boxShadow: [
                     BoxShadow(
                       color: Color(0x14000000),
@@ -324,21 +305,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ),
                             child: isPlacing
                                 ? const SizedBox(
-                                    width: 22,
-                                    height: 22,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                              width: 22,
+                              height: 22,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                                 : const Text(
-                                    'Place Order',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
+                              'Place Order',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                              ),
+                            ),
                           ),
                         );
                       },

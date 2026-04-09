@@ -23,9 +23,15 @@ class MenuItemModel extends MenuItemEntity {
     final List<VariantEntity>? variants;
 
     if (rawVariants != null && rawVariants is List && rawVariants.isNotEmpty) {
-      variants = rawVariants
-          .map((v) => VariantEntity(name: v['name']?.toString() ?? ''))
-          .toList();
+      variants = rawVariants.map((v) {
+        if (v is Map<String, dynamic>) {
+          return VariantEntity(
+            name: v['name']?.toString() ?? '',
+            stock: (v['stock'] as num?)?.toInt(),
+          );
+        }
+        return VariantEntity(name: v.toString());
+      }).toList();
     } else {
       variants = null;
     }

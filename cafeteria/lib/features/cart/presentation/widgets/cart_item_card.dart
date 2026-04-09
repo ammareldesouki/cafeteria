@@ -247,104 +247,104 @@ class _CartItemCardState extends State<CartItemCard> {
                 ],
 
                 // ── Notes field (shown for items that may need it) ─────────
-                if (widget.item.menuItemName.toLowerCase().contains('tea') ||
-                    widget.item.note != null) ...[
-                  const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      // Sugar-like stepper (generic "add-on amount")
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Sugar Amount',
-                              style: TextStyle(
-                                  fontSize: 12, color: Color(0xFF8B7355)),
-                            ),
-                            const SizedBox(height: 6),
-                            Row(
-                              children: [
-                                _SmallQtyButton(
-                                  icon: Icons.remove,
-                                  onTap: () {},
-                                ),
-                                const Padding(
-                                  padding:
-                                      EdgeInsets.symmetric(horizontal: 10),
-                                  child: Text('1',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15,
-                                          color: Color(0xFF3B1A08))),
-                                ),
-                                _SmallQtyButton(
-                                  icon: Icons.add,
-                                  onTap: () {},
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      // Notes
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Add Notes',
-                              style: TextStyle(
-                                  fontSize: 12, color: Color(0xFF8B7355)),
-                            ),
-                            const SizedBox(height: 6),
-                            TextField(
-                              controller: _noteController,
-                              maxLines: 2,
-                              style: const TextStyle(
-                                  fontSize: 12, color: Color(0xFF3B1A08)),
-                              onSubmitted: (_) {
-                                context.read<CartBloc>().add(
-                                      UpdateCartItemEvent(
-                                        itemId: widget.item.id,
-                                        quantity: widget.item.quantity,
-                                        variantName: widget.item.variantName,
-                                        note: _noteController.text,
-                                      ),
-                                    );
-                              },
-                              decoration: InputDecoration(
-                                hintText: 'Add any special instructions here...',
-                                hintStyle: const TextStyle(
-                                    fontSize: 11, color: Color(0xFFBCA999)),
-                                contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 8),
-                                filled: true,
-                                fillColor: const Color(0xFFFAF7F4),
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                      color: Color(0xFFD9C7B8)),
-                                ),
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                      color: Color(0xFFD9C7B8)),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                  borderSide: const BorderSide(
-                                      color: Color(0xFF3B1A08), width: 1.5),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                // if (widget.item.menuItemName.toLowerCase().contains('tea') ||
+                //     widget.item.note != null) ...[
+                //   const SizedBox(height: 12),
+                //   Row(
+                //     children: [
+                //       // Sugar-like stepper (generic "add-on amount")
+                //       Expanded(
+                //         child: Column(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             const Text(
+                //               'Sugar Amount',
+                //               style: TextStyle(
+                //                   fontSize: 12, color: Color(0xFF8B7355)),
+                //             ),
+                //             const SizedBox(height: 6),
+                //             Row(
+                //               children: [
+                //                 _SmallQtyButton(
+                //                   icon: Icons.remove,
+                //                   onTap: () {},
+                //                 ),
+                //                 const Padding(
+                //                   padding:
+                //                       EdgeInsets.symmetric(horizontal: 10),
+                //                   child: Text('1',
+                //                       style: TextStyle(
+                //                           fontWeight: FontWeight.bold,
+                //                           fontSize: 15,
+                //                           color: Color(0xFF3B1A08))),
+                //                 ),
+                //                 _SmallQtyButton(
+                //                   icon: Icons.add,
+                //                   onTap: () {},
+                //                 ),
+                //               ],
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //       const SizedBox(width: 12),
+                //       // Notes
+                //       Expanded(
+                //         child: Column(
+                //           crossAxisAlignment: CrossAxisAlignment.start,
+                //           children: [
+                //             const Text(
+                //               'Add Notes',
+                //               style: TextStyle(
+                //                   fontSize: 12, color: Color(0xFF8B7355)),
+                //             ),
+                //             const SizedBox(height: 6),
+                //             TextField(
+                //               controller: _noteController,
+                //               maxLines: 2,
+                //               style: const TextStyle(
+                //                   fontSize: 12, color: Color(0xFF3B1A08)),
+                //               onSubmitted: (_) {
+                //                 context.read<CartBloc>().add(
+                //                       UpdateCartItemEvent(
+                //                         itemId: widget.item.id,
+                //                         quantity: widget.item.quantity,
+                //                         variantName: widget.item.variantName,
+                //                         note: _noteController.text,
+                //                       ),
+                //                     );
+                //               },
+                //               decoration: InputDecoration(
+                //                 hintText: 'Add any special instructions here...',
+                //                 hintStyle: const TextStyle(
+                //                     fontSize: 11, color: Color(0xFFBCA999)),
+                //                 contentPadding: const EdgeInsets.symmetric(
+                //                     horizontal: 10, vertical: 8),
+                //                 filled: true,
+                //                 fillColor: const Color(0xFFFAF7F4),
+                //                 border: OutlineInputBorder(
+                //                   borderRadius: BorderRadius.circular(12),
+                //                   borderSide: const BorderSide(
+                //                       color: Color(0xFFD9C7B8)),
+                //                 ),
+                //                 enabledBorder: OutlineInputBorder(
+                //                   borderRadius: BorderRadius.circular(12),
+                //                   borderSide: const BorderSide(
+                //                       color: Color(0xFFD9C7B8)),
+                //                 ),
+                //                 focusedBorder: OutlineInputBorder(
+                //                   borderRadius: BorderRadius.circular(12),
+                //                   borderSide: const BorderSide(
+                //                       color: Color(0xFF3B1A08), width: 1.5),
+                //                 ),
+                //               ),
+                //             ),
+                //           ],
+                //         ),
+                //       ),
+                //     ],
+                //   ),
+                // ],
               ],
             ),
           ),

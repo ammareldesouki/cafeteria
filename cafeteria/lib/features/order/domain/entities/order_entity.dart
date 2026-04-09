@@ -21,6 +21,8 @@ class OrderItemEntity {
 class OrderEntity {
   final String id;
   final String userId;
+  final String? userName;
+  final String? userPhone;
   final String userEmail;
   final List<OrderItemEntity> items;
   final double totalPrice;
@@ -33,6 +35,8 @@ class OrderEntity {
   const OrderEntity({
     required this.id,
     required this.userId,
+    this.userName,
+    this.userPhone,
     required this.userEmail,
     required this.items,
     required this.totalPrice,

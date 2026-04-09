@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 
-
+import '../admin/presentation/manager/admin_bloc.dart';
+import '../admin/presentation/manager/admin_event.dart';
+import '../admin/presentation/pages/cafeteria_panel_page.dart';
 import '../auth/di/injaction.dart';
 import '../cart/presentation/manager/cart_bloc.dart';
 import '../cart/presentation/manager/cart_event.dart';
@@ -47,109 +49,132 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildUserLayout();
+    if (widget.role == 'admin') {
+      return _buildAdminLayout();
+    } else {
+      return _buildUserLayout();
+    }
   }
 
   Widget _buildUserLayout() {
     return MultiBlocProvider(
-      providers: [
-        BlocProvider.value(
-          value: sl<HomeBloc>()..add(const FetchMenuEvent()),
-        ),
-        BlocProvider.value(
-          value: sl<FavouriteBloc>()..add(GetFavouritesEvent()),
-        ),
-        BlocProvider.value(
-          value: sl<CartBloc>()..add(GetCartEvent()),
-        ),
-        BlocProvider.value(
-          value: sl<OrderBloc>()..add(GetOrdersEvent()),
-        ),
-        BlocProvider.value(
-          value: sl<AuthBloc>()..add(const GetUserInfoEvent()),
-        ),
-      ],
-      child: BlocListener<AuthBloc, AuthState>(
-        listener: (context, state) {
-          if (state is UserSignedOut) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              RouteNames.signIn,
-              (route) => false,
-            );
-          }
-        },
-        child: Scaffold(
-          body: Stack(
-            children: [
-              IndexedStack(
-                index: _index,
-                children: [
-                  HomePage(
-                    userName: widget.userName,
-                    userId: widget.userId,
-                  ),
-                  const FavPage(),
-                  const CartPage(),
-                  const OrderPage(),
-                ],
-              ),
-              // ── Top Header ──
-              Positioned(
-                top: MediaQuery.of(context).padding.top + 10,
-                right: 20,
-                child: BlocBuilder<AuthBloc, AuthState>(
-                  builder: (context, state) {
-                    String name = widget.userName;
-                    UserEntity? user;
-                    if (state is UserProfileLoaded) {
-                      name = state.user.name;
-                      user = state.user;
-                    }
-                    return ProfileHeader(
-                      userName: name,
-                      onTap: () {
-                        if (user != null) {
-                          showDialog(
-                            context: context,
-                            builder: (context) => AccountMenuDialog(user: user!),
-                          );
-                        } else {
-                          // Fallback if not loaded yet
-                          context.read<AuthBloc>().add(const GetUserInfoEvent());
-                        }
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
+        providers: [
+          BlocProvider.value(
+            value: sl<HomeBloc>()
+              ..add(const FetchMenuEvent()),
           ),
-          bottomNavigationBar: _navBar(
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home_rounded),
-              label: 'Home',
+          BlocProvider.value(
+            value: sl<FavouriteBloc>()
+              ..add(GetFavouritesEvent()),
+          ),
+          BlocProvider.value(
+            value: sl<CartBloc>()
+              ..add(GetCartEvent()),
+          ),
+          BlocProvider.value(
+            value: sl<OrderBloc>()
+              ..add(GetOrdersEvent()),
+          ),
+          BlocProvider.value(
+            value: sl<AuthBloc>()
+              ..add(const GetUserInfoEvent()),
+          ),
+        ],
+        child: BlocListener<AuthBloc, AuthState>(
+          listener: (context, state) {
+            if (state is UserSignedOut) {
+              Navigator.of(context).pushNamedAndRemoveUntil(
+                RouteNames.signIn,
+                    (route) => false,
+              );
+            }
+          },
+          child: Scaffold(
+            body: Stack(
+              children: [
+                IndexedStack(
+                  index: _index,
+                  children: [
+                    HomePage(
+                      userName: widget.userName,
+                      userId: widget.userId,
+                    ),
+                    const FavPage(),
+                    const CartPage(),
+                    const OrderPage(),
+                  ],
+                ),
+                // ── Top Header ──
+                Positioned(
+                  top: MediaQuery
+                      .of(context)
+                      .padding
+                      .top + 10,
+                  right: 20,
+                  child: BlocBuilder<AuthBloc, AuthState>(
+                    builder: (context, state) {
+                      String name = widget.userName;
+                      UserEntity? user;
+                      if (state is UserProfileLoaded) {
+                        name = state.user.name;
+                        user = state.user;
+                      }
+                      return ProfileHeader(
+                        userName: name,
+                        onTap: () {
+                          if (user != null) {
+                            showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  AccountMenuDialog(user: user!),
+                            );
+                          } else {
+                            // Fallback if not loaded yet
+                            context.read<AuthBloc>().add(
+                                const GetUserInfoEvent());
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_border_rounded),
-              activeIcon: Icon(Icons.favorite_rounded),
-              label: 'Favorites',
+            bottomNavigationBar: _navBar(
+              items: const [
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.home_outlined),
+                  activeIcon: Icon(Icons.home_rounded),
+                  label: 'Home',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.favorite_border_rounded),
+                  activeIcon: Icon(Icons.favorite_rounded),
+                  label: 'Favorites',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.shopping_cart_outlined),
+                  activeIcon: Icon(Icons.shopping_cart_rounded),
+                  label: 'Cart',
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.receipt_long_outlined),
+                  activeIcon: Icon(Icons.receipt_long_rounded),
+                  label: 'Orders',
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart_outlined),
-              activeIcon: Icon(Icons.shopping_cart_rounded),
-              label: 'Cart',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.receipt_long_outlined),
-              activeIcon: Icon(Icons.receipt_long_rounded),
-              label: 'Orders',
-            ),
-          ],
-        ),
-      ),
-    ));
+          ),
+        ));
+  }
+
+  Widget _buildAdminLayout() {
+    return BlocProvider(
+      create: (context) =>
+      sl<AdminBloc>()
+        ..add(LoadDashboardDataEvent()),
+      child: const CafeteriaPanelPage(),
+    );
   }
 
   Widget _navBar({required List<BottomNavigationBarItem> items}) {

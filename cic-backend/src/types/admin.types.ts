@@ -12,6 +12,8 @@ export interface DashboardAnalytics {
 
 export interface OrderFilters {
 	userId?: string;
+	search?: string;
+	dateRange?: string;
 	paymentStatus?: PaymentStatus;
 	status?: OrderStatus;
 	page?: number;

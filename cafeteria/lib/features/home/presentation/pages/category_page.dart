@@ -164,8 +164,14 @@ class _ProductCard extends StatelessWidget {
   const _ProductCard({required this.item});
 
   /// true when the item tracks stock AND has 0 available
-  bool get _isOutOfStock =>
-      item.trackStock && item.stock != null && item.stock! <= 0;
+  bool get _isOutOfStock {
+    if (!item.trackStock) return false;
+    if (item.hasVariants && item.variants != null &&
+        item.variants!.isNotEmpty) {
+      return item.variants!.every((v) => (v.stock ?? 0) <= 0);
+    }
+    return (item.stock ?? 0) <= 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -349,10 +355,28 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
   /// Untracked (hot drinks): capped at 99.
   int get _maxQuantity {
     if (!item.trackStock) return 99;
+    if (_hasVariants && _selectedVariant != null) {
+      final v = item.variants?.firstWhere(
+            (v) => v.name == _selectedVariant,
+        orElse: () => const VariantEntity(name: ''),
+      );
+      return v?.stock ?? 0;
+    }
     return item.stock ?? 0;
   }
 
-  bool get _isOutOfStock => item.trackStock && _maxQuantity <= 0;
+  bool get _isOutOfStock {
+    if (!item.trackStock) return false;
+    if (_hasVariants) {
+      if (_selectedVariant == null) {
+        // If no variant is selected, check if ALL variants are out of stock
+        return item.variants?.every((v) => (v.stock ?? 0) <= 0) ?? true;
+      } else {
+        return _maxQuantity <= 0;
+      }
+    }
+    return (item.stock ?? 0) <= 0;
+  }
 
   @override
   void dispose() {
@@ -573,22 +597,31 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                 ],
               ),
               // ── Stock indicator ──
-              if (item.trackStock && item.stock != null)
+              if (item.trackStock)
                 Padding(
                   padding: const EdgeInsets.only(top: 6),
-                  child: Text(
-                    item.stock! <= 5
-                        ? 'Only ${item.stock} left in stock'
-                        : '${item.stock} available',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: item.stock! <= 5
-                          ? const Color(0xFFE57373)
-                          : const Color(0xFF8B7355),
-                      fontWeight: item.stock! <= 5
-                          ? FontWeight.w600
-                          : FontWeight.normal,
-                    ),
+                  child: Builder(
+                    builder: (context) {
+                      final int currentStock = _maxQuantity;
+                      final String stockText = currentStock <= 5
+                          ? 'Only $currentStock left in stock'
+                          : '$currentStock available';
+
+                      return Text(
+                        _hasVariants && _selectedVariant == null
+                            ? 'Select a variety to see availability'
+                            : stockText,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: currentStock <= 5
+                              ? const Color(0xFFE57373)
+                              : const Color(0xFF8B7355),
+                          fontWeight: currentStock <= 5
+                              ? FontWeight.w600
+                              : FontWeight.normal,
+                        ),
+                      );
+                    },
                   ),
                 ),
 
@@ -630,33 +663,62 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                   runSpacing: 10,
                   children: item.variants!.map((variant) {
                     final isSelected = _selectedVariant == variant.name;
+                    final isOutOfStock =
+                        item.trackStock && (variant.stock ?? 0) <= 0;
+
                     return GestureDetector(
-                      onTap: () =>
-                          setState(() => _selectedVariant = variant.name),
-                      child: AnimatedContainer(
-                        duration: const Duration(milliseconds: 200),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 18, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: isSelected
-                              ? const Color(0xFF3B1A08)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(22),
-                          border: Border.all(
+                      onTap: isOutOfStock
+                          ? null
+                          : () =>
+                          setState(() {
+                            _selectedVariant = variant.name;
+                            if (_quantity > _maxQuantity) {
+                              _quantity = _maxQuantity > 0 ? 1 : 0;
+                            }
+                          }),
+                      child: Opacity(
+                        opacity: isOutOfStock ? 0.5 : 1.0,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 18, vertical: 10),
+                          decoration: BoxDecoration(
                             color: isSelected
                                 ? const Color(0xFF3B1A08)
-                                : const Color(0xFFD9C7B8),
-                            width: 1.5,
+                                : Colors.white,
+                            borderRadius: BorderRadius.circular(22),
+                            border: Border.all(
+                              color: isSelected
+                                  ? const Color(0xFF3B1A08)
+                                  : isOutOfStock
+                                  ? const Color(0xFFE57373)
+                                  : const Color(0xFFD9C7B8),
+                              width: 1.5,
+                            ),
                           ),
-                        ),
-                        child: Text(
-                          variant.name,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected
-                                ? Colors.white
-                                : const Color(0xFF3B1A08),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                variant.name,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : const Color(0xFF3B1A08),
+                                ),
+                              ),
+                              if (isOutOfStock)
+                                const Text(
+                                  "Out",
+                                  style: TextStyle(
+                                    fontSize: 9,
+                                    color: Color(0xFFE57373),
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ),

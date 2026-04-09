@@ -144,6 +144,14 @@ export const validateOrderFilters = (
 		filters.userId = req.query.userId as string;
 	}
 
+	if (req.query.search) {
+		filters.search = req.query.search as string;
+	}
+
+	if (req.query.dateRange) {
+		filters.dateRange = req.query.dateRange as string;
+	}
+
 	if (req.query.paymentStatus) {
 		const paymentStatus = req.query.paymentStatus as string;
 		if (

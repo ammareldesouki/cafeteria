@@ -17,14 +17,21 @@ export const createOrder = async (
 	next: NextFunction,
 ) => {
 	try {
+		console.log("Better-Auth User Data:", (req as any).user);
 		const userId = (req as any).user.id;
 		const userEmail = (req as any).user.email;
-		const deliveryLocation = req.body.deliveryLocation as string | undefined;
+		const username = (req as any).user.name;
+		const userPhone = (req as any).user.phoneNumber;
 
-		const order = await orderService.createOrderFromCart(
+		const deliveryLocation = req.body.deliveryLocation as string | undefined;
+const order= await orderService.createOrderFromCart(
+
 			userId,
 			userEmail,
 			deliveryLocation,
+			username,
+			userPhone,
+		
 		);
 
 		res.status(201).json(order);

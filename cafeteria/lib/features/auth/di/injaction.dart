@@ -35,6 +35,11 @@ import '../../order/data/repositories/order_repository_impl.dart';
 import '../../order/domain/repositories/order_repository.dart';
 import '../../order/domain/use_cases/order_usecases.dart';
 import '../../order/presentation/manager/order_bloc.dart';
+import '../../admin/data/data_sources/admin_remote_datasource.dart';
+import '../../admin/data/repositories/admin_repository_impl.dart';
+import '../../admin/domain/repositories/admin_repository.dart';
+import '../../admin/domain/use_cases/admin_usecases.dart';
+import '../../admin/presentation/manager/admin_bloc.dart';
 
 final sl = GetIt.instance;
 
@@ -168,4 +173,27 @@ Future<void> setupLocator() async {
     getOrderByIdUseCase: sl(),
     cancelOrderUseCase: sl(),
   ));
+
+  /// ── Admin DataSource ────────────────────
+  sl.registerLazySingleton<AdminRemoteDataSource>(
+        () => AdminRemoteDataSourceImpl(sl()),
+  );
+
+  /// ── Admin Repo ──────────────────────────
+  sl.registerLazySingleton<AdminRepository>(
+        () => AdminRepositoryImpl(sl()),
+  );
+
+  /// ── Admin UseCases ──────────────────────
+  sl.registerLazySingleton(() => GetDashboardAnalyticsUseCase(sl()));
+  sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateAdminOrderUseCase(sl()));
+
+  /// ── Admin Bloc ──────────────────────────
+  sl.registerLazySingleton(() =>
+      AdminBloc(
+        getDashboardAnalytics: sl(),
+        getAdminOrders: sl(),
+        updateAdminOrder: sl(),
+      ));
 }

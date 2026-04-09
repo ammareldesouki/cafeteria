@@ -89,4 +89,23 @@ export const walletService = {
 
 		await walletRepository.createTransaction(transaction);
 	},
+
+	/**
+	 * Record refund (credit to wallet when order is cancelled)
+	 */
+	async recordRefund(orderId: string, amount: number): Promise<void> {
+		// Update wallet balance (add amount back)
+		await walletRepository.updateBalance(amount);
+
+		// Create transaction record
+		const transaction: WalletTransaction = {
+			orderId,
+			amount,
+			type: TransactionType.CREDIT,
+			description: `Order ${orderId} cancelled (refund)`,
+			createdAt: new Date(),
+		};
+
+		await walletRepository.createTransaction(transaction);
+	},
 };

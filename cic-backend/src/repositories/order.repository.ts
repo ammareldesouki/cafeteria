@@ -5,9 +5,41 @@
  */
 import mongoose from "mongoose";
 import { Order, OrderStatus, PaymentStatus } from "@/types/order.types";
+import { OrderFilters } from "@/types/admin.types";
 import { ObjectId } from "mongodb";
 
 const collection = mongoose.connection.collection<Order>("orders");
+
+// Helper to build MongoDB query from filters
+function buildFilterQuery(filters: OrderFilters): any {
+	const query: Record<string, unknown> = {};
+
+	if (filters.userId) query.userId = filters.userId;
+	if (filters.paymentStatus) query.paymentStatus = filters.paymentStatus;
+	if (filters.status) query.status = filters.status;
+	
+	if (filters.search) {
+		query.userName = { $regex: filters.search, $options: "i" };
+	}
+	
+	if (filters.dateRange) {
+		const now = new Date();
+		const start = new Date(now);
+		start.setHours(0, 0, 0, 0);
+		
+		if (filters.dateRange === "today") {
+			query.createdAt = { $gte: start };
+		} else if (filters.dateRange === "week") {
+			start.setDate(now.getDate() - 7);
+			query.createdAt = { $gte: start };
+		} else if (filters.dateRange === "month") {
+			start.setMonth(now.getMonth() - 1);
+			query.createdAt = { $gte: start };
+		}
+	}
+	
+	return query;
+}
 
 export const orderRepository = {
 	/**
@@ -65,16 +97,8 @@ export const orderRepository = {
 	/**
 	 * Find all orders with filters (admin only)
 	 */
-	async findAllWithFilters(filters: {
-		userId?: string;
-		paymentStatus?: PaymentStatus;
-		status?: OrderStatus;
-	}): Promise<Order[]> {
-		const query: Record<string, unknown> = {};
-
-		if (filters.userId) query.userId = filters.userId;
-		if (filters.paymentStatus) query.paymentStatus = filters.paymentStatus;
-		if (filters.status) query.status = filters.status;
+	async findAllWithFilters(filters: OrderFilters): Promise<Order[]> {
+		const query = buildFilterQuery(filters);
 
 		return collection.find(query).sort({ createdAt: -1 }).toArray();
 	},
@@ -82,16 +106,8 @@ export const orderRepository = {
 	/**
 	 * Count orders with filters
 	 */
-	async countWithFilters(filters: {
-		userId?: string;
-		paymentStatus?: PaymentStatus;
-		status?: OrderStatus;
-	}): Promise<number> {
-		const query: Record<string, unknown> = {};
-
-		if (filters.userId) query.userId = filters.userId;
-		if (filters.paymentStatus) query.paymentStatus = filters.paymentStatus;
-		if (filters.status) query.status = filters.status;
+	async countWithFilters(filters: OrderFilters): Promise<number> {
+		const query = buildFilterQuery(filters);
 
 		return collection.countDocuments(query);
 	},
@@ -102,17 +118,9 @@ export const orderRepository = {
 	async findAllPaginated(
 		page: number,
 		limit: number,
-		filters: {
-			userId?: string;
-			paymentStatus?: PaymentStatus;
-			status?: OrderStatus;
-		},
+		filters: OrderFilters,
 	): Promise<Order[]> {
-		const query: Record<string, unknown> = {};
-
-		if (filters.userId) query.userId = filters.userId;
-		if (filters.paymentStatus) query.paymentStatus = filters.paymentStatus;
-		if (filters.status) query.status = filters.status;
+		const query = buildFilterQuery(filters);
 
 		const skip = (page - 1) * limit;
 
