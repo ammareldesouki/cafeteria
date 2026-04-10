@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dio/dio.dart';
+import '../../domain/use_cases/admin_menu_usecases.dart';
 import '../../domain/use_cases/admin_usecases.dart';
 import 'admin_event.dart';
 import 'admin_state.dart';
@@ -10,18 +11,49 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final GetAdminOrdersUseCase getAdminOrders;
   final UpdateAdminOrderUseCase updateAdminOrder;
 
+  // Menu UseCases
+  final GetAdminMenuItemsUseCase getAdminMenuItems;
+  final CreateMenuItemUseCase createMenuItem;
+  final UpdateMenuItemUseCase updateMenuItem;
+  final DeleteMenuItemUseCase deleteMenuItem;
+  final SetItemStockUseCase setItemStock;
+  final SetVariantStockUseCase setVariantStock;
+  final AddVariantUseCase addVariant;
+  final RemoveVariantUseCase removeVariant;
+
   AdminDashboardLoaded? _lastLoadedState;
+  AdminMenuLoaded? _lastMenuState;
   Timer? _pollTimer;
+
+  AdminMenuLoaded? get lastMenuState => _lastMenuState;
 
   AdminBloc({
     required this.getDashboardAnalytics,
     required this.getAdminOrders,
     required this.updateAdminOrder,
+    required this.getAdminMenuItems,
+    required this.createMenuItem,
+    required this.updateMenuItem,
+    required this.deleteMenuItem,
+    required this.setItemStock,
+    required this.setVariantStock,
+    required this.addVariant,
+    required this.removeVariant,
   }) : super(AdminInitial()) {
     on<LoadDashboardDataEvent>(_onLoadDashboardData);
     on<FetchAdminOrdersEvent>(_onFetchAdminOrders);
     on<UpdateAdminOrderEvent>(_onUpdateAdminOrder);
     on<PollDashboardDataEvent>(_onPollDashboardData);
+
+    // Menu Handlers
+    on<FetchAdminMenuEvent>(_onFetchAdminMenu);
+    on<CreateMenuItemEvent>(_onCreateMenuItem);
+    on<UpdateMenuItemEvent>(_onUpdateMenuItem);
+    on<DeleteMenuItemEvent>(_onDeleteMenuItem);
+    on<SetItemStockEvent>(_onSetItemStock);
+    on<SetVariantStockEvent>(_onSetVariantStock);
+    on<AddVariantEvent>(_onAddVariant);
+    on<RemoveVariantEvent>(_onRemoveVariant);
   }
 
   String _friendlyError(Object e) {
@@ -183,5 +215,137 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   Future<void> close() {
     _pollTimer?.cancel();
     return super.close();
+  }
+
+  // ─── Menu Handlers ───────────────────────────────────────────────────────
+
+  Future<void> _onFetchAdminMenu(
+    FetchAdminMenuEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(AdminLoading());
+    try {
+      final items = await getAdminMenuItems();
+      final newState = AdminMenuLoaded(items);
+      _lastMenuState = newState;
+      emit(newState);
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+    }
+  }
+
+  Future<void> _onCreateMenuItem(
+    CreateMenuItemEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await createMenuItem(
+        name: event.name,
+        price: event.price,
+        category: event.category,
+        description: event.description,
+        image: event.image,
+        hasVariants: event.hasVariants,
+        variants: event.variants,
+      );
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onUpdateMenuItem(
+    UpdateMenuItemEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await updateMenuItem(
+        itemId: event.itemId,
+        name: event.name,
+        price: event.price,
+        category: event.category,
+        description: event.description,
+        image: event.image,
+        hasVariants: event.hasVariants,
+      );
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onDeleteMenuItem(
+    DeleteMenuItemEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await deleteMenuItem(event.itemId);
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onSetItemStock(
+    SetItemStockEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await setItemStock(itemId: event.itemId, stock: event.stock);
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onSetVariantStock(
+    SetVariantStockEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await setVariantStock(
+        itemId: event.itemId,
+        variantName: event.variantName,
+        stock: event.stock,
+      );
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onAddVariant(
+    AddVariantEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await addVariant(
+        itemId: event.itemId,
+        name: event.name,
+        stock: event.stock,
+      );
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onRemoveVariant(
+    RemoveVariantEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await removeVariant(itemId: event.itemId, variantName: event.variantName);
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
   }
 }

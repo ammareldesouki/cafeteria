@@ -1,6 +1,7 @@
-import '../../domain/entities/analytics_entity.dart';
-import '../../domain/entities/paginated_orders_entity.dart';
+import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../../order/domain/entities/order_entity.dart';
+import '../entities/analytics_entity.dart';
+import '../entities/paginated_orders_entity.dart';
 
 abstract class AdminRepository {
   Future<DashboardAnalyticsEntity> getDashboardAnalytics();
@@ -18,5 +19,52 @@ abstract class AdminRepository {
     required String orderId,
     String? status,
     String? paymentStatus,
+  });
+
+  // Menu Management
+  Future<List<MenuItemEntity>> getAdminMenuItems();
+
+  Future<MenuItemEntity> createMenuItem({
+    required String name,
+    required double price,
+    required String category,
+    required String description,
+    required String image,
+    required bool hasVariants,
+    List<VariantEntity>? variants,
+  });
+
+  Future<MenuItemEntity> updateMenuItem({
+    required String itemId,
+    String? name,
+    double? price,
+    String? category,
+    String? description,
+    String? image,
+    bool? hasVariants,
+  });
+
+  Future<void> deleteMenuItem(String itemId);
+
+  Future<MenuItemEntity> setItemStock({
+    required String itemId,
+    required int stock,
+  });
+
+  Future<MenuItemEntity> setVariantStock({
+    required String itemId,
+    required String variantName,
+    required int stock,
+  });
+
+  Future<MenuItemEntity> addVariant({
+    required String itemId,
+    required String name,
+    required int stock,
+  });
+
+  Future<MenuItemEntity> removeVariant({
+    required String itemId,
+    required String variantName,
   });
 }

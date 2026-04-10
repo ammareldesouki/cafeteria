@@ -1,3 +1,4 @@
+import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../domain/entities/analytics_entity.dart';
 import '../../domain/entities/paginated_orders_entity.dart';
 
@@ -41,6 +42,12 @@ class AdminDashboardLoaded extends AdminState {
       activePaymentStatus: activePaymentStatus ?? this.activePaymentStatus,
     );
   }
+}
+
+class AdminMenuLoaded extends AdminState {
+  final List<MenuItemEntity> items;
+
+  AdminMenuLoaded(this.items);
 }
 
 class AdminError extends AdminState {

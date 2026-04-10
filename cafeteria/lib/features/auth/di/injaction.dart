@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../core/network/dio_handler.dart';
+import '../../admin/domain/use_cases/admin_menu_usecases.dart';
 import '../../cart/data/data_sources/cart_remote_datasource.dart';
 import '../../cart/data/repositories/cart_repository_impl.dart';
 import '../../cart/domain/repositories/cart_repository.dart';
@@ -188,6 +189,14 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => GetDashboardAnalyticsUseCase(sl()));
   sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
   sl.registerLazySingleton(() => UpdateAdminOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetAdminMenuItemsUseCase(sl()));
+  sl.registerLazySingleton(() => CreateMenuItemUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateMenuItemUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteMenuItemUseCase(sl()));
+  sl.registerLazySingleton(() => SetItemStockUseCase(sl()));
+  sl.registerLazySingleton(() => SetVariantStockUseCase(sl()));
+  sl.registerLazySingleton(() => AddVariantUseCase(sl()));
+  sl.registerLazySingleton(() => RemoveVariantUseCase(sl()));
 
   /// ── Admin Bloc ──────────────────────────
   sl.registerLazySingleton(() =>
@@ -195,5 +204,13 @@ Future<void> setupLocator() async {
         getDashboardAnalytics: sl(),
         getAdminOrders: sl(),
         updateAdminOrder: sl(),
+        getAdminMenuItems: sl(),
+        createMenuItem: sl(),
+        updateMenuItem: sl(),
+        deleteMenuItem: sl(),
+        setItemStock: sl(),
+        setVariantStock: sl(),
+        addVariant: sl(),
+        removeVariant: sl(),
       ));
 }
