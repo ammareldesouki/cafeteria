@@ -21,7 +21,7 @@ class OrderStatusTracker extends StatelessWidget {
               color: Color(0xFFE57373),
               size: 18,
             ),
-            const SizedBox(width: 6)Text(
+            const SizedBox(width: 6), Text(
               l10n.orderCancelled,
               style: const TextStyle(
                 color: Color(0xFFE57373),

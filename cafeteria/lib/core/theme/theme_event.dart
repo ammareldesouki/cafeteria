@@ -6,6 +6,5 @@ class ToggleThemeEvent extends ThemeEvent {}
 
 class SetThemeEvent extends ThemeEvent {
   final ThemeMode mode;
-
   SetThemeEvent(this.mode);
 }

@@ -9,6 +9,12 @@ const router = Router();
 router.use(
 	"/auth",
 	async (req: Request, res: Response, next: NextFunction) => {
+		// Disabled for now: password reset endpoints
+		// if (req.path === "/request-password-reset" || req.path === "/reset-password") {
+		// 	res.status(404).json({ message: "Password reset is disabled" });
+		// 	return;
+		// }
+
 		if (req.path === "/sign-up/email") {
 			return authNameFromEmailMiddleware(req, res, next);
 		}

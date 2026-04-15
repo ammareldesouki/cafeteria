@@ -132,14 +132,14 @@ class _EmptyState extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFF3B1A08),
-                borderRadius: BorderRadius.circular(14),
-              ),hild: Row(
-                mmainAxisSize: MainAxisSize.min,
-                children: [
+                borderRadius: BorderRadius.circular(14),,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                cchildren: [
                   Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
                   SizedBox(width: 8),
-                  Text(ppLocalizations.of(context)!.refresh,
-                    sstyle: TextStyle(
+                  Text(AppLocalizations.of(context)!.refresh,
+                    style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,

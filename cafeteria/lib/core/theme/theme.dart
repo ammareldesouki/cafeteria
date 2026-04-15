@@ -38,12 +38,12 @@ class AppTheme {
         ),
       ),
 
-      // ── OutlinedButton ────────────────────────────────────────────────
+      // ── OutlinedButton ────────────────────────────────────────────────/ ── InputDecoration ───────────────────────────────────────────────
+      inputDecorationTheme: TTextFormFieldTheme.lightInputDecorationTheme,
 
-      // ── InputDecoration ───────────────────────────────────────────────nputDecorationTheme: TTextFormFieldTheme.lightInputDecorationTheme,
-
-      /// ── Text ──────────────────────────────────────────────────────────extTheme: TTextTheme.lightTextTheme,
-    ));
+      /// ── Text ──────────────────────────────────────────────────────────
+      textTheme: TTextTheme.lightTextTheme,
+    );
   }
 
 
@@ -66,14 +66,11 @@ class AppTheme {
         centerTitle: false,
       ),
 
-      // ── ElevatedButton ────────────────────────────────
-        elevatedButtonTheme: TElevatedButtonTheme.darkElevatedButtonTheme,
+      // ── ElevatedButton ────────────────────────────────levatedButtonTheme: TElevatedButtonTheme.darkElevatedButtonTheme,
 
-      // ── InputDecoration ───────────────────────────────
-        inputDecorationTheme: TTextFormFieldTheme.darkInputDecorationTheme,
+      /// ── InputDecoration ───────────────────────────────nputDecorationTheme: TTextFormFieldTheme.darkInputDecorationTheme,
 
-      // ── Text ──────────────────────────────────────────
-        textTheme: TTextTheme.darkTextTheme
+      /// ── Text ──────────────────────────────────────────extTheme: TTextTheme.darkTextTheme,
 
       // ── Card / Surface ────────────────────────────────
       // cardColor: darkCard,
