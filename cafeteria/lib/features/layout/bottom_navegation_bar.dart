@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 
+import '../../l10n/app_localizations.dart';
 import '../admin/presentation/manager/admin_bloc.dart';
 import '../admin/presentation/manager/admin_event.dart';
 import '../admin/presentation/pages/cafeteria_panel_page.dart';
@@ -141,26 +142,26 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
               ],
             ),
             bottomNavigationBar: _navBar(
-              items: const [
+              items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home_outlined),
                   activeIcon: Icon(Icons.home_rounded),
-                  label: 'Home',
+                  label: AppLocalizations.of(context)!.home,
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.favorite_border_rounded),
                   activeIcon: Icon(Icons.favorite_rounded),
-                  label: 'Favorites',
+                  label: AppLocalizations.of(context)!.favorites,
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.shopping_cart_outlined),
                   activeIcon: Icon(Icons.shopping_cart_rounded),
-                  label: 'Cart',
+                  label: AppLocalizations.of(context)!.cart,
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.receipt_long_outlined),
                   activeIcon: Icon(Icons.receipt_long_rounded),
-                  label: 'Orders',
+                  label: AppLocalizations.of(context)!.order,
                 ),
               ],
             ),

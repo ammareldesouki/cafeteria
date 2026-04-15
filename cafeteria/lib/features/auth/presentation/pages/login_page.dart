@@ -4,6 +4,7 @@ import 'package:cafeteria/core/route/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../manager/auth_bloc.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/buttons.dart';
@@ -81,16 +82,9 @@ class _SignInPageState extends State<SignInPage> {
                 builder: (context, state) {
                   final isLoading = state is AuthLoading;
                   return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      // Back button
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                      ),
-                      const SizedBox(height: 20),
+
 
                       // Logo
                       Center(
@@ -117,7 +111,7 @@ class _SignInPageState extends State<SignInPage> {
 
                       // ── Email ──────────────────────────────────────────
                       AppTextField(
-                        label: 'Email',
+                        label: AppLocalizations.of(context)!.email,
                         hint: 'you@example.com',
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
@@ -127,7 +121,7 @@ class _SignInPageState extends State<SignInPage> {
 
                       // ── Password ───────────────────────────────────────
                       AppTextField(
-                        label: 'Password',
+                        label: AppLocalizations.of(context)!.password,
                         controller: _passwordController,
                         isPassword: true,
                         validator: (v) {
@@ -140,9 +134,24 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       const SizedBox(height: 16),
 
-                        Align(
-                          alignment: AlignmentGeometry.centerRight,
-                            child: Text("Forget Password ?",style:  TextStyle(fontSize: 15,))),
+                      Align(
+                        alignment: AlignmentGeometry.centerRight,
+                        child: GestureDetector(
+                          onTap: () =>
+                              Navigator.pushNamed(
+                                context,
+                                RouteNames.forgotPassword,
+                              ),
+                          child: Text(
+                            AppLocalizations.of(context)!.forgotPassword,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              color: Color(0xFF3B1A08),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -150,7 +159,7 @@ class _SignInPageState extends State<SignInPage> {
 
                       // ── Sign Up button ─────────────────────────────────
                       PrimaryButton(
-                        label: 'Log In',
+                        label: AppLocalizations.of(context)!.login,
                         isLoading: isLoading,
                         onTap: _onSignIn,
                       ),
@@ -165,17 +174,19 @@ class _SignInPageState extends State<SignInPage> {
                       Center(
                         child: GestureDetector(
                           onTap: () =>
-                              Navigator.pushReplacementNamed(context,RouteNames.signUp),
+                              Navigator.pushNamed(context, RouteNames.signUp),
                           child: RichText(
-                            text: const TextSpan(
-                              text: ' Don\'t Have An Account ? ',
+                            text: TextSpan(
+                              text: AppLocalizations.of(context)!
+                                  .dontHaveAccount,
                               style: TextStyle(
                                 color: Color(0xFF9E9E9E),
                                 fontSize: 13,
                               ),
                               children: [
                                 TextSpan(
-                                  text: 'Create Account',
+                                  text: AppLocalizations.of(context)!
+                                      .createAccount,
                                   style: TextStyle(
                                     color: Color(0xFF3B1A08),
                                     fontWeight: FontWeight.w600,

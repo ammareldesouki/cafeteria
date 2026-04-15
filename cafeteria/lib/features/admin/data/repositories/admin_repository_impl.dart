@@ -54,6 +54,7 @@ class AdminRepositoryImpl implements AdminRepository {
     required String description,
     required String image,
     required bool hasVariants,
+    required int stock,
     List<VariantEntity>? variants,
   }) => remoteDataSource.createMenuItem(
     name: name,
@@ -62,6 +63,7 @@ class AdminRepositoryImpl implements AdminRepository {
     description: description,
     image: image,
     hasVariants: hasVariants,
+    stock: stock,
     variants: variants
         ?.map((v) => {'name': v.name, 'stock': v.stock ?? 0})
         .toList(),

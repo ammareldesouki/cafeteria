@@ -45,6 +45,7 @@ class CreateMenuItemEvent extends AdminEvent {
   final String description;
   final String image;
   final bool hasVariants;
+  final int stock;
   final List<VariantEntity>? variants;
 
   CreateMenuItemEvent({
@@ -54,6 +55,7 @@ class CreateMenuItemEvent extends AdminEvent {
     required this.description,
     required this.image,
     required this.hasVariants,
+    required this.stock,
     this.variants,
   });
 }

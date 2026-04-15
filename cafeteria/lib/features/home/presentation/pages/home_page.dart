@@ -2,6 +2,7 @@ import 'package:cafeteria/core/route/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/menu_item_entity.dart';
 import '../manager/home_bloc.dart';
 import '../widgets/category_card.dart';
@@ -83,8 +84,8 @@ class _HomePageState extends State<HomePage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
-                                'Categories',
+                              Text(
+                                AppLocalizations.of(context)!.categories,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -93,7 +94,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               Text(
-                                '${state.allItems.length} items',
+                                '${state.allItems.length} ${AppLocalizations.of(
+                                    context)!.items}',
                                 style: const TextStyle(
                                   fontSize: 13,
                                   color: Color(0xFF9E8E82),
@@ -104,11 +106,11 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 16),
 
                           CategoryCard(
-                            title: 'Cold Drinks',
+                            title: AppLocalizations.of(context)!.coldDrinks,
                             subtitle: 'Refreshing iced beverages',
                             onTap: () => _onCategoryTap(
                               context,
-                              'Cold Drinks',
+                              AppLocalizations.of(context)!.coldDrinks,
                               state.coldDrinks,
                             ),
                             gradientColors: const [
@@ -121,11 +123,11 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 14),
 
                           CategoryCard(
-                            title: 'Hot Drinks',
+                            title: AppLocalizations.of(context)!.hotDrinks,
                             subtitle: 'Warm comforting beverages',
                             onTap: () => _onCategoryTap(
                               context,
-                              'Hot Drinks',
+                              AppLocalizations.of(context)!.hotDrinks,
                               state.hotDrinks,
                             ),
                             gradientColors: const [
@@ -138,11 +140,11 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(height: 14),
 
                           CategoryCard(
-                            title: 'Side Items',
+                            title: AppLocalizations.of(context)!.sides,
                             subtitle: 'Choose your selection of side items',
                             onTap: () => _onCategoryTap(
                               context,
-                              'Side Items',
+                              AppLocalizations.of(context)!.sides,
                               state.sideItems,
                             ),
                             gradientColors: const [
@@ -306,8 +308,8 @@ class _ErrorView extends StatelessWidget {
               Icons.refresh_rounded,
               color: Color(0xFF3B1A08),
             ),
-            label: const Text(
-              'Try again',
+            label: Text(
+              AppLocalizations.of(context)!.tryAgain,
               style: TextStyle(color: Color(0xFF3B1A08)),
             ),
           ),

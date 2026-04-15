@@ -209,19 +209,26 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
       child: BlocConsumer<AdminBloc, AdminState>(
         listener: _adminListener,
         builder: (context, state) {
-          if (state is AdminInitial ||
-              (state is AdminLoading &&
-                  context
-                      .read<AdminBloc>()
-                      .state is! AdminDashboardLoaded)) {
+          final lastDashboard = context
+              .read<AdminBloc>()
+              .lastDashboardState;
+
+          if (state is AdminInitial && lastDashboard == null) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final currentState = state is AdminDashboardLoaded
-              ? state
-              : (context
-              .read<AdminBloc>()
-              .state as AdminDashboardLoaded);
+          if (state is AdminLoading && lastDashboard == null) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          final currentState =
+          state is AdminDashboardLoaded ? state : lastDashboard;
+
+          if (currentState == null) {
+            // Safety net: if we ever got here without a loaded dashboard, trigger load.
+            context.read<AdminBloc>().add(LoadDashboardDataEvent());
+            return const Center(child: CircularProgressIndicator());
+          }
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -668,8 +675,17 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
     final categoryController = TextEditingController(text: item?.category);
     final descController = TextEditingController(text: item?.description);
     final imageController = TextEditingController(text: item?.image);
+    final stockController =
+    TextEditingController(text: item?.stock?.toString() ?? "0");
     bool hasVariants = item?.hasVariants ?? false;
+    final variantNameControllers = <TextEditingController>[];
+    final variantStockControllers = <TextEditingController>[];
     final adminBloc = context.read<AdminBloc>();
+
+    if (item == null && hasVariants) {
+      variantNameControllers.add(TextEditingController());
+      variantStockControllers.add(TextEditingController(text: "0"));
+    }
 
     showModalBottomSheet(
       context: context,
@@ -679,6 +695,18 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (stfContext, setState) {
+            void ensureVariantRow() {
+              if (variantNameControllers.isEmpty) {
+                variantNameControllers.add(TextEditingController());
+                variantStockControllers.add(TextEditingController(text: "0"));
+              }
+            }
+
+            void addVariantRow() {
+              variantNameControllers.add(TextEditingController());
+              variantStockControllers.add(TextEditingController(text: "0"));
+            }
+
             return Padding(
               padding: EdgeInsets.only(bottom: MediaQuery
                   .of(ctx)
@@ -717,14 +745,118 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                     SwitchListTile(
                       title: const Text("Has Variants?"),
                       value: hasVariants,
-                      onChanged: (val) => setState(() => hasVariants = val),
+                      onChanged: (val) =>
+                          setState(() {
+                            hasVariants = val;
+                            if (item == null && hasVariants) {
+                              ensureVariantRow();
+                            }
+                            if (item == null && !hasVariants) {
+                              variantNameControllers.clear();
+                              variantStockControllers.clear();
+                            }
+                          }),
                     ),
+                    if (item == null) ...[
+                      const SizedBox(height: 12),
+                      if (!hasVariants)
+                        TextFormField(
+                          controller: stockController,
+                          keyboardType: TextInputType.number,
+                          decoration: const InputDecoration(
+                            labelText: "Stock",
+                            border: OutlineInputBorder(),
+                          ),
+                        )
+                      else
+                        ...[
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Variants",
+                              style: Theme
+                                  .of(stfContext)
+                                  .textTheme
+                                  .titleMedium,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          ...List.generate(variantNameControllers.length, (i) {
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    flex: 3,
+                                    child: TextFormField(
+                                      controller: variantNameControllers[i],
+                                      decoration: InputDecoration(
+                                        labelText: "Variant name",
+                                        border: const OutlineInputBorder(),
+                                        suffixIcon: i == 0
+                                            ? null
+                                            : IconButton(
+                                          tooltip: "Remove",
+                                          onPressed: () =>
+                                              setState(() {
+                                                variantNameControllers
+                                                    .removeAt(i);
+                                                variantStockControllers
+                                                    .removeAt(i);
+                                              }),
+                                          icon: const Icon(Icons.close),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    flex: 2,
+                                    child: TextFormField(
+                                      controller: variantStockControllers[i],
+                                      keyboardType: TextInputType.number,
+                                      decoration: const InputDecoration(
+                                        labelText: "Stock",
+                                        border: OutlineInputBorder(),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }),
+                          SizedBox(
+                            width: double.infinity,
+                            child: OutlinedButton.icon(
+                              onPressed: () => setState(addVariantRow),
+                              icon: const Icon(Icons.add),
+                              label: const Text("More variants"),
+                            ),
+                          ),
+                        ],
+                    ],
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           if (item == null) {
+                            final variants = hasVariants
+                                ? List.generate(variantNameControllers.length,
+                                    (i) {
+                                  final name =
+                                  variantNameControllers[i].text.trim();
+                                  final stock = int.tryParse(
+                                      variantStockControllers[i].text) ??
+                                      0;
+                                  return VariantEntity(
+                                      name: name, stock: stock);
+                                }).where((v) =>
+                            v.name
+                                .trim()
+                                .isNotEmpty).toList()
+                                : null;
+
                             adminBloc.add(CreateMenuItemEvent(
                               name: nameController.text,
                               price: double.tryParse(priceController.text) ??
@@ -733,6 +865,10 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               description: descController.text,
                               image: imageController.text,
                               hasVariants: hasVariants,
+                              stock: hasVariants
+                                  ? 0
+                                  : (int.tryParse(stockController.text) ?? 0),
+                              variants: variants,
                             ));
                           } else {
                             adminBloc.add(UpdateMenuItemEvent(

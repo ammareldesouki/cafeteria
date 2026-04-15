@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../core/constants/image_strings.dart';
 import '../../core/route/route_name.dart';
 
 class LoadingPage extends StatefulWidget {
@@ -17,9 +18,10 @@ class _LoadingPageState extends State<LoadingPage> {
   }
 
   Future<void> _navigate() async {
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, RouteNames.signIn);
+      Navigator.pushNamedAndRemoveUntil(
+          context, RouteNames.roleSelection, (route) => false);
     }
   }
 
@@ -33,8 +35,8 @@ class _LoadingPageState extends State<LoadingPage> {
           children: [
             // Replace with your actual logo asset
             Image.asset(
-              'assets/icons/logo.png',
-              width: 140,
+              TImages.SplashScreen,
+
               errorBuilder: (_, __, ___) => Column(
                 children: const [
                   Icon(Icons.delivery_dining, size: 80, color: Color(0xFF3B1A08)),

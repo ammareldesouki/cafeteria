@@ -13,6 +13,8 @@ router.use(
 			return authNameFromEmailMiddleware(req, res, next);
 		}
 
+		// Allow using phone number as identifier anywhere Better Auth expects "email"
+		// (sign-in + password reset request).
 		if (req.path === "/sign-in/email") {
 			const identifier = req.body?.email;
 			// If it doesn't contain an @, assume it is a phone number and look it up

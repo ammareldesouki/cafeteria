@@ -31,6 +31,7 @@ abstract class AdminRepository {
     required String description,
     required String image,
     required bool hasVariants,
+    required int stock,
     List<VariantEntity>? variants,
   });
 

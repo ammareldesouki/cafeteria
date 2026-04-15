@@ -1,17 +1,18 @@
 import mongoose from "mongoose";
 
-const collection = mongoose.connection.collection("cafeteria_no");
-
 type CafeteriaSettingsDocument = {
 	_id: string;
 	callNumber: string;
 };
 
+const collection =
+	mongoose.connection.collection<CafeteriaSettingsDocument>("cafeteria_no");
+
 export const cafeteriaSettingsRepository = {
 	async getCallNumber(): Promise<string | null> {
-		const doc = (await collection.findOne({
+		const doc = await collection.findOne({
 			_id: "default",
-		})) as CafeteriaSettingsDocument | null;
+		});
 
 		return doc?.callNumber ?? null;
 	},

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../manager/favourite_bloc.dart';
 import '../manager/favourite_event.dart';
 import '../manager/favourite_state.dart';
@@ -102,8 +103,8 @@ class _EmptyState extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          const Text(
-            'No favorites yet',
+          Text(
+            AppLocalizations.of(context)!.favouriteEmpty,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -113,8 +114,8 @@ class _EmptyState extends StatelessWidget {
 
           const SizedBox(height: 10),
 
-          const Text(
-            'Your favorite drinks will appear here',
+          Text(
+            AppLocalizations.of(context)!.favouriteEmptySubtitle,
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 14,
@@ -132,15 +133,13 @@ class _EmptyState extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF3B1A08),
                 borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
+              ),hild: Row(
+                mmainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
                   SizedBox(width: 8),
-                  Text(
-                    'Refresh',
-                    style: TextStyle(
+                  Text(ppLocalizations.of(context)!.refresh,
+                    sstyle: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,
@@ -188,8 +187,8 @@ class _ErrorState extends StatelessWidget {
                 color: const Color(0xFF3B1A08),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Text(
-                'Try again',
+              child: Text(
+                AppLocalizations.of(context)!.tryAgain,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w600,

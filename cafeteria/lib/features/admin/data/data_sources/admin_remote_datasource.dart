@@ -31,6 +31,7 @@ abstract class AdminRemoteDataSource {
     required String description,
     required String image,
     required bool hasVariants,
+    required int stock,
     List<Map<String, dynamic>>? variants,
   });
 
@@ -141,6 +142,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     required String description,
     required String image,
     required bool hasVariants,
+    required int stock,
     List<Map<String, dynamic>>? variants,
   }) async {
     final body = {
@@ -150,6 +152,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       'description': description,
       'image': image,
       'hasVariants': hasVariants,
+      'stock': stock,
     };
     if (variants != null) body['variants'] = variants;
 

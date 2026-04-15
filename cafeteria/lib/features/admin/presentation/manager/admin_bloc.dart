@@ -27,6 +27,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
 
   AdminMenuLoaded? get lastMenuState => _lastMenuState;
 
+  AdminDashboardLoaded? get lastDashboardState => _lastLoadedState;
+
   AdminBloc({
     required this.getDashboardAnalytics,
     required this.getAdminOrders,
@@ -246,6 +248,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         description: event.description,
         image: event.image,
         hasVariants: event.hasVariants,
+        stock: event.stock,
         variants: event.variants,
       );
       add(FetchAdminMenuEvent());

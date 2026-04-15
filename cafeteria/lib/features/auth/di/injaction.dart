@@ -1,7 +1,9 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/local/locale_bloc.dart';
 import '../../../core/network/dio_handler.dart';
+import '../../../core/theme/theme_bloc.dart';
 import '../../admin/domain/use_cases/admin_menu_usecases.dart';
 import '../../cart/data/data_sources/cart_remote_datasource.dart';
 import '../../cart/data/repositories/cart_repository_impl.dart';
@@ -98,14 +100,6 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => AddFavouriteUseCase(sl()));
   sl.registerLazySingleton(() => RemoveFavouriteUseCase(sl()));
 
-  /// ── Favourite Bloc ──────────────────────
-  sl.registerLazySingleton(
-        () => FavouriteBloc(
-      getFavouritesUseCase: sl(),
-      addFavouriteUseCase: sl(),
-      removeFavouriteUseCase: sl(),
-    ),
-  );
 
   /// ── Home DataSource ─────────────────────
   sl.registerLazySingleton<HomeRemoteDataSource>(
@@ -120,8 +114,6 @@ Future<void> setupLocator() async {
   /// ── Home UseCase ────────────────────────
   sl.registerLazySingleton(() => GetMenuItemsUseCase(sl()));
 
-  /// ── Home Bloc ───────────────────────────
-  sl.registerLazySingleton(() => HomeBloc(sl()));
 
   /// ── Auth Bloc ───────────────────────────
   sl.registerFactory(
@@ -142,14 +134,6 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => RemoveCartItemUseCase(sl()));
   sl.registerLazySingleton(() => ClearCartUseCase(sl()));
 
-  /// ── Cart Bloc ───────────────────────────
-  sl.registerLazySingleton(() => CartBloc(
-    getCartUseCase: sl(),
-    addCartItemUseCase: sl(),
-    updateCartItemUseCase: sl(),
-    removeCartItemUseCase: sl(),
-    clearCartUseCase: sl(),
-  ));
 
   /// ── Order DataSource ────────────────────
   sl.registerLazySingleton<OrderRemoteDataSource>(
@@ -167,13 +151,6 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => GetOrderByIdUseCase(sl()));
   sl.registerLazySingleton(() => CancelOrderUseCase(sl()));
 
-  /// ── Order Bloc ──────────────────────────
-  sl.registerLazySingleton(() => OrderBloc(
-    createOrderUseCase: sl(),
-    getOrdersUseCase: sl(),
-    getOrderByIdUseCase: sl(),
-    cancelOrderUseCase: sl(),
-  ));
 
   /// ── Admin DataSource ────────────────────
   sl.registerLazySingleton<AdminRemoteDataSource>(
@@ -213,4 +190,43 @@ Future<void> setupLocator() async {
         addVariant: sl(),
         removeVariant: sl(),
       ));
+
+  /// ── Order Bloc ──────────────────────────
+  sl.registerLazySingleton(() =>
+      OrderBloc(
+        createOrderUseCase: sl(),
+        getOrdersUseCase: sl(),
+        getOrderByIdUseCase: sl(),
+        cancelOrderUseCase: sl(),
+      ));
+
+  /// ── Cart Bloc ───────────────────────────
+  sl.registerLazySingleton(() =>
+      CartBloc(
+        getCartUseCase: sl(),
+        addCartItemUseCase: sl(),
+        updateCartItemUseCase: sl(),
+        removeCartItemUseCase: sl(),
+        clearCartUseCase: sl(),
+      ));
+
+  /// ── Favourite Bloc ──────────────────────
+  sl.registerLazySingleton(
+        () =>
+        FavouriteBloc(
+          getFavouritesUseCase: sl(),
+          addFavouriteUseCase: sl(),
+          removeFavouriteUseCase: sl(),
+        ),
+  );
+
+  /// ── Home Bloc ───────────────────────────
+  sl.registerLazySingleton(() => HomeBloc(sl()));
+
+
+  // Theme
+  sl.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
+
+// Locale
+  sl.registerLazySingleton<LocaleBloc>(() => LocaleBloc());
 }

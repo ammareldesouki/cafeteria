@@ -8,6 +8,8 @@ import '../../features/auth/presentation/manager/auth_bloc.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/role_selection_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
+import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/favourite/presentation/manager/favourite_bloc.dart';
 import '../../features/home/presentation/manager/home_bloc.dart';
 import '../../features/cart/presentation/manager/cart_bloc.dart';
@@ -102,9 +104,13 @@ class AppRouter {
       return _buildRoute(BlocProvider(
         create: (_) => sl<AuthBloc>(),
         child: const SignInPage(),
-      ), settings);
+      ), settings);;
 
-      default:
+      case RouteNames.forgotPassword:
+        return _buildRoute(const ForgotPasswordPage(), settings);
+
+      case RouteNames.resetPassword:
+        return _buildRoute(const ResetPasswordPage(), settings)default:
         return _buildRoute(
           Scaffold(
             body: Center(

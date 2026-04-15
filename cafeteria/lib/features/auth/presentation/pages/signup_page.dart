@@ -3,6 +3,7 @@ import 'package:cafeteria/core/utils/validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../manager/auth_bloc.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/buttons.dart';
@@ -83,6 +84,7 @@ class _SignupPageState extends State<SignupPage> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
+
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -127,21 +129,24 @@ class _SignupPageState extends State<SignupPage> {
                       const SizedBox(height: 28),
 
 
-                      AppTextField(label: "Name", controller: _nameController,hint: "Enter Name",),
+                      AppTextField(label: AppLocalizations.of(context)!
+                          .firstName,
+                        controller: _nameController,
+                        hint: "Enter Name",),
                       const SizedBox(height: 16),
 
                       // ── Email ──────────────────────────────────────────
                       AppTextField(
-                        label: 'Email',
+                        label: AppLocalizations.of(context)!.email,
                         hint: 'you@example.com',
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         validator: (v) {
                           if (v == null || v.trim().isEmpty) {
-                            return 'Email is required';
+                            return AppLocalizations.of(context)!.emailRequired;
                           }
                           if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(v)) {
-                            return 'Enter a valid email';
+                            return AppLocalizations.of(context)!.emailInvalid;
                           }
                           return null;
                         },
@@ -150,13 +155,17 @@ class _SignupPageState extends State<SignupPage> {
 
                       // ── Password ───────────────────────────────────────
                       AppTextField(
-                        label: 'Password',
+                        label: AppLocalizations.of(context)!.password,
+                        hint: '********',
                         controller: _passwordController,
                         isPassword: true,
                         validator: (v) {
-                          if (v == null || v.isEmpty) return 'Password is required';
+                          if (v == null || v.isEmpty)
+                            return AppLocalizations.of(context)!
+                                .passwordRequired;
                           if (v.length < 8) {
-                            return 'Password must be at least 8 characters';
+                            return AppLocalizations.of(context)!
+                                .passwordTooShort;
                           }
                           return null;
                         },
@@ -179,7 +188,8 @@ class _SignupPageState extends State<SignupPage> {
 
 
                       AppTextField(
-                        label: 'Phone Number',
+                          label: AppLocalizations.of(context)!.phoneNumber,
+                          hint: '0123456789',
                         controller:_phoneNumberController,
                         isPassword: true,
                         validator: Validator.validatePhoneNumber
@@ -187,7 +197,7 @@ class _SignupPageState extends State<SignupPage> {
                       const SizedBox(height: 16),
 
                       Text(
-                        'Gender',
+                        AppLocalizations.of(context)!.gender,
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -221,7 +231,7 @@ class _SignupPageState extends State<SignupPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Male',
+                                    AppLocalizations.of(context)!.male,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       color: _selectedGender == 'male'
@@ -257,7 +267,7 @@ class _SignupPageState extends State<SignupPage> {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'Female',
+                                    AppLocalizations.of(context)!.female,
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
                                       color: _selectedGender == 'female'
@@ -275,7 +285,7 @@ class _SignupPageState extends State<SignupPage> {
                       const SizedBox(height: 12),
                       // ── Sign Up button ─────────────────────────────────
                       PrimaryButton(
-                        label: 'Sign Up',
+                        label: AppLocalizations.of(context)!.signUp,
                         isLoading: isLoading,
                         onTap: _onSignUp,
                       ),
@@ -322,15 +332,16 @@ class _SignupPageState extends State<SignupPage> {
                           onTap: () =>
                               Navigator.pushReplacementNamed(context, RouteNames.signIn),
                           child: RichText(
-                            text: const TextSpan(
-                              text: 'Already have an account? ',
+                            text: TextSpan(
+                              text: AppLocalizations.of(context)!
+                                  .alreadyHaveAccount,
                               style: TextStyle(
                                 color: Color(0xFF9E9E9E),
                                 fontSize: 13,
                               ),
                               children: [
                                 TextSpan(
-                                  text: 'Sign In',
+                                  text: AppLocalizations.of(context)!.login,
                                   style: TextStyle(
                                     color: Color(0xFF3B1A08),
                                     fontWeight: FontWeight.w600,

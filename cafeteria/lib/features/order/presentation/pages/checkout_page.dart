@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../cart/domain/entities/cart_entity.dart';
 import '../../../cart/presentation/manager/cart_bloc.dart';
 import '../../../cart/presentation/manager/cart_event.dart';
@@ -90,8 +91,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       Icon(Icons.person, color: Colors.white, size: 20),
                     ),
                     const SizedBox(width: 10),
-                    const Text(
-                      'Checkout',
+                    Text(
+                      AppLocalizations.of(context)!.checkout,
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
@@ -125,8 +126,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Order Summary',
+                              Text(
+                                AppLocalizations.of(context)!.orderSummary,
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -184,7 +185,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         ),
                                         Text(
                                           '${item.subtotal.toStringAsFixed(
-                                              2)} L.E',
+                                              2)}${AppLocalizations.of(context)!
+                                              .pound}',
                                           style: const TextStyle(
                                             fontSize: 14,
                                             fontWeight: FontWeight.w600,
@@ -200,8 +202,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 mainAxisAlignment:
                                 MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text(
-                                    'Total',
+                                  Text(
+                                    AppLocalizations.of(context)!.total,
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -209,7 +211,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     ),
                                   ),
                                   Text(
-                                    '${cart.totalPrice.toStringAsFixed(2)} L.E',
+                                    '${cart.totalPrice.toStringAsFixed(
+                                        2)}${AppLocalizations.of(context)!
+                                        .total}',
                                     style: const TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
@@ -237,8 +241,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
-                                'Delivery Location',
+                              Text(
+                                AppLocalizations.of(context)!.deliveryLocation,
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -252,7 +256,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   if (value == null || value
                                       .trim()
                                       .isEmpty) {
-                                    return 'Please enter a delivery location';
+                                    return AppLocalizations.of(context)!
+                                        .deliveryLocationrequired;
                                   }
                                   return null;
                                 },
@@ -312,8 +317,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                 strokeWidth: 2,
                               ),
                             )
-                                : const Text(
-                              'Place Order',
+                                : Text(
+                              AppLocalizations.of(context)!.placeOrder,
                               style: TextStyle(
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
@@ -327,14 +332,14 @@ class _CheckoutPageState extends State<CheckoutPage> {
                     const SizedBox(height: 10),
                     GestureDetector(
                       onTap: () => Navigator.pop(context),
-                      child: const Row(
+                      child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Icon(Icons.arrow_back,
                               size: 16, color: Color(0xFF8B7355)),
                           SizedBox(width: 6),
                           Text(
-                            'Back to Cart',
+                            AppLocalizations.of(context)!.backToCart,
                             style: TextStyle(
                               color: Color(0xFF8B7355),
                               fontSize: 14,

@@ -85,7 +85,7 @@ export const adminUpdateMenuItem = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id } = req.params;
+		const id = String((req.params as any).id);
 		const fields = req.body as UpdateMenuItemInput;
 		const updated = await menuService.updateItem(id, fields);
 		res.json(updated);
@@ -108,7 +108,7 @@ export const adminDeleteMenuItem = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id } = req.params;
+		const id = String((req.params as any).id);
 		const result = await menuService.deleteItem(id);
 		res.json(result);
 	} catch (err: any) {
@@ -132,7 +132,7 @@ export const adminSetItemStock = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id } = req.params;
+		const id = String((req.params as any).id);
 		const { stock } = req.body as { stock: number };
 		const updated = await menuService.setItemStock(id, stock);
 		res.json(updated);
@@ -158,7 +158,8 @@ export const adminSetVariantStock = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id, variantName } = req.params;
+		const id = String((req.params as any).id);
+		const variantName = String((req.params as any).variantName);
 		const { stock } = req.body as { stock: number };
 		const updated = await menuService.setVariantStock(id, variantName, stock);
 		res.json(updated);
@@ -187,7 +188,7 @@ export const adminAddVariant = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id } = req.params;
+		const id = String((req.params as any).id);
 		const { name, stock } = req.body as { name: string; stock?: number };
 		const updated = await menuService.addVariant(id, { name, stock: stock ?? 0 });
 		res.status(201).json(updated);
@@ -214,7 +215,8 @@ export const adminRemoveVariant = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id, variantName } = req.params;
+		const id = String((req.params as any).id);
+		const variantName = String((req.params as any).variantName);
 		const updated = await menuService.removeVariant(id, variantName);
 		res.json(updated);
 	} catch (err: any) {

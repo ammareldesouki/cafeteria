@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 
 /// Visual order status tracker: Received → Preparing → Delivered
 class OrderStatusTracker extends StatelessWidget {
@@ -7,17 +8,22 @@ class OrderStatusTracker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (status == 'cancelled') {
       return Container(
         padding: const EdgeInsets.symmetric(vertical: 8),
-        child: const Row(
+        child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.cancel_rounded, color: Color(0xFFE57373), size: 18),
-            SizedBox(width: 6),
-            Text(
-              'Order Cancelled',
-              style: TextStyle(
+            const Icon(
+              Icons.cancel_rounded,
+              color: Color(0xFFE57373),
+              size: 18,
+            ),
+            const SizedBox(width: 6)Text(
+              l10n.orderCancelled,
+              style: const TextStyle(
                 color: Color(0xFFE57373),
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
@@ -40,21 +46,21 @@ class OrderStatusTracker extends StatelessWidget {
     return Row(
       children: [
         _StepCircle(
-          label: 'Received',
+          label: l10n.orderConfirmed,
           icon: Icons.schedule_rounded,
           isActive: currentStep >= 0,
           isComplete: currentStep > 0,
         ),
         _StepLine(isActive: currentStep > 0),
         _StepCircle(
-          label: 'Preparing',
+          label: l10n.orderPreparing,
           icon: Icons.local_fire_department_rounded,
           isActive: currentStep >= 1,
           isComplete: currentStep > 1,
         ),
         _StepLine(isActive: currentStep > 1),
         _StepCircle(
-          label: 'Delivered',
+          label: l10n.orderDelivered,
           icon: Icons.check_circle_rounded,
           isActive: currentStep >= 2,
           isComplete: currentStep > 2,

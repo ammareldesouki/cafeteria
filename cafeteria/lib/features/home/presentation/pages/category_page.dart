@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../favourite/presentation/manager/favourite_bloc.dart';
 import '../../../favourite/presentation/manager/favourite_event.dart';
 import '../../../favourite/presentation/manager/favourite_state.dart';
@@ -73,7 +74,7 @@ class _CategoryPageState extends State<CategoryPage> {
             ),
             const SizedBox(height: 6),
              Text(
-              "Swipe to browse items",
+               AppLocalizations.of(context)!.swipeToBrowseItems,
               style:   Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 20),
@@ -230,7 +231,8 @@ class _ProductCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    '${item.price.toStringAsFixed(0)} L.E',
+                    '${item.price.toStringAsFixed(0)} ${AppLocalizations.of(
+                        context)!.pound} ',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w700,
@@ -251,8 +253,8 @@ class _ProductCard extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     _isOutOfStock
-                        ? 'Out of Stock'
-                        : 'Tap to customize and add to cart',
+                        ? AppLocalizations.of(context)!.outOfStock
+                        : AppLocalizations.of(context)!.addToCart,
                     style: TextStyle(
                       fontSize: 12,
                       color: _isOutOfStock
@@ -279,8 +281,8 @@ class _ProductCard extends StatelessWidget {
                   color: const Color(0xFFE57373),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'Sold Out',
+                child: Text(
+                  AppLocalizations.of(context)!.outOfStock,
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 12,
@@ -387,8 +389,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
   void _addToCart() {
     if (!_canAddToCart) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please select a variant first'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.varaity),
           backgroundColor: Color(0xFF3B1A08),
         ),
       );
@@ -415,7 +417,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('${item.name} added to cart 🛒'),
+              content: Text(
+                  '${item.name} ${AppLocalizations.of(context)!.addToCart} 🛒'),
               backgroundColor: const Color(0xFF3B1A08),
             ),
           );
@@ -465,7 +468,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                   ),
                   const SizedBox(width: 12),
                    Text(
-                    "Customize Your Order",
+                       AppLocalizations.of(context)!.customizeYourOrder,
                     style:  Theme.of(context).textTheme.titleLarge),
 
                 ],
@@ -504,7 +507,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            '${item.price.toStringAsFixed(0)} L.E',
+                              '${item.price.toStringAsFixed(
+                                  0)} ${AppLocalizations.of(context)!.pound}',
                               style: Theme.of(context).textTheme.titleLarge
                           ),
                         ],
@@ -560,8 +564,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
               const SizedBox(height: 22),
 
               // Quantity
-              const Text(
-                "Quantity",
+              Text(
+                AppLocalizations.of(context)!.quantity,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -604,12 +608,15 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                     builder: (context) {
                       final int currentStock = _maxQuantity;
                       final String stockText = currentStock <= 5
-                          ? 'Only $currentStock left in stock'
-                          : '$currentStock available';
+                          ? '${AppLocalizations.of(context)!
+                          .onlyLeftInStock}$currentStock '
+                          : '$currentStock ${AppLocalizations.of(context)!
+                          .inStock}';
 
                       return Text(
                         _hasVariants && _selectedVariant == null
-                            ? 'Select a variety to see availability'
+                            ? AppLocalizations.of(context)!
+                            .selectAvarietyToSeeAvailability
                             : stockText,
                         style: TextStyle(
                           fontSize: 12,
@@ -630,8 +637,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                 const SizedBox(height: 22),
                 Row(
                   children: [
-                    const Text(
-                      "Select Type",
+                    Text(
+                      AppLocalizations.of(context)!.varaity,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
@@ -646,8 +653,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                         color: const Color(0xFFFFE5CC),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Text(
-                        "Required",
+                      child: Text(
+                        AppLocalizations.of(context)!.required,
                         style: TextStyle(
                           fontSize: 11,
                           color: Color(0xFFBF6E2E),
@@ -729,8 +736,8 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
 
               // Notes
               const SizedBox(height: 22),
-              const Text(
-                "Notes",
+              Text(
+                AppLocalizations.of(context)!.customize,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 15,
@@ -743,7 +750,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                 maxLines: 2,
                 style: const TextStyle(fontSize: 14, color: Color(0xFF3B1A08)),
                 decoration: InputDecoration(
-                  hintText: "Add any special instructions here...",
+                  hintText: AppLocalizations.of(context)!.customizeYourOrder,
                   hintStyle: const TextStyle(color: Color(0xFFBCA999)),
                   filled: true,
                   fillColor: Colors.white,
@@ -802,8 +809,12 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                           const SizedBox(width: 8),
                           Text(
                             _hasVariants && _selectedVariant == null
-                                ? 'Select a variant first'
-                                : 'Add $_quantity to Cart  –  ${_totalPrice.toStringAsFixed(0)} L.E',
+                                ? AppLocalizations.of(context)!
+                                .varaityIsRequired
+                                : '${AppLocalizations.of(context)!
+                                .add} $_quantity ${AppLocalizations.of(context)!
+                                .toCart}  –  ${_totalPrice.toStringAsFixed(
+                                0)} ${AppLocalizations.of(context)!.pound}',
                             style: const TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.bold,

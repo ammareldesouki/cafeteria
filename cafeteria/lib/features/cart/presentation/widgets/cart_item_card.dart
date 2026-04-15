@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/cart_entity.dart';
 import '../manager/cart_bloc.dart';
 import '../manager/cart_event.dart';
@@ -130,7 +131,9 @@ class _CartItemCardState extends State<CartItemCard> {
                           ],
                           const SizedBox(height: 4),
                           Text(
-                            '\$${widget.item.unitPrice.toStringAsFixed(2)} each',
+                            '${AppLocalizations.of(context)!.pound}${widget.item
+                                .unitPrice.toStringAsFixed(
+                                2)} ${AppLocalizations.of(context)!.eachItem}',
                             style: const TextStyle(
                               fontSize: 13,
                               color: Color(0xFF8B7355),
@@ -219,8 +222,10 @@ class _CartItemCardState extends State<CartItemCard> {
                       alignment: Alignment.centerLeft,
                       child: Text(
                         widget.item.stock! <= 5
-                            ? 'Only ${widget.item.stock} left'
-                            : '${widget.item.stock} in stock',
+                            ? '${AppLocalizations.of(context)!
+                            .onlyLeftInStock} ${widget.item.stock} left'
+                            : '${widget.item.stock} ${AppLocalizations.of(
+                            context)!.inStock}',
                         style: TextStyle(
                           fontSize: 11,
                           color: widget.item.stock! <= 5

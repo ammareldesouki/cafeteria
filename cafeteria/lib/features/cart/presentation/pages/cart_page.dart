@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../manager/cart_bloc.dart';
 import '../manager/cart_event.dart';
 import '../manager/cart_state.dart';
@@ -121,8 +122,8 @@ class _CartHeader extends StatelessWidget {
             child: Icon(Icons.person, color: Colors.white, size: 20),
           ),
           const SizedBox(width: 10),
-          const Text(
-            'My Cart',
+          Text(
+            AppLocalizations.of(context)!.cart,
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.bold,
@@ -137,7 +138,7 @@ class _CartHeader extends StatelessWidget {
               borderRadius: BorderRadius.circular(20),
             ),
             child: Text(
-              '$itemCount item${itemCount == 1 ? '' : 's'}',
+              '$itemCount ${AppLocalizations.of(context)!.item}',
               style: const TextStyle(
                 color: Colors.white,
                 fontSize: 13,
@@ -185,8 +186,8 @@ class _CartFooter extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
-                'Total',
+              Text(
+                AppLocalizations.of(context)!.total,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -216,8 +217,8 @@ class _CartFooter extends StatelessWidget {
                 ),
                 elevation: 0,
               ),
-              child: const Text(
-                'Proceed to Checkout',
+              child: Text(
+                AppLocalizations.of(context)!.checkout,
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -259,8 +260,8 @@ class _EmptyCart extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'Your cart is empty',
+          Text(
+            AppLocalizations.of(context)!.cartEmpty,
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
@@ -268,8 +269,8 @@ class _EmptyCart extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Add items from the menu to get started',
+          Text(
+            AppLocalizations.of(context)!.addItemsFromTheMenuToGetStarted,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14, color: Color(0xFF8B7355)),
           ),
@@ -283,13 +284,13 @@ class _EmptyCart extends StatelessWidget {
                 color: const Color(0xFF3B1A08),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
                   SizedBox(width: 8),
                   Text(
-                    'Refresh',
+                    AppLocalizations.of(context)!.refresh,
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

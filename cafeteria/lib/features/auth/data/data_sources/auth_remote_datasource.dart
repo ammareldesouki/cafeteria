@@ -97,7 +97,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<AuthResponseModel> signUpWithGoogle({required String idToken}) async {
     try {
       final response = await _dioHandler.dio.post(
-        '/api/v1/auth/sign-up/google',
+        '/auth/sign-up/google',
         data: {'idToken': idToken},
       );
       final model = AuthResponseModel.fromMap(response.data);
@@ -123,7 +123,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   }) async {
     try {
       final response = await _dioHandler.dio.post(
-        '/api/v1/auth/sign-up/microsoft',
+        '/auth/sign-up/microsoft',
         data: {'accessToken': accessToken},
       );
       final model = AuthResponseModel.fromMap(response.data);
@@ -159,7 +159,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> signOut() async {
     try {
-      await _dioHandler.dio.post('/api/v1/auth/sign-out');
+      await _dioHandler.dio.post('/auth/sign-out');
       _dioHandler.clearAuthToken();
     } on DioException catch (e) {
       throw ServerFailure.fromMap(

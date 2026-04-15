@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/order_entity.dart';
 import '../manager/order_bloc.dart';
 import '../manager/order_event.dart';
@@ -23,6 +24,8 @@ class _OrderPageState extends State<OrderPage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -38,10 +41,12 @@ class _OrderPageState extends State<OrderPage> {
                     child: Icon(Icons.person, color: Colors.white, size: 20),
                   ),
                   const SizedBox(width: 10),
-                   Text(
-                    'My Orders',
-                     style: Theme.of(context).textTheme.titleLarge,
-
+                  Text(
+                    l10n.myOrders,
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .titleLarge,
                   ),
                   const Spacer(),
                 ],
@@ -54,8 +59,8 @@ class _OrderPageState extends State<OrderPage> {
                 listener: (context, state) {
                   if (state is OrderCancelled) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                       SnackBar(
-                        content: Text('Order cancelled successfully'),
+                      SnackBar(
+                        content: Text(l10n.orderCancelled),
                         backgroundColor: Theme.of(context).colorScheme.surface,
                       ),
                     );
@@ -136,6 +141,8 @@ class _OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -163,7 +170,8 @@ class _OrderCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Order #${order.id.substring(order.id.length > 10 ? order.id.length - 10 : 0)}',
+                        '${l10n.orderNumber} #${order.id.substring(
+                            order.id.length > 10 ? order.id.length - 10 : 0)}',
                         style: const TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
@@ -190,52 +198,53 @@ class _OrderCard extends StatelessWidget {
 
             // ── Items list ──
             ...order.items.map((item) => Padding(
-                  padding: const EdgeInsets.only(bottom: 8),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              '${item.quantity}x ${item.menuItemName ?? 'Item'}',
-                              style: const TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF3B1A08),
-                              ),
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '${item.quantity}x ${item.menuItemName ?? l10n.item}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Color(0xFF3B1A08),
+                          ),
+                        ),
+                        if (item.variantName != null)
+                          Text(
+                            item.variantName!,
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF8B7355),
                             ),
-                            if (item.variantName != null)
-                              Text(
-                                item.variantName!,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFF8B7355),
-                                ),
-                              ),
-                            if (item.note != null && item.note!.isNotEmpty)
-                              Text(
-                                'Note: ${item.note}',
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  color: Color(0xFF8B7355),
-                                  fontStyle: FontStyle.italic,
-                                ),
-                              ),
-                          ],
-                        ),
-                      ),
-                      Text(
-                        '${item.subtotal.toStringAsFixed(2)} L.E',
-                        style: const TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w600,
-                          color: Color(0xFF3B1A08),
-                        ),
-                      ),
-                    ],
+                          ),
+                        if (item.note != null && item.note!.isNotEmpty)
+                          Text(
+                            '${l10n.specialInstructions}: ${item.note}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF8B7355),
+                              fontStyle: FontStyle.italic,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                )),
+                  Text(
+                    '${item.subtotal.toStringAsFixed(2)}${AppLocalizations.of(
+                        context)!.pound}',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF3B1A08),
+                    ),
+                  ),
+                ],
+              ),
+            )),
 
             // ── Delivery location ──
             if (order.deliveryLocation != null &&
@@ -247,7 +256,7 @@ class _OrderCard extends StatelessWidget {
                       size: 16, color: Color(0xFFC07722)),
                   const SizedBox(width: 4),
                   Text(
-                    'Delivery to: ${order.deliveryLocation}',
+                    '${l10n.deliveryAddress}: ${order.deliveryLocation}',
                     style: const TextStyle(
                       fontSize: 13,
                       color: Color(0xFFC07722),
@@ -264,16 +273,17 @@ class _OrderCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Total',
-                  style: TextStyle(
+                Text(
+                  l10n.total,
+                  style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF3B1A08),
                   ),
                 ),
                 Text(
-                  '${order.totalPrice.toStringAsFixed(2)} L.E',
+                  '${order.totalPrice.toStringAsFixed(2)} ${AppLocalizations.of(
+                      context)!.pound}',
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,
@@ -306,21 +316,21 @@ class _OrderCard extends StatelessWidget {
                   ),
                   child: isActionLoading
                       ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Color(0xFFE57373),
-                          ),
-                        )
-                      : const Text(
-                          'Cancel Order',
-                          style: TextStyle(
-                            color: Color(0xFFE57373),
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13,
-                          ),
-                        ),
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Color(0xFFE57373),
+                    ),
+                  )
+                      : Text(
+                    l10n.cancelOrder,
+                    style: const TextStyle(
+                      color: Color(0xFFE57373),
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -331,27 +341,29 @@ class _OrderCard extends StatelessWidget {
   }
 
   void _showCancelDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text(
-          'Cancel Order?',
-          style: TextStyle(
+        title: Text(
+          l10n.cancelOrder,
+          style: const TextStyle(
             color: Color(0xFF3B1A08),
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: const Text(
-          'Are you sure you want to cancel this order? This action cannot be undone.',
-          style: TextStyle(color: Color(0xFF8B7355)),
+        content: Text(
+          l10n.cancelOrderConfirm,
+          style: const TextStyle(color: Color(0xFF8B7355)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text(
-              'Keep Order',
-              style: TextStyle(color: Color(0xFF8B7355)),
+            child: Text(
+              l10n.no,
+              style: const TextStyle(color: Color(0xFF8B7355)),
             ),
           ),
           ElevatedButton(
@@ -365,9 +377,9 @@ class _OrderCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text(
-              'Cancel Order',
-              style: TextStyle(color: Colors.white),
+            child: Text(
+              l10n.cancelOrder,
+              style: const TextStyle(color: Colors.white),
             ),
           ),
         ],
@@ -384,39 +396,51 @@ class _StatusBadge extends StatelessWidget {
   final String status;
   const _StatusBadge({required this.status});
 
+  String _localizedStatus(BuildContext context, String status) {
+    final l10n = AppLocalizations.of(context)!;
+    return switch (status) {
+      'pending' => l10n.orderConfirmed,
+      'processing' => l10n.orderPreparing,
+      'completed' => l10n.orderReady,
+      'delivered' => l10n.orderDelivered,
+      'cancelled' => l10n.orderCancelled,
+      _ => status[0].toUpperCase() + status.substring(1),
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final (Color bg, Color fg, IconData icon) = switch (status) {
       'pending' => (
-          const Color(0xFFFFF3E0),
-          const Color(0xFFE65100),
-          Icons.schedule_rounded
-        ),
+      const Color(0xFFFFF3E0),
+      const Color(0xFFE65100),
+      Icons.schedule_rounded
+      ),
       'processing' => (
-          const Color(0xFFE3F2FD),
-          const Color(0xFF1565C0),
-          Icons.local_fire_department_rounded
-        ),
+      const Color(0xFFE3F2FD),
+      const Color(0xFF1565C0),
+      Icons.local_fire_department_rounded
+      ),
       'completed' => (
-          const Color(0xFFE8F5E9),
-          const Color(0xFF2E7D32),
-          Icons.check_circle_rounded
-        ),
+      const Color(0xFFE8F5E9),
+      const Color(0xFF2E7D32),
+      Icons.check_circle_rounded
+      ),
       'delivered' => (
-          const Color(0xFFE8F5E9),
-          const Color(0xFF2E7D32),
-          Icons.check_circle_rounded
-        ),
+      const Color(0xFFE8F5E9),
+      const Color(0xFF2E7D32),
+      Icons.check_circle_rounded
+      ),
       'cancelled' => (
-          const Color(0xFFFCE4EC),
-          const Color(0xFFC62828),
-          Icons.cancel_rounded
-        ),
+      const Color(0xFFFCE4EC),
+      const Color(0xFFC62828),
+      Icons.cancel_rounded
+      ),
       _ => (
-          const Color(0xFFF5F5F5),
-          const Color(0xFF616161),
-          Icons.help_rounded
-        ),
+      const Color(0xFFF5F5F5),
+      const Color(0xFF616161),
+      Icons.help_rounded
+      ),
     };
 
     return Container(
@@ -431,7 +455,7 @@ class _StatusBadge extends StatelessWidget {
           Icon(icon, size: 14, color: fg),
           const SizedBox(width: 4),
           Text(
-            status[0].toUpperCase() + status.substring(1),
+            _localizedStatus(context, status),
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.bold,
@@ -454,6 +478,8 @@ class _EmptyOrders extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -472,38 +498,38 @@ class _EmptyOrders extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          const Text(
-            'No orders yet',
-            style: TextStyle(
+          Text(
+            l10n.myOrders,
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Color(0xFF3B1A08),
             ),
           ),
           const SizedBox(height: 10),
-          const Text(
-            'Your order history will appear here',
+          Text(
+            l10n.orderHistory,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: Color(0xFF8B7355)),
+            style: const TextStyle(fontSize: 14, color: Color(0xFF8B7355)),
           ),
           const SizedBox(height: 28),
           GestureDetector(
             onTap: onRefresh,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
               decoration: BoxDecoration(
                 color: const Color(0xFF3B1A08),
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
-                  SizedBox(width: 8),
+                  const Icon(
+                      Icons.refresh_rounded, color: Colors.white, size: 18),
+                  const SizedBox(width: 8),
                   Text(
-                    'Refresh',
-                    style: TextStyle(
+                    l10n.refresh,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
                       fontSize: 15,

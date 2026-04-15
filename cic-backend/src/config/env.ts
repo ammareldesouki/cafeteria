@@ -43,6 +43,13 @@ export const BETTER_AUTH_URL =
 	rawEnv.BETTER_AUTH_URL || "http://localhost:3001";
 export const BETTER_AUTH_SECRET = rawEnv.BETTER_AUTH_SECRET || "secret";
 
+// SMTP (optional) - used for password reset emails
+// export const SMTP_HOST = rawEnv.SMTP_HOST;
+// export const SMTP_PORT = rawEnv.SMTP_PORT ? Number(rawEnv.SMTP_PORT) : undefined;
+// export const SMTP_USER = rawEnv.SMTP_USER;
+// export const SMTP_PASS = rawEnv.SMTP_PASS;
+// export const SMTP_FROM = rawEnv.SMTP_FROM;
+
 // Provide CORS origins as an array (empty if not set)
 export const CORS_ORIGIN_LIST =
 	rawEnv.CORS_ORIGINS?.split(",")

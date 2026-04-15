@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../core/local/locale_bloc.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../auth/domain/entities/user_entity.dart';
 import '../../auth/presentation/manager/auth_bloc.dart';
 
@@ -221,11 +223,13 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
   }
 
   Widget _buildSettingsTab() {
-    return const Center(
-      child: Text(
-        'Settings coming soon',
-        style: TextStyle(color: Colors.grey),
-      ),
+    return Center(
+        child: ElevatedButton(
+          onPressed: () {
+            context.read<LocaleBloc>().add(ToggleLocaleEvent());
+          },
+          child: Text(AppLocalizations.of(context)!.language),
+        )
     );
   }
 
