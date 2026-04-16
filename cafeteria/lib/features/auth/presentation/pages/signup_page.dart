@@ -83,7 +83,6 @@ class _SignupPageState extends State<SignupPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
 
         body: SafeArea(
           child: SingleChildScrollView(
@@ -191,7 +190,6 @@ class _SignupPageState extends State<SignupPage> {
                           label: AppLocalizations.of(context)!.phoneNumber,
                           hint: '0123456789',
                         controller:_phoneNumberController,
-                        isPassword: true,
                         validator: Validator.validatePhoneNumber
                       ),
                       const SizedBox(height: 16),
@@ -291,40 +289,40 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // ── Divider ────────────────────────────────────────
-                      Row(
-                        children: const [
-                          Expanded(child: Divider()),
-                          Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 12),
-                            child: Text(
-                              'Or continue with',
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: Color(0xFF9E9E9E),
-                              ),
-                            ),
-                          ),
-                          Expanded(child: Divider()),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
+                      // // ── Divider ────────────────────────────────────────
+                      // Row(
+                      //   children: const [
+                      //     Expanded(child: Divider()),
+                      //     Padding(
+                      //       padding: EdgeInsets.symmetric(horizontal: 12),
+                      //       child: Text(
+                      //         'Or continue with',
+                      //         style: TextStyle(
+                      //           fontSize: 13,
+                      //           color: Color(0xFF9E9E9E),
+                      //         ),
+                      //       ),
+                      //     ),
+                      //     Expanded(child: Divider()),
+                      //   ],
+                      // ),
+                      // const SizedBox(height: 16),
 
-                      // ── Outlook button ────────────────────────────────
-                      SocialButton(
-                        label: 'Sign up with Outlook',
-                        iconAsset: 'assets/icons/logo.png',
-                        onTap: isLoading ? null : _onOutlookSignUp,
-                      ),
-                      const SizedBox(height: 12),
-
-                      // ── Google button ─────────────────────────────────
-                      SocialButton(
-                        label: 'Sign up with Google',
-                        iconAsset: 'assets/icons/logo.png',
-                        onTap: isLoading ? null : _onGoogleSignUp,
-                      ),
-                      const SizedBox(height: 24),
+                      // // ── Outlook button ────────────────────────────────
+                      // SocialButton(
+                      //   label: 'Sign up with Outlook',
+                      //   iconAsset: 'assets/icons/logo.png',
+                      //   onTap: isLoading ? null : _onOutlookSignUp,
+                      // ),
+                      // const SizedBox(height: 12),
+                      //
+                      // // ── Google button ─────────────────────────────────
+                      // SocialButton(
+                      //   label: 'Sign up with Google',
+                      //   iconAsset: 'assets/icons/logo.png',
+                      //   onTap: isLoading ? null : _onGoogleSignUp,
+                      // ),
+                      // const SizedBox(height: 24),
 
                       // ── Sign In link ───────────────────────────────────
                       Center(
@@ -335,15 +333,16 @@ class _SignupPageState extends State<SignupPage> {
                             text: TextSpan(
                               text: AppLocalizations.of(context)!
                                   .alreadyHaveAccount,
-                              style: TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 13,
-                              ),
+                              style: Theme
+                                  .of(context)
+                                  .textTheme
+                                  .bodyMedium,
+
                               children: [
                                 TextSpan(
                                   text: AppLocalizations.of(context)!.login,
                                   style: TextStyle(
-                                    color: Color(0xFF3B1A08),
+                                    color: Color(0xFFFF6107),
                                     fontWeight: FontWeight.w600,
                                   ),
                                 ),

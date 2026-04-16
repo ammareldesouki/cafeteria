@@ -33,8 +33,10 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
 
       await NetworkDioHandler().dio.post(
         '/auth/reset-password',
-        queryParameters: {'token': token},
-        data: {'newPassword': newPassword},
+        data: {
+          'token': token,
+          'newPassword': newPassword,
+        },
       );
 
       if (!mounted) return;

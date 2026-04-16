@@ -107,11 +107,11 @@ class AppRouter {
       ), settings);;
 
       case RouteNames.forgotPassword:
-        return _buildRoute(const ForgotPasswordPage(), settings);
+        return _buildRoute(const ForgotPasswordPage(), settings);;
 
-      case RouteNames.resetPassword::
-        return _buildRoute(const ResetPasswordPage(), settings);
-      defaultreturn _buildRoute(
+      case RouteNames.resetPasswordreturn _buildRoute(const ResetPasswordPage(), settings);
+      default:
+        return _buildRoute(
           Scaffold(
             body: Center(
               child: Text('No route defined for ${settings.name}'),

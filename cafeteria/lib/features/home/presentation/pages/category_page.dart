@@ -8,6 +8,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../core/constants/colors.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favourite/presentation/manager/favourite_bloc.dart';
 import '../../../favourite/presentation/manager/favourite_event.dart';
@@ -222,22 +223,22 @@ class _ProductCard extends StatelessWidget {
                   const SizedBox(height: 22),
                   Text(
                     item.name,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF3B1A08),
-                    ),
+                    style: Theme
+                        .of(context)
+                        .textTheme!
+                        .titleLarge!
+                        .copyWith(fontSize: 30),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
                   Text(
                     '${item.price.toStringAsFixed(0)} ${AppLocalizations.of(
                         context)!.pound} ',
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w700,
-                      color: Color(0xFF3B1A08),
-                    ),
+                    style: Theme
+                        .of(context)
+                        .textTheme!
+                        .titleLarge,
+
                   ),
                   const SizedBox(height: 10),
                   Padding(
@@ -247,16 +248,21 @@ class _ProductCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF8B7355)),
+                      style: Theme
+                          .of(context)
+                          .textTheme!
+                          .bodyLarge,
+
                     ),
-                  ),
+                    ),
+
                   const SizedBox(height: 12),
                   Text(
                     _isOutOfStock
                         ? AppLocalizations.of(context)!.outOfStock
                         : AppLocalizations.of(context)!.addToCart,
                     style: TextStyle(
-                      fontSize: 12,
+                      fontSize: 24,
                       color: _isOutOfStock
                           ? const Color(0xFFE57373)
                           : const Color(0xFF9E8E82),
@@ -301,7 +307,7 @@ class _ProductCard extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.transparent,
+      backgroundColor: Colors.white,
       builder: (_) => MultiBlocProvider(
         providers: [
           BlocProvider.value(value: context.read<FavouriteBloc>()),
@@ -436,7 +442,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
         padding:
         EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
         decoration:  BoxDecoration(
-          color:   Theme.of(context).colorScheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
         child: SingleChildScrollView(
@@ -469,7 +475,11 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                   const SizedBox(width: 12),
                    Text(
                        AppLocalizations.of(context)!.customizeYourOrder,
-                    style:  Theme.of(context).textTheme.titleLarge),
+                       style: Theme
+                           .of(context)
+                           .textTheme
+                           .titleLarge!
+                           .copyWith(color: TColors.primary)),
 
                 ],
               ),
@@ -738,11 +748,12 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
               const SizedBox(height: 22),
               Text(
                 AppLocalizations.of(context)!.customize,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 15,
-                  color: Color(0xFF3B1A08),
-                ),
+                style: Theme
+                    .of(context)
+                    .textTheme!
+                    .titleMedium!
+                    .copyWith(color: TColors.primary),
+
               ),
               const SizedBox(height: 10),
               TextField(

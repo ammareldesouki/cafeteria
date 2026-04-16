@@ -9,19 +9,12 @@ const router = Router();
 router.use(
 	"/auth",
 	async (req: Request, res: Response, next: NextFunction) => {
-		// Disabled for now: password reset endpoints
-		// if (req.path === "/request-password-reset" || req.path === "/reset-password") {
-		// 	res.status(404).json({ message: "Password reset is disabled" });
-		// 	return;
-		// }
-
 		if (req.path === "/sign-up/email") {
 			return authNameFromEmailMiddleware(req, res, next);
 		}
 
-		// Allow using phone number as identifier anywhere Better Auth expects "email"
-		// (sign-in + password reset request).
-		if (req.path === "/sign-in/email") {
+		// Enabled: Allow using phone number as identifier for sign-in AND password reset
+		if (req.path === "/sign-in/email" || req.path === "/request-password-reset") {
 			const identifier = req.body?.email;
 			// If it doesn't contain an @, assume it is a phone number and look it up
 			if (identifier && !identifier.includes("@")) {

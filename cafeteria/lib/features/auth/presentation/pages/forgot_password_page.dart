@@ -75,7 +75,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const Text(
-                  'Enter your email or phone number.',
+                  'Enter your registered email or phone number to receive a reset code.',
                   style: TextStyle(fontSize: 14, color: Colors.black54),
                 ),
                 const SizedBox(height: 16),

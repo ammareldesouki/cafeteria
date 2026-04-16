@@ -72,7 +72,6 @@ class _SignInPageState extends State<SignInPage> {
         }
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -144,11 +143,10 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                           child: Text(
                             AppLocalizations.of(context)!.forgotPassword,
-                            style: const TextStyle(
-                              fontSize: 15,
-                              color: Color(0xFF3B1A08),
-                              fontWeight: FontWeight.w600,
-                            ),
+                              style: Theme
+                                  .of(context)
+                                  .textTheme!
+                                  .bodyMedium
                           ),
                         ),
                       ),
@@ -179,19 +177,24 @@ class _SignInPageState extends State<SignInPage> {
                             text: TextSpan(
                               text: AppLocalizations.of(context)!
                                   .dontHaveAccount,
-                              style: TextStyle(
-                                color: Color(0xFF9E9E9E),
-                                fontSize: 13,
-                              ),
+                              style: Theme
+                                  .of(context)
+                                  .textTheme!
+                                  .bodyMedium,
+
                               children: [
                                 TextSpan(
                                   text: AppLocalizations.of(context)!
                                       .createAccount,
-                                  style: TextStyle(
-                                    color: Color(0xFF3B1A08),
-                                    fontWeight: FontWeight.w600,
+                                  style: Theme
+                                      .of(context)
+                                      .textTheme!
+                                      .bodyMedium!
+                                      .copyWith(
+                                    color: const Color(0xFFE46822),
                                   ),
-                                ),
+                                  ),
+
                               ],
                             ),
                           ),

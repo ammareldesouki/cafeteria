@@ -131,12 +131,11 @@ class _EmptyState extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF3B1A08),
-                borderRadius: BorderRadius.circular(14),,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                cchildren: [
-                  Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
+                color: const Color(0xFF3B1A08),orderRadius: BorderRadius.circular(14),
+              ),
+              cchild: Row(
+                mainAxisSize: MainAxisSize.min,hildren: [
+                  IIcon(Icons.refresh_rounded, color: Colors.white, size: 18),
                   SizedBox(width: 8),
                   Text(AppLocalizations.of(context)!.refresh,
                     style: TextStyle(

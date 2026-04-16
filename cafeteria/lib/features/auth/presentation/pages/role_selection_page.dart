@@ -8,7 +8,12 @@ class RoleSelectionPage extends StatelessWidget {
   const RoleSelectionPage({super.key});
 
   void _onRoleSelected(BuildContext context, UserRole role) {
-    Navigator.pushNamed(
+    if (role == UserRole.cafeteriaStaff) {
+      Navigator.pushNamed(context, RouteNames.signIn);
+      return;
+    }
+
+    NNavigator.pushNamed(
       context,
       RouteNames.signUp,
       arguments: role,
@@ -18,7 +23,6 @@ class RoleSelectionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F2F2),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
