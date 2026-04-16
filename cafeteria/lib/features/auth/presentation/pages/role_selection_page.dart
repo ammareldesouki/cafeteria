@@ -13,7 +13,7 @@ class RoleSelectionPage extends StatelessWidget {
       return;
     }
 
-    NNavigator.pushNamed(
+    Navigator.pushNamed(
       context,
       RouteNames.signUp,
       arguments: role,
