@@ -111,7 +111,8 @@ class AppRouter {
         ;
 
       case RouteNames.resetPassword:
-        return _buildRoute(const ResetPasswordPage(), settings)default:
+        return _buildRoute(const ResetPasswordPage(), settings);
+      default:
         return _buildRoute(
           Scaffold(
             body: Center(

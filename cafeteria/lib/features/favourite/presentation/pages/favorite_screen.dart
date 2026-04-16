@@ -130,9 +130,9 @@ class _EmptyState extends StatelessWidget {
             onTap: onRefresh,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
-              decoration: BoxDecoration(olor: const Color(0xFF3B1A08),
+              decoration: BoxDecoration(color: const Color(0xFF3B1A08),
                 borderRadius: BorderRadius.circular(14),
-              )),
+              ),
               child: Row(
                 mainAxisSize: MainAxisSize.min, children: [
                 Icon(Icons.refresh_rounded, color: Colors.white, size: 18),
