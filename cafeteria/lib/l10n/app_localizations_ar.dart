@@ -757,4 +757,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get itemRemovedFromCart => 'تمت إزالة العنصر من السلة';
+
+  @override
+  String get unpaidOnly => 'غير مدفوع فقط';
+
+  @override
+  String get paidOnly => 'مدفوع فقط';
+
+  @override
+  String get filterDate => 'تصفية حسب التاريخ';
+
+  @override
+  String get allTime => 'كل الوقت';
+
+  @override
+  String get today => 'اليوم';
+
+  @override
+  String get thisWeek => 'هذا الأسبوع';
+
+  @override
+  String get thisMonth => 'هذا الشهر';
+
+  @override
+  String get activeOrder => 'الطلبات النشطة';
+
+  @override
+  String get totalOrder => 'إجمالي الطلبات';
+
+  @override
+  String get rvenue => 'الإيرادات';
+
+  @override
+  String get pendingWallet => 'الإيرادات المعلقة';
 }

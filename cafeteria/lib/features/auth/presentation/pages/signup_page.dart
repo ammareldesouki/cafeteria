@@ -7,6 +7,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../manager/auth_bloc.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/buttons.dart';
+import '../widgets/language_theme_toggles.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -62,17 +63,21 @@ class _SignupPageState extends State<SignupPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
-          Navigator.pushReplacementNamed(
-  context,
-  RouteNames.layout,
-  arguments: {
-    'userName': state.response.user.name.isNotEmpty
-        ? state.response.user.name
-        : state.response.user.email.split('@').first,
-    'userId': state.response.user.id,
-  },
-);
+          final role = state.response.user.role;
+          final targetRoute =
+              role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
 
+          Navigator.pushReplacementNamed(
+            context,
+            targetRoute,
+            arguments: {
+              'userName': state.response.user.name.isNotEmpty
+                  ? state.response.user.name
+                  : state.response.user.email.split('@').first,
+              'userId': state.response.user.id,
+              'role': role,
+            },
+          );
         } else if (state is AuthFailureState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -93,14 +98,22 @@ class _SignupPageState extends State<SignupPage> {
                 builder: (context, state) {
                   final isLoading = state is AuthLoading;
                   return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // Back button
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+                            padding: EdgeInsets.zero,
+                            constraints: const BoxConstraints(),
+                          ),
+                          const LanguageThemeToggles(key: ValueKey('signup_toggles')),
+                        ],
                       ),
                       const SizedBox(height: 20),
 

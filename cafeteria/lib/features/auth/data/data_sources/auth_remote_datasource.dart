@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:cafeteria/core/constants/api.dart';
 import 'package:dio/dio.dart';
 import '../../../../core/failure/server_failure.dart';
@@ -159,14 +161,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> signOut() async {
     try {
+      // Sign out from the server (using full path for Better Auth)
       await _dioHandler.dio.post('/auth/sign-out');
-      _dioHandler.clearAuthToken();
-    } on DioException catch (e) {
-      throw ServerFailure.fromMap(
-        (e.response?.data is Map<String, dynamic>)
-            ? e.response!.data as Map<String, dynamic>
-            : {'message': e.message ?? 'Unknown error'},
-      );
+    } catch (e) {
+      log("Sign out request failed, but clearing local session anyway: $e");
+    } finally {
+      // ALWAYS clear the local token so the user can log in again
+      await _dioHandler.clearAuthToken();
     }
   }
 }

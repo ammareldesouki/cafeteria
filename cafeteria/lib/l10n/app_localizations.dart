@@ -1591,6 +1591,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Item removed from cart'**
   String get itemRemovedFromCart;
+
+  /// No description provided for @unpaidOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Unpaid Only'**
+  String get unpaidOnly;
+
+  /// No description provided for @paidOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid Only'**
+  String get paidOnly;
+
+  /// No description provided for @filterDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter Date'**
+  String get filterDate;
+
+  /// No description provided for @allTime.
+  ///
+  /// In en, this message translates to:
+  /// **'All Time'**
+  String get allTime;
+
+  /// No description provided for @today.
+  ///
+  /// In en, this message translates to:
+  /// **'Today'**
+  String get today;
+
+  /// No description provided for @thisWeek.
+  ///
+  /// In en, this message translates to:
+  /// **'This Week'**
+  String get thisWeek;
+
+  /// No description provided for @thisMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'This Month'**
+  String get thisMonth;
+
+  /// No description provided for @activeOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Orders'**
+  String get activeOrder;
+
+  /// No description provided for @totalOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Orders'**
+  String get totalOrder;
+
+  /// No description provided for @rvenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Revenue'**
+  String get rvenue;
+
+  /// No description provided for @pendingWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Revenue'**
+  String get pendingWallet;
 }
 
 class _AppLocalizationsDelegate

@@ -4,6 +4,7 @@ import '../../../core/local/locale_bloc.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/domain/entities/user_entity.dart';
 import '../../auth/presentation/manager/auth_bloc.dart';
+import '../../auth/presentation/widgets/language_theme_toggles.dart';
 
 class AccountMenuDialog extends StatefulWidget {
   final UserEntity user;
@@ -223,13 +224,31 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
   }
 
   Widget _buildSettingsTab() {
-    return Center(
-        child: ElevatedButton(
-          onPressed: () {
-            context.read<LocaleBloc>().add(ToggleLocaleEvent());
-          },
-          child: Text(AppLocalizations.of(context)!.language),
-        )
+    return SingleChildScrollView(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.translate_rounded, color: Color(0xFF8B7355)),
+            title: Text(
+              AppLocalizations.of(context)!.language,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            trailing: const LanguageThemeToggles(key: ValueKey('dialog_toggles')),
+          ),
+          const Divider(color: Color(0xFFFDF9F5)),
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.palette_outlined, color: Color(0xFF8B7355)),
+            title: const Text(
+              'App Appearance',
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            ),
+            subtitle: const Text('Light / Dark Mode', style: TextStyle(fontSize: 11, color: Colors.grey)),
+          ),
+        ],
+      ),
     );
   }
 

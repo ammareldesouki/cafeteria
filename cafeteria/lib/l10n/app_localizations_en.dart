@@ -759,4 +759,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get itemRemovedFromCart => 'Item removed from cart';
+
+  @override
+  String get unpaidOnly => 'Unpaid Only';
+
+  @override
+  String get paidOnly => 'Paid Only';
+
+  @override
+  String get filterDate => 'Filter Date';
+
+  @override
+  String get allTime => 'All Time';
+
+  @override
+  String get today => 'Today';
+
+  @override
+  String get thisWeek => 'This Week';
+
+  @override
+  String get thisMonth => 'This Month';
+
+  @override
+  String get activeOrder => 'Active Orders';
+
+  @override
+  String get totalOrder => 'Total Orders';
+
+  @override
+  String get rvenue => 'Revenue';
+
+  @override
+  String get pendingWallet => 'Pending Revenue';
 }

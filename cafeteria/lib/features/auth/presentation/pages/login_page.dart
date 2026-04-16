@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../manager/auth_bloc.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/buttons.dart';
+import '../widgets/language_theme_toggles.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -48,20 +49,21 @@ class _SignInPageState extends State<SignInPage> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state is AuthSuccess) {
+          final role = state.response.user.role;
+          final targetRoute =
+              role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
 
           Navigator.pushReplacementNamed(
             context,
-            RouteNames.layout,
+            targetRoute,
             arguments: {
               'userName': state.response.user.name.isNotEmpty
                   ? state.response.user.name
                   : state.response.user.email.split('@').first,
               'userId': state.response.user.id,
-              'role': state.response.user.role,
+              'role': role,
             },
           );
-
-
         } else if (state is AuthFailureState) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -82,10 +84,13 @@ class _SignInPageState extends State<SignInPage> {
                   final isLoading = state is AuthLoading;
                   return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-
-
-                      // Logo
+                      const Align(
+                        alignment: Alignment.centerRight,
+                        child: LanguageThemeToggles(key: ValueKey('login_toggles')),
+                      ),
+                      const SizedBox(height: 10),
                       Center(
                         child: Image.asset(
                           TImages.logoRemove,

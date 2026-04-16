@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../core/network/dio_handler.dart';
 
 import '../../core/constants/image_strings.dart';
 import '../../core/route/route_name.dart';
@@ -20,8 +21,22 @@ class _LoadingPageState extends State<LoadingPage> {
   Future<void> _navigate() async {
     await Future.delayed(const Duration(seconds: 3));
     if (mounted) {
-      Navigator.pushNamedAndRemoveUntil(
-          context, RouteNames.roleSelection, (route) => false);
+      final isLoggedIn = NetworkDioHandler().hasToken();
+      
+      
+      if (isLoggedIn) {
+        final role = NetworkDioHandler().currentRole;
+        if (role == 'admin') {
+          Navigator.pushNamedAndRemoveUntil(
+              context, RouteNames.cafeteriaPanel, (route) => false);
+        } else {
+          Navigator.pushNamedAndRemoveUntil(
+              context, RouteNames.layout, (route) => false);
+        }
+      } else {
+        Navigator.pushNamedAndRemoveUntil(
+            context, RouteNames.roleSelection, (route) => false);
+      }
     }
   }
 

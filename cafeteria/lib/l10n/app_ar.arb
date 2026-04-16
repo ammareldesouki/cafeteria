@@ -250,5 +250,17 @@
   "reviewSubmitted": "تم إرسال التقييم بنجاح",
   "addressSaved": "تم حفظ العنوان بنجاح",
   "itemAddedToCart": "تمت إضافة العنصر إلى السلة",
-  "itemRemovedFromCart": "تمت إزالة العنصر من السلة"
+  "itemRemovedFromCart": "تمت إزالة العنصر من السلة",
+  "unpaidOnly": "غير مدفوع فقط",
+  "paidOnly": "مدفوع فقط",
+  "filterDate": "تصفية حسب التاريخ",
+  "allTime": "كل الوقت",
+  "today": "اليوم",
+  "thisWeek": "هذا الأسبوع",
+  "thisMonth": "هذا الشهر",
+  "activeOrder": "الطلبات النشطة",
+  "totalOrder": "إجمالي الطلبات",
+  "rvenue": "الإيرادات",
+  "pendingWallet": "الإيرادات المعلقة"
+
 }

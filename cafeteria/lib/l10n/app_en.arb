@@ -251,5 +251,20 @@
   "reviewSubmitted": "Review submitted successfully",
   "addressSaved": "Address saved successfully",
   "itemAddedToCart": "Item added to cart",
-  "itemRemovedFromCart": "Item removed from cart"
+  "itemRemovedFromCart": "Item removed from cart",
+  "unpaidOnly": "Unpaid Only",
+  "paidOnly": "Paid Only",
+  "filterDate": "Filter Date",
+  "allTime": "All Time",
+  "today": "Today",
+  "thisWeek": "This Week",
+  "thisMonth": "This Month",
+  "activeOrder": "Active Orders",
+  "totalOrder": "Total Orders",
+  "rvenue": "Revenue",
+  "pendingWallet": "Pending Revenue"
+
+
+
+
 }

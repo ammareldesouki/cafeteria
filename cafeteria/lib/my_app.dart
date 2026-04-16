@@ -7,6 +7,7 @@ import 'core/route/app_route.dart';
 import 'core/theme/theme.dart';
 import 'core/theme/theme_bloc.dart';
 import 'features/auth/di/injaction.dart';
+import 'features/auth/presentation/manager/auth_bloc.dart';
 import 'l10n/app_localizations.dart';
 
 class MyApp extends StatelessWidget {
@@ -18,16 +19,17 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => sl<ThemeBloc>()),
         BlocProvider(create: (_) => sl<LocaleBloc>()),
-        // keep all your existing BlocProviders here
+        BlocProvider(create: (_) => sl<AuthBloc>()),
       ],
       child: BlocBuilder<ThemeBloc, ThemeMode>(
         builder: (context, themeMode) {
           return BlocBuilder<LocaleBloc, Locale>(
             builder: (context, locale) {
               return MaterialApp(
+                key: ValueKey('app_${locale.languageCode}_${themeMode.name}'),
                 title: "OnTheWay",
                 // Theme
-                themeMode: ThemeMode.system,
+                themeMode: themeMode,
                 theme: AppTheme.light,
                 darkTheme: AppTheme.dark,
 

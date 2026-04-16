@@ -43,6 +43,12 @@ class CBottomNavigationBar extends StatefulWidget {
 class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
   int _index = 0;
 
+  @override
+  void initState() {
+    super.initState();
+    context.read<AuthBloc>().add(const GetUserInfoEvent());
+  }
+
   /// Public method to switch tab programmatically (e.g., from success page)
   void switchToTab(int index) {
     setState(() => _index = index);
@@ -75,10 +81,6 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
           BlocProvider.value(
             value: sl<OrderBloc>()
               ..add(GetOrdersEvent()),
-          ),
-          BlocProvider.value(
-            value: sl<AuthBloc>()
-              ..add(const GetUserInfoEvent()),
           ),
         ],
         child: BlocListener<AuthBloc, AuthState>(

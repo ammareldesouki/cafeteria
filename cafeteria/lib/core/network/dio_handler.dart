@@ -1,16 +1,25 @@
 import 'dart:developer';
 import 'package:dio/dio.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/api.dart';
 
 class NetworkDioHandler {
   static NetworkDioHandler? _instance;
+  late final SharedPreferences _prefs;
+  static const String _tokenKey = 'auth_token';
+  static const String _userIdKey = 'user_id';
+  static const String _roleKey = 'user_role';
 
   factory NetworkDioHandler() {
-    _instance ??= NetworkDioHandler._internal(ApiConstat.baseUrl);
     return _instance!;
   }
 
-  NetworkDioHandler._internal(this.baseUrl) {
+  static Future<void> init(SharedPreferences prefs) async {
+    _instance = NetworkDioHandler._internal(ApiConstat.baseUrl, prefs);
+    await _instance!._loadFromPrefs();
+  }
+
+  NetworkDioHandler._internal(this.baseUrl, this._prefs) {
     dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
@@ -41,26 +50,43 @@ class NetworkDioHandler {
 
   String? currentUserId;
   String? currentRole;
-  String? currentWorkStatus; // ← workStatus from login response
+  String? currentWorkStatus;
 
-  void setAuthToken(String token) {
-    dio.options.headers['Authorization'] = 'Bearer $token';
+  Future<void> _loadFromPrefs() async {
+    final token = _prefs.getString(_tokenKey);
+    if (token != null) {
+      dio.options.headers['Authorization'] = 'Bearer $token';
+    }
+    currentUserId = _prefs.getString(_userIdKey);
+    currentRole = _prefs.getString(_roleKey);
   }
 
-  void setCurrentUser({
+  Future<void> setAuthToken(String token) async {
+    dio.options.headers['Authorization'] = 'Bearer $token';
+    await _prefs.setString(_tokenKey, token);
+  }
+
+  Future<void> setCurrentUser({
     required String userId,
     required String role,
     required String? workStatus,
-  }) {
+  }) async {
     currentUserId = userId;
     currentRole = role;
     currentWorkStatus = workStatus;
+    await _prefs.setString(_userIdKey, userId);
+    await _prefs.setString(_roleKey, role);
   }
 
-  void clearAuthToken() {
+  Future<void> clearAuthToken() async {
     dio.options.headers.remove('Authorization');
+    await _prefs.remove(_tokenKey);
+    await _prefs.remove(_userIdKey);
+    await _prefs.remove(_roleKey);
     currentUserId = null;
     currentRole = null;
     currentWorkStatus = "None";
   }
+
+  bool hasToken() => _prefs.containsKey(_tokenKey);
 }

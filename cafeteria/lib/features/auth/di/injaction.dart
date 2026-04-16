@@ -52,6 +52,7 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton<SharedPreferences>(() => prefs);
 
   /// ── Core ────────────────────────────────
+  await NetworkDioHandler.init(sl());
   sl.registerLazySingleton<NetworkDioHandler>(() => NetworkDioHandler());
 
   /// ── Auth DataSources ────────────────────
@@ -225,8 +226,8 @@ Future<void> setupLocator() async {
 
 
   // Theme
-  sl.registerLazySingleton<ThemeBloc>(() => ThemeBloc());
+  sl.registerLazySingleton<ThemeBloc>(() => ThemeBloc(sl()));
 
 // Locale
-  sl.registerLazySingleton<LocaleBloc>(() => LocaleBloc());
+  sl.registerLazySingleton<LocaleBloc>(() => LocaleBloc(sl()));
 }
