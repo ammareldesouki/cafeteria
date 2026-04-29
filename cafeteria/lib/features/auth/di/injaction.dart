@@ -31,6 +31,8 @@ import '../domain/use_cases/sign_out_usecase.dart';
 import '../domain/use_cases/sign_up_with_email_usecase.dart';
 import '../domain/use_cases/sign_up_with_google_usecase.dart';
 import '../domain/use_cases/sign_up_with_microsoft_usecase.dart';
+import '../domain/use_cases/forget_password_usecase.dart';
+import '../domain/use_cases/reset_password_usecase.dart';
 import '../presentation/manager/auth_bloc.dart';
 import '../../cart/presentation/manager/cart_bloc.dart';
 import '../../order/data/data_sources/order_remote_datasource.dart';
@@ -75,6 +77,8 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => SignInUseCase(sl()));
   sl.registerLazySingleton(() => GetUserProfileUseCase(sl()));
   sl.registerLazySingleton(() => SignOutUseCase(sl()));
+  sl.registerLazySingleton(() => ForgetPasswordUseCase(sl()));
+  sl.registerLazySingleton(() => ResetPasswordUseCase(sl()));
 
   /// ── Cart DataSource ─────────────────────
   sl.registerLazySingleton<CartRemoteDataSource>(
@@ -125,6 +129,8 @@ Future<void> setupLocator() async {
       signUpWithMicrosoft: sl(),
       getUserProfile: sl(),
       signOut: sl(),
+      forgetPassword: sl(),
+      resetPassword: sl(),
     ),
   );
 

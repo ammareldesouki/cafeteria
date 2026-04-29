@@ -21,4 +21,5 @@ class TImages {
   static const String courses= "assets/icons/coursesIcon.png";
 
   static const String expoloreIcon = "assets/icons/explore.png";
+  static const String googleIcon = "assets/icons/google.png";
 }

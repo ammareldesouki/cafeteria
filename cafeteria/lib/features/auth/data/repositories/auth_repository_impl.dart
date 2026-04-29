@@ -123,4 +123,31 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(ServerFailure(message: e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, void>> forgetPassword({required String email}) async {
+    try {
+      await _remote.forgetPassword(email: email);
+      return const Right(null);
+    } on ServerFailure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> resetPassword({
+    required String newPassword,
+    required String token,
+  }) async {
+    try {
+      await _remote.resetPassword(newPassword: newPassword, token: token);
+      return const Right(null);
+    } on ServerFailure catch (e) {
+      return Left(e);
+    } catch (e) {
+      return Left(ServerFailure(message: e.toString()));
+    }
+  }
 }

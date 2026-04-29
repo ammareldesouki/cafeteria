@@ -302,7 +302,7 @@ class _SignupPageState extends State<SignupPage> {
                       ),
                       const SizedBox(height: 20),
 
-                      // // ── Divider ────────────────────────────────────────
+                      // ── Divider ────────────────────────────────────────
                       // Row(
                       //   children: const [
                       //     Expanded(child: Divider()),

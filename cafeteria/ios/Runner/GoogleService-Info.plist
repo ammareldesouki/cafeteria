@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>1058634289271-bgg7a6d5t7j5lf1up27u4qmmrsuhjr9e.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.1058634289271-bgg7a6d5t7j5lf1up27u4qmmrsuhjr9e</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>1058634289271-4spod6qs50s70037kg52i6c0p8onddfo.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyB8YMA-bqWHwLVtKW44xrRbeKH0pzwp8ps</string>
+	<key>GCM_SENDER_ID</key>
+	<string>1058634289271</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ammar.cafeteria</string>
+	<key>PROJECT_ID</key>
+	<string>cafetria-2104b</string>
+	<key>STORAGE_BUCKET</key>
+	<string>cafetria-2104b.firebasestorage.app</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:1058634289271:ios:fc01612c973bde60747672</string>
+</dict>
+</plist>

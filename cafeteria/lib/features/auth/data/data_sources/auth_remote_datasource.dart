@@ -27,6 +27,13 @@ abstract class AuthRemoteDataSource {
   Future<UserModel> getUserProfile();
 
   Future<void> signOut();
+
+  Future<void> forgetPassword({required String email});
+
+  Future<void> resetPassword({
+    required String newPassword,
+    required String token,
+  });
 }
 
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
@@ -99,8 +106,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   Future<AuthResponseModel> signUpWithGoogle({required String idToken}) async {
     try {
       final response = await _dioHandler.dio.post(
-        '/auth/sign-up/google',
-        data: {'idToken': idToken},
+        EndPoints.googleSignIn,
+        data: {
+          'provider': 'google',
+          'idToken': {'token': idToken},
+        },
       );
       final model = AuthResponseModel.fromMap(response.data);
       _dioHandler.setAuthToken(model.token);
@@ -168,6 +178,47 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } finally {
       // ALWAYS clear the local token so the user can log in again
       await _dioHandler.clearAuthToken();
+    }
+  }
+
+  @override
+  Future<void> forgetPassword({required String email}) async {
+    try {
+      await _dioHandler.dio.post(
+        '/auth/forget-password',
+        data: {
+          'email': email,
+          'redirectTo': 'http://localhost:3000/reset-password', // Replace with your actual redirect URL
+        },
+      );
+    } on DioException catch (e) {
+      throw ServerFailure.fromMap(
+        (e.response?.data is Map<String, dynamic>)
+            ? e.response!.data as Map<String, dynamic>
+            : {'message': e.message ?? 'Unknown error'},
+      );
+    }
+  }
+
+  @override
+  Future<void> resetPassword({
+    required String newPassword,
+    required String token,
+  }) async {
+    try {
+      await _dioHandler.dio.post(
+        '/auth/reset-password',
+        data: {
+          'newPassword': newPassword,
+          'token': token,
+        },
+      );
+    } on DioException catch (e) {
+      throw ServerFailure.fromMap(
+        (e.response?.data is Map<String, dynamic>)
+            ? e.response!.data as Map<String, dynamic>
+            : {'message': e.message ?? 'Unknown error'},
+      );
     }
   }
 }

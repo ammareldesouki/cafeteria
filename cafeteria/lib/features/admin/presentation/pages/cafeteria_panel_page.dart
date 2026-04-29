@@ -750,7 +750,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         InputDecoration(labelText: "Image URL")),
                     const SizedBox(height: 12),
                     SwitchListTile(
-                      title: Text(l10n.inStock),
+                      title: Text(l10n.varaity),
                       value: hasVariants,
                       onChanged: (val) => setState(() {
                         hasVariants = val;
@@ -775,7 +775,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                       else ...[
                         Align(
                           alignment: Alignment.centerRight,
-                          child: Text(l10n.items,
+                          child: Text("الانواع",
                               style:
                               Theme.of(stfContext).textTheme.titleMedium),
                         ),
@@ -790,7 +790,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                                   child: TextFormField(
                                     controller: variantNameControllers[i],
                                     decoration: InputDecoration(
-                                      labelText: l10n.item,
+                                      labelText: l10n.varaity,
                                       border: const OutlineInputBorder(),
                                       suffixIcon: i == 0
                                           ? null

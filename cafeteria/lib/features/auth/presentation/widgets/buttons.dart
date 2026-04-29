@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class PrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
+  final String? icon;
   final bool isLoading;
 
   const PrimaryButton({
     super.key,
     required this.label,
+    this.icon,
     this.onTap,
     this.isLoading = false,
   });
@@ -37,13 +39,23 @@ class PrimaryButton extends StatelessWidget {
                   color: Colors.white,
                 ),
               )
-            : Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+            :
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (icon != null)  Image.asset(icon??'', width: 20, height: 20),
+            const SizedBox(width: 10),
+
+
+            Text(
+                    label,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+          ],
+        ),
       ),
     );
   }
@@ -66,7 +78,7 @@ class SocialButton extends StatelessWidget {
     return SizedBox(
       width: double.infinity,
       height: 50,
-      child: OutlinedButton(
+      child: ElevatedButton(
         onPressed: onTap,
         style: OutlinedButton.styleFrom(
           side: const BorderSide(color: Color(0xFFE0E0E0)),

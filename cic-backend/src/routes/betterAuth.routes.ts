@@ -14,7 +14,7 @@ router.use(
 		}
 
 		// Enabled: Allow using phone number as identifier for sign-in AND password reset
-		if (req.path === "/sign-in/email" || req.path === "/request-password-reset") {
+		if (req.path === "/sign-in/email" || req.path === "/forget-password") {
 			const identifier = req.body?.email;
 			// If it doesn't contain an @, assume it is a phone number and look it up
 			if (identifier && !identifier.includes("@")) {

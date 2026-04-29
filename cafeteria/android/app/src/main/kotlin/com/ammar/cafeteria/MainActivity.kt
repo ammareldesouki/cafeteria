@@ -1,4 +1,4 @@
-package com.example.cafeteria
+package com.ammar.cafeteria
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -26,8 +26,10 @@ dependencies:
   intl: ^0.20.2
   mocktail: ^1.0.4
   animate_do: ^4.2.0
+  firebase_core: ^4.7.0
 
 dev_dependencies:
+  change_app_package_name: ^1.5.0
   flutter_launcher_icons: ^0.13.1
   flutter_lints: ^5.0.0
   flutter_test:

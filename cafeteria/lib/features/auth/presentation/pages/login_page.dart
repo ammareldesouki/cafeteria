@@ -166,6 +166,18 @@ class _SignInPageState extends State<SignInPage> {
                         isLoading: isLoading,
                         onTap: _onSignIn,
                       ),
+                      const SizedBox(height: 16),
+
+                      // ── Google Sign In button ──────────────────────────
+                      PrimaryButton(
+                        label: 'Sign in with Google',
+                        icon: TImages.googleIcon,
+                        onTap: isLoading
+                            ? null
+                            : () => context
+                                .read<AuthBloc>()
+                                .add(const SignUpWithGoogleEvent()),
+                      ),
                       const SizedBox(height: 20),
 
                       // ── Divider ────────────────────────────────────────

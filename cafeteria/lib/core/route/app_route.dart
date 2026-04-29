@@ -9,6 +9,7 @@ import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/role_selection_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
 import '../../features/auth/presentation/pages/forgot_password_page.dart';
+import '../../features/auth/presentation/pages/otp_verification_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/favourite/presentation/manager/favourite_bloc.dart';
 import '../../features/home/presentation/manager/home_bloc.dart';
@@ -107,11 +108,15 @@ class AppRouter {
       ), settings);;
 
       case RouteNames.forgotPassword:
-        return _buildRoute(const ForgotPasswordPage(), settings);;
-        ;
+        return _buildRoute(const ForgotPasswordPage(), settings);
+
+      case RouteNames.otpVerification:
+        final email = settings.arguments as String;
+        return _buildRoute(OTPVerificationPage(email: email), settings);
 
       case RouteNames.resetPassword:
-        return _buildRoute(const ResetPasswordPage(), settings);
+        final args = settings.arguments as Map<String, String>?;
+        return _buildRoute(ResetPasswordPage(arguments: args), settings);
       default:
         return _buildRoute(
           Scaffold(

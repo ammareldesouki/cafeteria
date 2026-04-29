@@ -38,3 +38,21 @@ class UserProfileLoaded extends AuthState {
 }
 
 class UserSignedOut extends AuthState {}
+
+class ForgetPasswordSuccess extends AuthState {
+  final String message;
+
+  const ForgetPasswordSuccess({this.message = 'Reset token sent successfully. Please check your email.'});
+
+  @override
+  List<Object?> get props => [message];
+}
+
+class ResetPasswordSuccess extends AuthState {
+  final String message;
+
+  const ResetPasswordSuccess({this.message = 'Password has been reset successfully. You can now log in.'});
+
+  @override
+  List<Object?> get props => [message];
+}

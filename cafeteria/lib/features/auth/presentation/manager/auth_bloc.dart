@@ -13,6 +13,8 @@ import '../../domain/use_cases/sign_out_usecase.dart';
 import '../../domain/use_cases/sign_up_with_email_usecase.dart';
 import '../../domain/use_cases/sign_up_with_google_usecase.dart';
 import '../../domain/use_cases/sign_up_with_microsoft_usecase.dart';
+import '../../domain/use_cases/forget_password_usecase.dart';
+import '../../domain/use_cases/reset_password_usecase.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -24,11 +26,16 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final SignInUseCase _signIn;
   final GetUserProfileUseCase _getUserProfile;
   final SignOutUseCase _signOut;
+  final ForgetPasswordUseCase _forgetPassword;
+  final ResetPasswordUseCase _resetPassword;
 
 
 
   // ── Google Sign-In ──────────────────────────────────────────────────────
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+    serverClientId: '1058634289271-6gm6151g6h5gaep6osljdarhrfl4lbkl.apps.googleusercontent.com',
+  );
 
   // ── Microsoft / Outlook OAuth ───────────────────────────────────────────
   // Replace with your Azure AD tenant ID and client ID.
@@ -49,18 +56,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     required SignInUseCase signIn,
     required GetUserProfileUseCase getUserProfile,
     required SignOutUseCase signOut,
+    required ForgetPasswordUseCase forgetPassword,
+    required ResetPasswordUseCase resetPassword,
   })  : _signUpWithEmail = signUpWithEmail,
         _signUpWithGoogle = signUpWithGoogle,
         _signUpWithMicrosoft = signUpWithMicrosoft,
         _signIn = signIn,
         _getUserProfile = getUserProfile,
         _signOut = signOut,
+        _forgetPassword = forgetPassword,
+        _resetPassword = resetPassword,
         super(AuthInitial()) {
     on<SignUpWithEmailEvent>(_onSignUpWithEmail);
     on<SignInEvent>(_onSsignIn);
     on<GetUserInfoEvent>(_onGetUserInfo);
     on<SignOutEvent>(_onSignOut);
-    // on<SignUpWithGoogleEvent>(_onSignUpWithGoogle);
+    on<SignUpWithGoogleEvent>(_onSignUpWithGoogle);
+    on<ForgetPasswordEvent>(_onForgetPassword);
+    on<ResetPasswordEvent>(_onResetPassword);
     // on<SignUpWithMicrosoftEvent>(_onSignUpWithMicrosoft);
   }
 
@@ -129,41 +142,75 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     );
   }
 
+  Future<void> _onForgetPassword(
+    ForgetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    final result = await _forgetPassword(email: event.email);
+    result.fold(
+      (failure) => emit(AuthFailureState(
+        failure.messageEn ?? failure.messageAr ?? 'Failed to request password reset',
+      )),
+      (_) => emit(const ForgetPasswordSuccess()),
+    );
+  }
+
+  Future<void> _onResetPassword(
+    ResetPasswordEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    final result = await _resetPassword(
+      newPassword: event.newPassword,
+      token: event.token,
+    );
+    result.fold(
+      (failure) => emit(AuthFailureState(
+        failure.messageEn ?? failure.messageAr ?? 'Failed to reset password',
+      )),
+      (_) => emit(const ResetPasswordSuccess()),
+    );
+  }
+
   // ── Google Sign-Up ───────────────────────────────────────────────────────
-  // Future<void> _onSignUpWithGoogle(
-  //   SignUpWithGoogleEvent event,
-  //   Emitter<AuthState> emit,
-  // ) async {
-  //   emit(AuthLoading());
-  //   try {
-  //     // 1. Trigger Google OAuth flow
-  //     final googleUser = await _googleSignIn.signIn();
-  //     if (googleUser == null) {
-  //       emit(const AuthFailureState('Google sign-in was cancelled'));
-  //       return;
-  //     }
-  //
-  //     // 2. Get authentication tokens
-  //     final googleAuth = await googleUser.authentication;
-  //     final idToken = googleAuth.idToken;
-  //
-  //     if (idToken == null) {
-  //       emit(const AuthFailureState('Could not retrieve Google ID token'));
-  //       return;
-  //     }
-  //
-  //     // 3. Send idToken to your backend
-  //     final result = await _signUpWithGoogle(idToken: idToken);
-  //     result.fold(
-  //       (failure) => emit(AuthFailureState(
-  //         failure.messageEn ?? failure.messageAr ?? 'Google sign-up failed',
-  //       )),
-  //       (response) => emit(AuthSuccess(response)),
-  //     );
-  //   } catch (e) {
-  //     emit(AuthFailureState(e.toString()));
-  //   }
-  // }
+  Future<void> _onSignUpWithGoogle(
+    SignUpWithGoogleEvent event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(AuthLoading());
+    try {
+      // 0. Force account chooser by signing out first
+      await _googleSignIn.signOut();
+
+      // 1. Trigger Google OAuth flow
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) {
+        emit(const AuthFailureState('Google sign-in was cancelled'));
+        return;
+      }
+
+      // 2. Get authentication tokens
+      final googleAuth = await googleUser.authentication;
+      final idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        emit(const AuthFailureState('Could not retrieve Google ID token'));
+        return;
+      }
+
+      // 3. Send idToken to your backend
+      final result = await _signUpWithGoogle(idToken: idToken);
+      result.fold(
+        (failure) => emit(AuthFailureState(
+          failure.messageEn ?? failure.messageAr ?? 'Google sign-up failed',
+        )),
+        (response) => emit(AuthSuccess(response)),
+      );
+    } catch (e) {
+      emit(AuthFailureState(e.toString()));
+    }
+  }
 
   // // ── Microsoft / Outlook Sign-Up ──────────────────────────────────────────
   // Future<void> _onSignUpWithMicrosoft(

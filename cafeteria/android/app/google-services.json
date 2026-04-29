@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "1058634289271",
+    "project_id": "cafetria-2104b",
+    "storage_bucket": "cafetria-2104b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1058634289271:android:f6a1c4b46392f1b6747672",
+        "android_client_info": {
+          "package_name": "com.ammar.cafeteria"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1058634289271-6gm6151g6h5gaep6osljdarhrfl4lbkl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDk7wo9-W-SD6CehyJy4xFvHZUKrwfxjiA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1058634289271-6gm6151g6h5gaep6osljdarhrfl4lbkl.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1058634289271-ggp90jn6oaa1pkq742a48qh3bn7q7qfa.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cafeteria"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

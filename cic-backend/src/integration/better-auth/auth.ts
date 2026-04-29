@@ -38,16 +38,41 @@ export const auth = betterAuth({
 			const token = (() => {
 				try {
 					const parsed = new URL(url);
-					return parsed.searchParams.get("token");
+					// The token is often in the path: /reset-password/<token>
+					const parts = parsed.pathname.split('/');
+					const pathToken = parts[parts.length - 1];
+					return parsed.searchParams.get("token") || pathToken;
 				} catch {
 					return null;
 				}
 			})();
 
+			// Generate a 6-digit numeric OTP for better mobile UI
+			const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+			
+			if (token && user?.email) {
+				try {
+					const { otpRepository } = await import("@/repositories/otp.repository");
+					// Clean up old OTPs first
+					await otpRepository.deleteByEmail(user.email, "password_reset");
+					// Store mapping: OTP Code -> Better Auth Token
+					await otpRepository.create({
+						email: user.email,
+						code: otpCode,
+						token: token, // Store the original better-auth token
+						type: "password_reset",
+						expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes
+						createdAt: new Date(),
+					});
+				} catch (err) {
+					console.error("Failed to store OTP mapping", err);
+				}
+			}
+
 			console.log(
 				`🔐 PASSWORD_RESET_REQUEST for ${user?.email || user?.phoneNumber}\n🔗 URL: ${url}${
 					token ? `\n🔢 RESET_CODE: ${token}` : ""
-				}`,
+				}\n🔢 OTP_CODE: ${otpCode}`,
 			);
 
 			if (canSendEmail && user?.email) {
@@ -63,17 +88,26 @@ export const auth = betterAuth({
 						from: SMTP_FROM,
 						to: user.email,
 						subject: "Reset your password",
-						text: `Reset your password using this code: ${token}\nOr click here: ${url}`,
-						html: `<p>Reset your password using this code: <b>${token}</b></p><p>Or click this link:</p><p><a href="${url}">${url}</a></p>`,
+						text: `Reset your password using this code: ${otpCode}\nOr click here: ${url}`,
+						html: `
+							<div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+								<h2 style="color: #333;">Password Reset</h2>
+								<p>Use the following 6-digit code to reset your password:</p>
+								<div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4F46E5; margin: 20px 0;">${otpCode}</div>
+								<p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+								<hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+								<p style="font-size: 12px; color: #999;">If you didn't request this, please ignore this email.</p>
+							</div>
+						`,
 					});
 
-					console.log(`📧 Password reset email sent to ${user.email}`);
+					console.log(`📧 Password reset OTP email sent to ${user.email}`);
 				} catch (err) {
 					console.error("❌ Failed to send reset email", err);
 				}
 			} else if (!canSendEmail) {
 				console.log(
-					"💡 SMTP not configured. For free/local testing, copy the RESET_CODE above into your app.",
+					"💡 SMTP not configured. For free/local testing, copy the OTP_CODE above into your app.",
 				);
 			}
 		},
@@ -94,6 +128,20 @@ export const auth = betterAuth({
 				type: "string",
 				required: false,
 			},
+		},
+	},
+
+	account: {
+		accountLinking: {
+			enabled: true,
+			trustedProviders: ["google"],
+		},
+	},
+
+	socialProviders: {
+		google: {
+			clientId: process.env.GOOGLE_CLIENT_ID || "1058634289271-6gm6151g6h5gaep6osljdarhrfl4lbkl.apps.googleusercontent.com",
+			clientSecret: process.env.GOOGLE_CLIENT_SECRET || "dummy",
 		},
 	},
 
