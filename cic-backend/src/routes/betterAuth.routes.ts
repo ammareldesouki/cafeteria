@@ -32,6 +32,38 @@ router.use(
 			}
 		}
 
+		// Pre-check: if user exists but has no password credential, better-auth crashes
+		// with an empty 500. Catch it here and return a helpful error instead.
+		if (req.path === "/sign-in/email") {
+			const email = req.body?.email;
+			if (email) {
+				try {
+					const db = mongoose.connection.db;
+					const user = await db?.collection("user").findOne({ email });
+					if (user) {
+						const credential = await db?.collection("account").findOne({
+							userId: user._id.toString(),
+							providerId: "credential",
+						});
+						if (!credential) {
+							// User exists but signed up via Google/social — no password set
+							res.status(400).json({
+								success: false,
+								error: {
+									code: 400,
+									message:
+										"This account was created with Google. Please sign in with Google.",
+								},
+							});
+							return;
+						}
+					}
+				} catch (err) {
+					console.error("Pre-check failed, continuing to better-auth:", err);
+				}
+			}
+		}
+
 		next();
 	},
 	(req: Request, res: Response, next: NextFunction) => {
