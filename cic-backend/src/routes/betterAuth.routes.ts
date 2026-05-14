@@ -34,7 +34,28 @@ router.use(
 
 		next();
 	},
-	toNodeHandler(auth),
+	(req: Request, res: Response, next: NextFunction) => {
+		// toNodeHandler bypasses Express error middleware — wrap it so crashes
+		// produce a proper JSON 500 instead of an empty response.
+		try {
+			const handler = toNodeHandler(auth);
+			Promise.resolve(handler(req, res, next)).catch((err: unknown) => {
+				if (!res.headersSent) {
+					res.status(500).json({
+						success: false,
+						error: {
+							code: 500,
+							message:
+								err instanceof Error ? err.message : "Internal server error",
+						},
+					});
+				}
+				console.error("[BetterAuth] unhandled error:", err);
+			});
+		} catch (err: unknown) {
+			next(err);
+		}
+	},
 );
 
 export default router;
