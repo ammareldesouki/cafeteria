@@ -15,6 +15,9 @@ build/
 *.tsbuildinfo
 
 # Environment variables
+.env
+.env.*
+!.env.example
 
 
 # Logs
