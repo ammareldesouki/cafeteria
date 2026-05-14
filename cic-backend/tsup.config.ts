@@ -3,7 +3,7 @@ import { defineConfig } from "tsup";
 export default defineConfig({
 	entry: ["src/server.ts"], // Multiple entries allowed when adding CLI etc.
 	outDir: "dist", // Output directory
-	format: ["cjs"], // Add 'esm' if needed: ['cjs', 'esm']
+	format: ["esm"],
 	dts: true, // Generate type declaration files (.d.ts)
 	sourcemap: true, // Generate sourcemaps
 	clean: true, // Clean dist folder before build
