@@ -1657,6 +1657,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pending Revenue'**
   String get pendingWallet;
+
+  /// No description provided for @additemMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Item To Menu'**
+  String get additemMenu;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
+  /// No description provided for @itemName.
+  ///
+  /// In en, this message translates to:
+  /// **'Item Name'**
+  String get itemName;
 }
 
 class _AppLocalizationsDelegate

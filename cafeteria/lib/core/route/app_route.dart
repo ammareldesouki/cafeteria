@@ -19,7 +19,7 @@ import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/layout/bottom_navegation_bar.dart';
 import '../../features/order/presentation/manager/order_bloc.dart';
 import '../../features/order/presentation/pages/checkout_page.dart';
-import '../../features/splash/loading_page.dart';
+import '../../features/splash/slash.dart';
 import '../../features/admin/presentation/manager/admin_bloc.dart';
 import '../../features/admin/presentation/pages/cafeteria_panel_page.dart';
 

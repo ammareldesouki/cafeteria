@@ -721,18 +721,18 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(item == null ? l10n.addToCart : l10n.edit,
+                    Text(item == null ? l10n.additemMenu: l10n.edit,
                         style: Theme.of(stfContext).textTheme.titleLarge),
                     const SizedBox(height: 20),
                     TextFormField(
                         controller: nameController,
-                        decoration: InputDecoration(labelText: l10n.appName)),
+                        decoration: InputDecoration(labelText: l10n.itemName)),
                     const SizedBox(height: 12),
                     TextFormField(
                         controller: priceController,
                         keyboardType: TextInputType.number,
                         decoration:
-                        InputDecoration(labelText: l10n.subtotal)),
+                        InputDecoration(labelText: l10n.price)),
                     const SizedBox(height: 12),
                     TextFormField(
                         controller: categoryController,
@@ -883,7 +883,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         style: ElevatedButton.styleFrom(
                             backgroundColor: TColors.primary),
                         child: Text(
-                            item == null ? l10n.addToCart : l10n.edit,
+                            item == null ? l10n.additemMenu : l10n.edit,
                             style: const TextStyle(color: Colors.white)),
                       ),
                     ),

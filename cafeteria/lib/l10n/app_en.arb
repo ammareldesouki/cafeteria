@@ -262,7 +262,10 @@
   "activeOrder": "Active Orders",
   "totalOrder": "Total Orders",
   "rvenue": "Revenue",
-  "pendingWallet": "Pending Revenue"
+  "pendingWallet": "Pending Revenue",
+  "additemMenu": "Add Item To Menu",
+  "price": "Price",
+  "itemName":"Item Name"
 
 
 

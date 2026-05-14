@@ -790,4 +790,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get pendingWallet => 'الإيرادات المعلقة';
+
+  @override
+  String get additemMenu => 'اضف عنصر للقائمة';
+
+  @override
+  String get price => 'المبلغ';
+
+  @override
+  String get itemName => 'اسم المنتج';
 }

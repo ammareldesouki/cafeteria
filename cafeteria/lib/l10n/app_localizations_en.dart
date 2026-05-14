@@ -792,4 +792,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pendingWallet => 'Pending Revenue';
+
+  @override
+  String get additemMenu => 'Add Item To Menu';
+
+  @override
+  String get price => 'Price';
+
+  @override
+  String get itemName => 'Item Name';
 }

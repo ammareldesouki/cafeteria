@@ -261,6 +261,9 @@
   "activeOrder": "الطلبات النشطة",
   "totalOrder": "إجمالي الطلبات",
   "rvenue": "الإيرادات",
-  "pendingWallet": "الإيرادات المعلقة"
+  "pendingWallet": "الإيرادات المعلقة",
+  "additemMenu": "اضف عنصر للقائمة",
+  "price": "المبلغ",
+  "itemName": "اسم المنتج"
 
 }

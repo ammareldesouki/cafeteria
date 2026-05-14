@@ -74,10 +74,12 @@ class _HomePageState extends State<HomePage> {
                     if (state is HomeInitial || state is HomeLoading)
                       const HomeSkeleton()
                     else if (state is HomeError)
-                      _ErrorView(
-                        message: state.message,
-                        onRetry: () =>
-                            context.read<HomeBloc>().add(const FetchMenuEvent()),
+                      Center(
+                        child: _ErrorView(
+                          message: state.message,
+                          onRetry: () =>
+                              context.read<HomeBloc>().add(const FetchMenuEvent()),
+                        ),
                       )
                     else if (state is HomeLoaded) ...[
                         if (!state.isSearching) ...[
