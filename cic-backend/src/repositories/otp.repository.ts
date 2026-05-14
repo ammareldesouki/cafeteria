@@ -9,7 +9,7 @@ export const otpRepository = {
 		return { ...otp, _id: result.insertedId };
 	},
 
-	async findValidOTP(email: string, code: string, type: string): Promise<OTP | null> {
+	async findValidOTP(email: string, code: string, type: OTP["type"]): Promise<OTP | null> {
 		return collection.findOne({
 			email,
 			code,
@@ -18,7 +18,7 @@ export const otpRepository = {
 		}) as Promise<OTP | null>;
 	},
 
-	async deleteByEmail(email: string, type: string): Promise<void> {
+	async deleteByEmail(email: string, type: OTP["type"]): Promise<void> {
 		await collection.deleteMany({ email, type });
 	},
 };

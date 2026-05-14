@@ -17,7 +17,7 @@ router.post("/auth/request-password-reset", async (req: Request, res: Response) 
 
 	try {
 		// This will trigger the sendResetPassword callback in auth.ts
-		await auth.api.forgetPassword({
+		await auth.api.requestPasswordReset({
 			body: { email },
 		});
 		res.json({ success: true, message: "OTP sent if user exists" });

@@ -28,7 +28,7 @@ export const updateMenuItemStock = async (
 	next: NextFunction,
 ) => {
 	try {
-		const { id } = req.params;
+		const id = req.params.id as string;
 		const { in_stock } = req.body as { in_stock: boolean };
 
 		const updated = await menuService.updateItemStock(id, in_stock);
