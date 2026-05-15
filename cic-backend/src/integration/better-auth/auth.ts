@@ -75,36 +75,40 @@ export const auth = betterAuth({
 				}\n🔢 OTP_CODE: ${otpCode}`,
 			);
 
+			// Send email in the background — do NOT await so the API responds instantly
 			if (canSendEmail && user?.email) {
-				try {
-					const transporter = nodemailer.createTransport({
-						host: SMTP_HOST,
-						port: SMTP_PORT,
-						secure: SMTP_PORT === 465,
-						auth: { user: SMTP_USER, pass: SMTP_PASS },
-					});
+				const transporter = nodemailer.createTransport({
+					host: SMTP_HOST,
+					port: SMTP_PORT,
+					secure: SMTP_PORT === 465,
+					auth: { user: SMTP_USER, pass: SMTP_PASS },
+					pool: true,           // reuse SMTP connections
+					connectionTimeout: 8_000,
+					greetingTimeout: 8_000,
+					socketTimeout: 10_000,
+				});
 
-					await transporter.sendMail({
-						from: SMTP_FROM,
-						to: user.email,
-						subject: "Reset your password",
-						text: `Reset your password using this code: ${otpCode}\nOr click here: ${url}`,
-						html: `
-							<div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
-								<h2 style="color: #333;">Password Reset</h2>
-								<p>Use the following 6-digit code to reset your password:</p>
-								<div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4F46E5; margin: 20px 0;">${otpCode}</div>
-								<p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
-								<hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
-								<p style="font-size: 12px; color: #999;">If you didn't request this, please ignore this email.</p>
-							</div>
-						`,
-					});
-
+				// Fire-and-forget: respond to client immediately, deliver email async
+				transporter.sendMail({
+					from: SMTP_FROM,
+					to: user.email,
+					subject: "Reset your password",
+					text: `Reset your password using this code: ${otpCode}\nOr click here: ${url}`,
+					html: `
+						<div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #eee; border-radius: 10px;">
+							<h2 style="color: #333;">Password Reset</h2>
+							<p>Use the following 6-digit code to reset your password:</p>
+							<div style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4F46E5; margin: 20px 0;">${otpCode}</div>
+							<p style="color: #666; font-size: 14px;">This code will expire in 10 minutes.</p>
+							<hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+							<p style="font-size: 12px; color: #999;">If you didn't request this, please ignore this email.</p>
+						</div>
+					`,
+				}).then(() => {
 					console.log(`📧 Password reset OTP email sent to ${user.email}`);
-				} catch (err) {
+				}).catch((err: unknown) => {
 					console.error("❌ Failed to send reset email", err);
-				}
+				});
 			} else if (!canSendEmail) {
 				console.log(
 					"💡 SMTP not configured. For free/local testing, copy the OTP_CODE above into your app.",
