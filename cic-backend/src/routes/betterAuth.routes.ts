@@ -46,13 +46,14 @@ router.use(
 							providerId: "credential",
 						});
 						if (!credential) {
-							// User exists but signed up via Google/social — no password set
+							// User exists but has no password yet (e.g. signed up via Google).
+							// Guide them to use Forgot Password to set one.
 							res.status(400).json({
 								success: false,
 								error: {
 									code: 400,
 									message:
-										"This account was created with Google. Please sign in with Google.",
+										"No password set for this account. Use 'Forgot Password' to set a password, then sign in with email.",
 								},
 							});
 							return;
