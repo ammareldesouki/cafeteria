@@ -1,3 +1,10 @@
+// Polyfill globalThis.crypto for Node.js 18 (required by better-auth)
+import { webcrypto } from "node:crypto";
+if (!globalThis.crypto) {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	(globalThis as any).crypto = webcrypto;
+}
+
 import "@config/env";
 import app from "./app";
 import { connectDB } from "@config/db";
