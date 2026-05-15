@@ -23,8 +23,8 @@ class NetworkDioHandler {
     dio = Dio(
       BaseOptions(
         baseUrl: baseUrl,
-        receiveTimeout: const Duration(seconds: 10),
-        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 30),
+        connectTimeout: const Duration(seconds: 30),
       ),
     );
     dio.interceptors.add(InterceptorsWrapper(
