@@ -41,8 +41,9 @@ router.use(
 					const db = mongoose.connection.db;
 					const user = await db?.collection("user").findOne({ email });
 					if (user) {
+						// userId is stored as ObjectId — also check string form for legacy rows
 						const credential = await db?.collection("account").findOne({
-							userId: user._id.toString(),
+							userId: { $in: [user._id, user._id.toString()] },
 							providerId: "credential",
 						});
 						if (!credential) {
