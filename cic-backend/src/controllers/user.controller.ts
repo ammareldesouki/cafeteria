@@ -2,12 +2,13 @@
  * Controller Layer - User HTTP Handler
  * Parse HTTP input → Call service → Return HTTP response
  */
-import { Request, Response, NextFunction } from "express";
-import { userService } from "@/services/user.service";
-import { balanceService } from "@/services/balance.service";
-import { orderRepository } from "@/repositories/order.repository";
-import { OrderStatus } from "@/types/order.types";
+import type { NextFunction, Request, Response } from "express";
 import { handleServiceError } from "@/middlewares/serviceErrorHandler.middleware";
+import { orderRepository } from "@/repositories/order.repository";
+import { balanceService } from "@/services/balance.service";
+import { userService } from "@/services/user.service";
+import { userWalletService } from "@/services/userWallet.service";
+import { OrderStatus } from "@/types/order.types";
 import { logger } from "@/utils/logger";
 
 /**
@@ -27,7 +28,7 @@ export const getUserProfile = async (
 			return;
 		}
 
-		const { balance } = await balanceService.getBalance();
+		const { balance } = await balanceService.getBalance(userId);
 
 		// Fetch order counts
 		const [totalOrders, completedOrders] = await Promise.all([
@@ -49,6 +50,53 @@ export const getUserProfile = async (
 		});
 	} catch (err) {
 		logger.error(`[GET /users/me] ${(err as Error).message}`);
+		next(err);
+	}
+};
+
+/**
+ * Get current user's wallet balance
+ * GET /api/v1/me/wallet
+ */
+export const getMyWallet = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const userId = req.user?.id;
+		if (!userId) {
+			res.status(401).json({ error: { code: 401, message: "Unauthorized" } });
+			return;
+		}
+
+		const wallet = await userWalletService.getBalance(userId);
+		res.json({ balance: wallet.balance, updatedAt: wallet.updatedAt });
+	} catch (err) {
+		next(err);
+	}
+};
+
+/**
+ * Get current user's wallet balance + transaction history
+ * GET /api/v1/me/wallet/details?page=1&limit=10
+ */
+export const getMyWalletDetails = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const userId = req.user?.id;
+		if (!userId) {
+			res.status(401).json({ error: { code: 401, message: "Unauthorized" } });
+			return;
+		}
+
+		const { page, limit } = (req as any).pagination;
+		const details = await userWalletService.getDetails(userId, page, limit);
+		res.json(details);
+	} catch (err) {
 		next(err);
 	}
 };

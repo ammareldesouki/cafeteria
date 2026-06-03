@@ -1340,6 +1340,66 @@ abstract class AppLocalizations {
   /// **'Top Up Wallet'**
   String get topUpWallet;
 
+  /// No description provided for @accountMenu.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Menu'**
+  String get accountMenu;
+
+  /// No description provided for @account.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get account;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @totalOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Orders'**
+  String get totalOrders;
+
+  /// No description provided for @completedOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Orders'**
+  String get completedOrders;
+
+  /// No description provided for @appAppearance.
+  ///
+  /// In en, this message translates to:
+  /// **'App Appearance'**
+  String get appAppearance;
+
+  /// No description provided for @lightDarkMode.
+  ///
+  /// In en, this message translates to:
+  /// **'Light / Dark Mode'**
+  String get lightDarkMode;
+
+  /// No description provided for @recentBalanceUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Balance Updates'**
+  String get recentBalanceUpdates;
+
+  /// No description provided for @noRecentTransactions.
+  ///
+  /// In en, this message translates to:
+  /// **'No recent transactions'**
+  String get noRecentTransactions;
+
+  /// No description provided for @youOwe.
+  ///
+  /// In en, this message translates to:
+  /// **'You owe {amount} {currency}'**
+  String youOwe(String amount, String currency);
+
   /// No description provided for @yes.
   ///
   /// In en, this message translates to:

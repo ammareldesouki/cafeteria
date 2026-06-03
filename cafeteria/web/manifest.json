@@ -1,6 +1,6 @@
 {
-    "name": "cafeteria",
-    "short_name": "cafeteria",
+    "name": "OnTheWay",
+    "short_name": "OnTheWay",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

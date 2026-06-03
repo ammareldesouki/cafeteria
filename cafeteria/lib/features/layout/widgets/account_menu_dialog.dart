@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../core/local/locale_bloc.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../auth/domain/entities/user_entity.dart';
 import '../../auth/presentation/manager/auth_bloc.dart';
 import '../../auth/presentation/widgets/language_theme_toggles.dart';
+import '../../wallet/presentation/widgets/wallet_transactions_view.dart';
 
 class AccountMenuDialog extends StatefulWidget {
   final UserEntity user;
@@ -48,9 +48,9 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
-                  'Account Menu',
-                  style: TextStyle(
+                Text(
+                  AppLocalizations.of(context)!.accountMenu,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF3B1A08),
@@ -111,10 +111,10 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
         unselectedLabelColor: Colors.grey,
         labelColor: const Color(0xFF8B7355),
         labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-        tabs: const [
-          Tab(text: 'Account'),
-          Tab(text: 'Settings'),
-          Tab(text: 'Wallet'),
+        tabs: [
+          Tab(text: AppLocalizations.of(context)!.account),
+          Tab(text: AppLocalizations.of(context)!.settings),
+          Tab(text: AppLocalizations.of(context)!.wallet),
         ],
       ),
     );
@@ -188,9 +188,9 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
             ),
           ),
           const SizedBox(height: 16),
-          _buildStatCard('Total Orders', widget.user.totalOrders.toString()),
+          _buildStatCard(AppLocalizations.of(context)!.totalOrders, widget.user.totalOrders.toString()),
           const SizedBox(height: 12),
-          _buildStatCard('Completed Orders', widget.user.completedOrders.toString(), color: Colors.green),
+          _buildStatCard(AppLocalizations.of(context)!.completedOrders, widget.user.completedOrders.toString(), color: Colors.green),
         ],
       ),
     );
@@ -241,11 +241,11 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
           ListTile(
             contentPadding: EdgeInsets.zero,
             leading: const Icon(Icons.palette_outlined, color: Color(0xFF8B7355)),
-            title: const Text(
-              'App Appearance',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+            title: Text(
+              AppLocalizations.of(context)!.appAppearance,
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
             ),
-            subtitle: const Text('Light / Dark Mode', style: TextStyle(fontSize: 11, color: Colors.grey)),
+            subtitle: Text(AppLocalizations.of(context)!.lightDarkMode, style: const TextStyle(fontSize: 11, color: Colors.grey)),
           ),
         ],
       ),
@@ -266,19 +266,19 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 16),
-                  SizedBox(width: 8),
+                  const Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 16),
+                  const SizedBox(width: 8),
                   Text(
-                    'Wallet Balance',
-                    style: TextStyle(color: Colors.white70, fontSize: 13),
+                    AppLocalizations.of(context)!.walletBalance,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Text(
-                '${widget.user.balance.toStringAsFixed(2)} L.E',
+                '${widget.user.balance.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 28,
@@ -286,25 +286,26 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
                 ),
               ),
               if (isNegative)
-                const Text(
-                  'Negative Credit',
-                  style: TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+                Text(
+                  AppLocalizations.of(context)!.youOwe(
+                    widget.user.balance.abs().toStringAsFixed(2),
+                    AppLocalizations.of(context)!.pound,
+                  ),
+                  style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
             ],
           ),
         ),
         const SizedBox(height: 20),
-        const Align(
+        Align(
           alignment: Alignment.centerLeft,
           child: Text(
-            'Recent Balance Updates',
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3B1A08)),
+            AppLocalizations.of(context)!.recentBalanceUpdates,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3B1A08)),
           ),
         ),
         const SizedBox(height: 10),
-        const Center(
-          child: Text('No recent transactions', style: TextStyle(color: Colors.grey, fontSize: 12)),
-        ),
+        const Expanded(child: WalletTransactionsView()),
       ],
     );
   }
@@ -318,7 +319,7 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
 
         },
         icon: const Icon(Icons.logout_rounded, size: 18),
-        label: const Text('Logout'),
+        label: Text(AppLocalizations.of(context)!.logout),
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red.shade50,
           foregroundColor: Colors.red,

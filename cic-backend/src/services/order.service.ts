@@ -2,26 +2,90 @@
  * Service Layer - Orders Business Logic
  * Orchestrates order operations. Validates items exist, manages order lifecycle.
  */
+
+import { ObjectId } from "mongodb";
+import { cartRepository } from "@/repositories/cart.repository";
 import { orderRepository } from "@/repositories/order.repository";
+import { stockService } from "@/services/stock.service";
+import { userWalletService } from "@/services/userWallet.service";
+import { walletService } from "@/services/wallet.service";
 import {
-	Order,
-	OrderItem,
+	isValidStatusTransition,
+	type Order,
+	type OrderItem,
 	OrderStatus,
 	PaymentStatus,
-	isValidStatusTransition,
 } from "@/types/order.types";
-import { walletService } from "@/services/wallet.service";
-import { stockService } from "@/services/stock.service";
-import { balanceService } from "@/services/balance.service";
-import { cartRepository } from "@/repositories/cart.repository";
 import {
-	UnauthorizedOrderAccessError,
+	EmptyCartError,
 	InvalidStatusTransitionError,
 	OrderNotCancellableError,
-	EmptyCartError,
+	UnauthorizedOrderAccessError,
 } from "@/utils/errors";
-import { ObjectId } from "mongodb";
-import mongoose from "mongoose";
+
+/**
+ * Wallet effect of an order state, expressed as signed balance contributions.
+ * - User owes (negative balance) while an order is delivered but unpaid.
+ * - Cafeteria realizes revenue (positive balance) once an order is paid.
+ * Settlement is computed as the *delta* between the before/after states, so any
+ * transition (deliver-unpaid, pay later, deliver+pay, reversal, cancel) is
+ * handled uniformly and cancel always nets out whatever was applied.
+ */
+function userBalanceEffect(o: {
+	status: OrderStatus;
+	paymentStatus: PaymentStatus;
+	totalPrice: number;
+}): number {
+	return o.status === OrderStatus.DELIVERED &&
+		o.paymentStatus === PaymentStatus.UNPAID
+		? -o.totalPrice
+		: 0;
+}
+
+function cafeteriaRevenueEffect(o: {
+	status: OrderStatus;
+	paymentStatus: PaymentStatus;
+	totalPrice: number;
+}): number {
+	return o.paymentStatus === PaymentStatus.PAID &&
+		o.status !== OrderStatus.CANCELLED
+		? o.totalPrice
+		: 0;
+}
+
+/**
+ * Apply the wallet changes needed to move an order from `before` to `after`.
+ */
+async function settleWallets(
+	userId: string,
+	orderId: string,
+	before: {
+		status: OrderStatus;
+		paymentStatus: PaymentStatus;
+		totalPrice: number;
+	},
+	after: {
+		status: OrderStatus;
+		paymentStatus: PaymentStatus;
+		totalPrice: number;
+	},
+): Promise<void> {
+	const userDelta = userBalanceEffect(after) - userBalanceEffect(before);
+	const cafeteriaDelta =
+		cafeteriaRevenueEffect(after) - cafeteriaRevenueEffect(before);
+
+	if (userDelta > 0) {
+		await userWalletService.credit(userId, orderId, userDelta);
+	} else if (userDelta < 0) {
+		await userWalletService.debit(userId, orderId, -userDelta);
+	}
+
+	if (cafeteriaDelta > 0) {
+		await walletService.recordPayment(orderId, cafeteriaDelta);
+	} else if (cafeteriaDelta < 0) {
+		await walletService.recordReversal(orderId, -cafeteriaDelta);
+	}
+}
 
 export const orderService = {
 	/**
@@ -33,7 +97,7 @@ export const orderService = {
 		userId: string,
 		userEmail: string,
 		deliveryLocation?: string,
-		username?: string,         // 4th
+		username?: string, // 4th
 		userPhone?: string,
 	): Promise<Order> {
 		const cart = await cartRepository.findByUserId(userId);
@@ -57,9 +121,7 @@ export const orderService = {
 			const cartItem = cart.items[i];
 
 			// Look up item name from menu
-			const { menuRepository } = await import(
-				"@/repositories/menu.repository"
-			);
+			const { menuRepository } = await import("@/repositories/menu.repository");
 			const menuItem = await menuRepository.findById(
 				cartItem.menuItemId.toString(),
 			);
@@ -82,11 +144,6 @@ export const orderService = {
 			0,
 		);
 
-		const userDoc = await mongoose.connection.collection("user").findOne({ id: userId });
-
-		       console.log(userDoc);
-
-		
 		const order: Order = {
 			userId,
 			username,
@@ -101,15 +158,11 @@ export const orderService = {
 			updatedAt: new Date(),
 		};
 
+		// Order is placed unpaid; no wallet movement happens until the order is
+		// delivered (settlement is handled in updateOrderByAdmin / cancelOrder).
 		const createdOrder = await orderRepository.create(order);
 
-		await balanceService.deductBalanceForOrder(
-			createdOrder._id!.toString(),
-			totalPrice,
-		);
-
 		await cartRepository.clearCart(userId);
-       console.log(userDoc?.name);
 		return createdOrder;
 	},
 
@@ -237,7 +290,6 @@ export const orderService = {
 		}));
 
 		await stockService.restoreStockBatch(stockItems);
-		await walletService.recordRefund(orderId, order.totalPrice);
 
 		const updated = await orderRepository.updateStatus(
 			orderId,
@@ -246,6 +298,11 @@ export const orderService = {
 		if (!updated) {
 			throw new Error("Failed to cancel order");
 		}
+
+		// Reverse only the wallet effects that were actually applied
+		// (clears a user's debt for a delivered-unpaid order, or reverses
+		// realized revenue for a paid order; no-op for a pending order).
+		await settleWallets(order.userId, orderId, order, updated);
 
 		return updated;
 	},
@@ -285,8 +342,9 @@ export const orderService = {
 	},
 
 	/**
-	 * Update order by admin (no ownership check)
-	 * Automatically updates wallet when payment status changes
+	 * Update order by admin (no ownership check).
+	 * Settles the user wallet and cafeteria wallet based on the net change
+	 * between the order's original and final (status, paymentStatus).
 	 */
 	async updateOrderByAdmin(
 		orderId: string,
@@ -302,7 +360,6 @@ export const orderService = {
 		}
 
 		const originalStatus = order.status;
-		const originalPaymentStatus = order.paymentStatus;
 
 		if (updates.status !== undefined) {
 			if (!isValidStatusTransition(originalStatus, updates.status)) {
@@ -320,19 +377,19 @@ export const orderService = {
 			if (!updated) {
 				throw new Error("Failed to update order status");
 			}
-			
-			// Handle admin cancellation
-			if (updates.status === OrderStatus.CANCELLED && originalStatus !== OrderStatus.CANCELLED) {
+
+			// Restore stock on cancellation
+			if (
+				updates.status === OrderStatus.CANCELLED &&
+				originalStatus !== OrderStatus.CANCELLED
+			) {
 				const stockItems = order.items.map((item) => ({
 					menuItemId: item.menuItemId.toString(),
 					variantName: item.variantName,
 					quantity: item.quantity,
 				}));
 				await stockService.restoreStockBatch(stockItems);
-				await walletService.recordRefund(orderId, order.totalPrice);
 			}
-
-			Object.assign(order, updated);
 		}
 
 		if (updates.paymentStatus !== undefined) {
@@ -341,9 +398,8 @@ export const orderService = {
 				updates.paymentStatus,
 			);
 			if (!updated) {
-				throw new Error("Failed to update order status");
+				throw new Error("Failed to update payment status");
 			}
-			Object.assign(order, updated);
 		}
 
 		const finalOrder = await orderRepository.findById(orderId);
@@ -351,44 +407,11 @@ export const orderService = {
 			throw new Error("Order not found after update");
 		}
 
-		const paymentStatusChanged =
-			updates.paymentStatus !== undefined &&
-			originalPaymentStatus !== updates.paymentStatus;
-
-		const statusChanged =
-			updates.status !== undefined && originalStatus !== updates.status;
-
-		if (
-			paymentStatusChanged &&
-			originalPaymentStatus === PaymentStatus.UNPAID &&
-			updates.paymentStatus === PaymentStatus.PAID
-		) {
-			await walletService.recordPayment(orderId, finalOrder.totalPrice);
-		} else if (
-			paymentStatusChanged &&
-			originalPaymentStatus === PaymentStatus.PAID &&
-			updates.paymentStatus === PaymentStatus.UNPAID
-		) {
-			await walletService.recordDelivery(orderId, finalOrder.totalPrice);
-		} else if (
-			statusChanged &&
-			updates.status === OrderStatus.COMPLETED &&
-			finalOrder.paymentStatus === PaymentStatus.UNPAID &&
-			originalPaymentStatus === PaymentStatus.UNPAID
-		) {
-			await walletService.recordDelivery(orderId, finalOrder.totalPrice);
-		} else if (
-			statusChanged &&
-			paymentStatusChanged &&
-			updates.status === OrderStatus.COMPLETED &&
-			updates.paymentStatus === PaymentStatus.PAID
-		) {
-			await walletService.recordPayment(orderId, finalOrder.totalPrice);
-		}
-		
-		// If order was cancelled and had payment, we already handled refund above based on the status change block.
-		// However if they mark it PAID *and* CANCELLED at the same time, we might have conflicting logic.
-		// The simplest approach is we assume cancel takes precedence for the refund logic embedded above.
+		// Single source of truth for wallet movement: the delta between the
+		// original and final order state. Handles deliver-unpaid (user debit),
+		// pay-now/pay-later (user credit + cafeteria revenue), reversal, and
+		// cancellation (nets out whatever was previously applied) uniformly.
+		await settleWallets(finalOrder.userId, orderId, order, finalOrder);
 
 		return finalOrder;
 	},

@@ -16,6 +16,11 @@ import '../../favourite/domain/use_cases/add_favourite_usecase.dart';
 import '../../favourite/domain/use_cases/get_favourites_usecase.dart';
 import '../../favourite/domain/use_cases/remove_favourite_usecase.dart';
 import '../../favourite/presentation/manager/favourite_bloc.dart';
+import '../../wallet/data/data_sources/wallet_remote_datasource.dart';
+import '../../wallet/data/repositories/wallet_repository_impl.dart';
+import '../../wallet/domain/repositories/wallet_repository.dart';
+import '../../wallet/domain/use_cases/get_wallet_details_usecase.dart';
+import '../../wallet/presentation/manager/wallet_bloc.dart';
 import '../../home/data/data_sources/home_remote_datasource.dart';
 import '../../home/data/repositories/home_repository_impl.dart';
 import '../../home/domain/repositories/home_repository.dart';
@@ -104,6 +109,15 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => GetFavouritesUseCase(sl()));
   sl.registerLazySingleton(() => AddFavouriteUseCase(sl()));
   sl.registerLazySingleton(() => RemoveFavouriteUseCase(sl()));
+
+  /// ── Wallet ──────────────────────────────
+  sl.registerLazySingleton<WalletRemoteDataSource>(
+        () => WalletRemoteDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<WalletRepository>(
+        () => WalletRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton(() => GetWalletDetailsUseCase(sl()));
 
 
   /// ── Home DataSource ─────────────────────
@@ -226,6 +240,9 @@ Future<void> setupLocator() async {
           removeFavouriteUseCase: sl(),
         ),
   );
+
+  /// ── Wallet Bloc (fresh instance per use) ─
+  sl.registerFactory(() => WalletBloc(getWalletDetailsUseCase: sl()));
 
   /// ── Home Bloc ───────────────────────────
   sl.registerLazySingleton(() => HomeBloc(sl()));

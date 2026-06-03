@@ -1,31 +1,17 @@
 /**
  * Service Layer - Balance Business Logic
- * Handles user balance operations (read-only from client perspective)
- * Balance is automatically updated through order processing only
+ * Thin wrapper exposing the *user's own* wallet balance (read-only).
+ * Balance is a debt ledger: negative = the user owes the cafeteria money.
+ * It is mutated only through order settlement (see order.service.ts).
  */
-import { walletService } from "@/services/wallet.service";
+import { userWalletService } from "@/services/userWallet.service";
 
 export const balanceService = {
 	/**
-	 * Get user balance (read-only)
+	 * Get a user's own balance (read-only). Negative = owes the cafeteria.
 	 */
-	async getBalance(): Promise<{ balance: number }> {
-		const wallet = await walletService.getWalletBalance();
+	async getBalance(userId: string): Promise<{ balance: number }> {
+		const wallet = await userWalletService.getBalance(userId);
 		return { balance: wallet.balance };
-	},
-
-	/**
-	 * Deduct balance when order is placed (called internally by order service)
-	 * Balance can go negative (credit system)
-	 */
-	async deductBalanceForOrder(orderId: string, amount: number): Promise<void> {
-		await walletService.recordDelivery(orderId, amount);
-	},
-
-	/**
-	 * Add balance when payment is received (called internally by order service)
-	 */
-	async addBalanceForPayment(orderId: string, amount: number): Promise<void> {
-		await walletService.recordPayment(orderId, amount);
 	},
 };

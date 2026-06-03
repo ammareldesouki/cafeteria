@@ -4,11 +4,12 @@
  */
 import { walletRepository } from "@/repositories/wallet.repository";
 import {
-	CafeteriaWallet,
-	WalletTransaction,
+	type CafeteriaWallet,
+	type PaginatedResponse,
 	TransactionType,
-	PaginatedResponse,
+	type WalletTransaction,
 } from "@/types/wallet.types";
+import { runWalletTransaction } from "@/utils/walletTransaction";
 
 export const walletService = {
 	/**
@@ -53,59 +54,42 @@ export const walletService = {
 	},
 
 	/**
-	 * Record payment (credit to wallet)
+	 * Record realized revenue (credit) when an order is settled paid.
+	 * Writes the balance and ledger row atomically.
 	 */
 	async recordPayment(orderId: string, amount: number): Promise<void> {
-		// Update wallet balance
-		await walletRepository.updateBalance(amount);
-
-		// Create transaction record
-		const transaction: WalletTransaction = {
-			orderId,
-			amount,
-			type: TransactionType.CREDIT,
-			description: `Payment received for order ${orderId}`,
-			createdAt: new Date(),
-		};
-
-		await walletRepository.createTransaction(transaction);
+		await runWalletTransaction(async (session) => {
+			await walletRepository.updateBalance(amount, session);
+			await walletRepository.createTransaction(
+				{
+					orderId,
+					amount,
+					type: TransactionType.CREDIT,
+					description: `Payment received for order ${orderId}`,
+					createdAt: new Date(),
+				},
+				session,
+			);
+		});
 	},
 
 	/**
-	 * Record delivery without payment (debit from wallet - credit owed)
+	 * Reverse realized revenue (debit) when a previously-paid order is
+	 * refunded, cancelled, or its payment is reverted to unpaid.
 	 */
-	async recordDelivery(orderId: string, amount: number): Promise<void> {
-		// Deduct from wallet (can go negative)
-		await walletRepository.updateBalance(-amount);
-
-		// Create transaction record
-		const transaction: WalletTransaction = {
-			orderId,
-			amount,
-			type: TransactionType.DEBIT,
-			description: `Order ${orderId} delivered unpaid (credit)`,
-			createdAt: new Date(),
-		};
-
-		await walletRepository.createTransaction(transaction);
-	},
-
-	/**
-	 * Record refund (credit to wallet when order is cancelled)
-	 */
-	async recordRefund(orderId: string, amount: number): Promise<void> {
-		// Update wallet balance (add amount back)
-		await walletRepository.updateBalance(amount);
-
-		// Create transaction record
-		const transaction: WalletTransaction = {
-			orderId,
-			amount,
-			type: TransactionType.CREDIT,
-			description: `Order ${orderId} cancelled (refund)`,
-			createdAt: new Date(),
-		};
-
-		await walletRepository.createTransaction(transaction);
+	async recordReversal(orderId: string, amount: number): Promise<void> {
+		await runWalletTransaction(async (session) => {
+			await walletRepository.updateBalance(-amount, session);
+			await walletRepository.createTransaction(
+				{
+					orderId,
+					amount,
+					type: TransactionType.DEBIT,
+					description: `Revenue reversed for order ${orderId}`,
+					createdAt: new Date(),
+				},
+				session,
+			);
+		});
 	},
 };

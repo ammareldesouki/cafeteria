@@ -633,6 +633,38 @@ class AppLocalizationsAr extends AppLocalizations {
   String get topUpWallet => 'شحن المحفظة';
 
   @override
+  String get accountMenu => 'قائمة الحساب';
+
+  @override
+  String get account => 'الحساب';
+
+  @override
+  String get settings => 'الإعدادات';
+
+  @override
+  String get totalOrders => 'إجمالي الطلبات';
+
+  @override
+  String get completedOrders => 'الطلبات المكتملة';
+
+  @override
+  String get appAppearance => 'مظهر التطبيق';
+
+  @override
+  String get lightDarkMode => 'الوضع الفاتح / الداكن';
+
+  @override
+  String get recentBalanceUpdates => 'آخر تحديثات الرصيد';
+
+  @override
+  String get noRecentTransactions => 'لا توجد معاملات حديثة';
+
+  @override
+  String youOwe(String amount, String currency) {
+    return 'عليك دفع $amount $currency';
+  }
+
+  @override
   String get yes => 'نعم';
 
   @override

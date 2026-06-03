@@ -2,13 +2,8 @@
  * Repository Layer - Wallet Data Access
  * Manages cafeteria wallet and transaction ledger
  */
-import mongoose from "mongoose";
-import {
-	CafeteriaWallet,
-	WalletTransaction,
-	TransactionType,
-} from "@/types/wallet.types";
-import { ObjectId } from "mongodb";
+import mongoose, { type ClientSession } from "mongoose";
+import type { CafeteriaWallet, WalletTransaction } from "@/types/wallet.types";
 
 const walletCollection =
 	mongoose.connection.collection<CafeteriaWallet>("cafeteria_wallets");
@@ -39,14 +34,17 @@ export const walletRepository = {
 	/**
 	 * Update wallet balance
 	 */
-	async updateBalance(amount: number): Promise<CafeteriaWallet | null> {
+	async updateBalance(
+		amount: number,
+		session?: ClientSession | null,
+	): Promise<CafeteriaWallet | null> {
 		const result = await walletCollection.findOneAndUpdate(
 			{},
 			{
 				$inc: { balance: amount },
 				$set: { updatedAt: new Date() },
 			},
-			{ returnDocument: "after", upsert: true },
+			{ returnDocument: "after", upsert: true, session: session ?? undefined },
 		);
 		return result || null;
 	},
@@ -56,8 +54,11 @@ export const walletRepository = {
 	 */
 	async createTransaction(
 		transaction: WalletTransaction,
+		session?: ClientSession | null,
 	): Promise<WalletTransaction> {
-		const result = await transactionCollection.insertOne(transaction as any);
+		const result = await transactionCollection.insertOne(transaction as any, {
+			session: session ?? undefined,
+		});
 		return { ...transaction, _id: result.insertedId };
 	},
 

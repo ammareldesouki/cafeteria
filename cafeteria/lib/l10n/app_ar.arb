@@ -210,6 +210,22 @@
   "wallet": "المحفظة",
   "walletBalance": "رصيد المحفظة",
   "topUpWallet": "شحن المحفظة",
+  "accountMenu": "قائمة الحساب",
+  "account": "الحساب",
+  "settings": "الإعدادات",
+  "totalOrders": "إجمالي الطلبات",
+  "completedOrders": "الطلبات المكتملة",
+  "appAppearance": "مظهر التطبيق",
+  "lightDarkMode": "الوضع الفاتح / الداكن",
+  "recentBalanceUpdates": "آخر تحديثات الرصيد",
+  "noRecentTransactions": "لا توجد معاملات حديثة",
+  "youOwe": "عليك دفع {amount} {currency}",
+  "@youOwe": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "currency": { "type": "String" }
+    }
+  },
   "yes": "نعم",
   "no": "لا",
   "ok": "موافق",

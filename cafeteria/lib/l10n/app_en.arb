@@ -211,6 +211,22 @@
   "wallet": "Wallet",
   "walletBalance": "Wallet Balance",
   "topUpWallet": "Top Up Wallet",
+  "accountMenu": "Account Menu",
+  "account": "Account",
+  "settings": "Settings",
+  "totalOrders": "Total Orders",
+  "completedOrders": "Completed Orders",
+  "appAppearance": "App Appearance",
+  "lightDarkMode": "Light / Dark Mode",
+  "recentBalanceUpdates": "Recent Balance Updates",
+  "noRecentTransactions": "No recent transactions",
+  "youOwe": "You owe {amount} {currency}",
+  "@youOwe": {
+    "placeholders": {
+      "amount": { "type": "String" },
+      "currency": { "type": "String" }
+    }
+  },
   "yes": "Yes",
   "no": "No",
   "ok": "OK",

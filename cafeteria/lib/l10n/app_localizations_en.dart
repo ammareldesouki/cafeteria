@@ -635,6 +635,38 @@ class AppLocalizationsEn extends AppLocalizations {
   String get topUpWallet => 'Top Up Wallet';
 
   @override
+  String get accountMenu => 'Account Menu';
+
+  @override
+  String get account => 'Account';
+
+  @override
+  String get settings => 'Settings';
+
+  @override
+  String get totalOrders => 'Total Orders';
+
+  @override
+  String get completedOrders => 'Completed Orders';
+
+  @override
+  String get appAppearance => 'App Appearance';
+
+  @override
+  String get lightDarkMode => 'Light / Dark Mode';
+
+  @override
+  String get recentBalanceUpdates => 'Recent Balance Updates';
+
+  @override
+  String get noRecentTransactions => 'No recent transactions';
+
+  @override
+  String youOwe(String amount, String currency) {
+    return 'You owe $amount $currency';
+  }
+
+  @override
   String get yes => 'Yes';
 
   @override

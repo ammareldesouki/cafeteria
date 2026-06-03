@@ -23,12 +23,17 @@ export const analyticsRepository = {
 	},
 
 	/**
-	 * Get total revenue from paid orders
+	 * Get realized revenue: total of orders that have actually been paid.
 	 */
 	async getTotalRevenue(): Promise<number> {
 		const result = await collection
 			.aggregate([
-				{ $match: { status: { $ne: OrderStatus.CANCELLED } } },
+				{
+					$match: {
+						paymentStatus: PaymentStatus.PAID,
+						status: { $ne: OrderStatus.CANCELLED },
+					},
+				},
 				{ $group: { _id: null, total: { $sum: "$totalPrice" } } },
 			])
 			.toArray();
@@ -37,12 +42,18 @@ export const analyticsRepository = {
 	},
 
 	/**
-	 * Get pending revenue from unpaid orders
+	 * Get pending revenue: money owed by customers for orders that were
+	 * delivered but not paid (this is what makes user balances negative).
 	 */
 	async getPendingRevenue(): Promise<number> {
 		const result = await collection
 			.aggregate([
-				{ $match: { paymentStatus: PaymentStatus.UNPAID, status: { $ne: OrderStatus.CANCELLED } } },
+				{
+					$match: {
+						status: OrderStatus.DELIVERED,
+						paymentStatus: PaymentStatus.UNPAID,
+					},
+				},
 				{ $group: { _id: null, total: { $sum: "$totalPrice" } } },
 			])
 			.toArray();
