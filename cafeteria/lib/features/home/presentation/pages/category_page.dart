@@ -30,12 +30,34 @@ class CategoryPage extends StatefulWidget {
 
 class _CategoryPageState extends State<CategoryPage> {
   final PageController _controller = PageController(viewportFraction: 0.80);
+  final TextEditingController _searchController = TextEditingController();
   int currentIndex = 0;
+  String _query = '';
 
   @override
   void dispose() {
     _controller.dispose();
+    _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    setState(() {
+      _query = value.trim().toLowerCase();
+      currentIndex = 0;
+    });
+    if (_controller.hasClients) {
+      _controller.jumpToPage(0);
+    }
+  }
+
+  List<MenuItemEntity> _filter(List<MenuItemEntity> products) {
+    if (_query.isEmpty) return products;
+    return products
+        .where((item) =>
+            item.name.toLowerCase().contains(_query) ||
+            item.description.toLowerCase().contains(_query))
+        .toList();
   }
 
   @override
@@ -45,6 +67,7 @@ class _CategoryPageState extends State<CategoryPage> {
     final String category = args['category'] as String;
     final List<MenuItemEntity> products =
     args['products'] as List<MenuItemEntity>;
+    final List<MenuItemEntity> filtered = _filter(products);
 
     return Scaffold(
       body: SafeArea(
@@ -81,37 +104,72 @@ class _CategoryPageState extends State<CategoryPage> {
             const SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                height: 52,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFFD9C7B8)),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.search_rounded, color: Color(0xFF8B7355)),
-                    SizedBox(width: 10),
-                    Text(
-                      "Search items...",
-                      style: TextStyle(color: Color(0xFF9E8E82)),
-                    ),
-                  ],
+              child: TextField(
+                controller: _searchController,
+                onChanged: _onSearchChanged,
+                textInputAction: TextInputAction.search,
+                style: const TextStyle(color: Color(0xFF3B1A08)),
+                decoration: InputDecoration(
+                  hintText: AppLocalizations.of(context)!.searchPlaceholder,
+                  hintStyle: const TextStyle(color: Color(0xFF9E8E82)),
+                  prefixIcon:
+                      const Icon(Icons.search_rounded, color: Color(0xFF8B7355)),
+                  suffixIcon: _query.isNotEmpty
+                      ? IconButton(
+                          icon: const Icon(Icons.close_rounded,
+                              color: Color(0xFF8B7355)),
+                          onPressed: () {
+                            _searchController.clear();
+                            _onSearchChanged('');
+                          },
+                        )
+                      : null,
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding:
+                      const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFD9C7B8)),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Color(0xFFD9C7B8)),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide:
+                        const BorderSide(color: Color(0xFF3B1A08), width: 1.5),
+                  ),
                 ),
               ),
             ),
             const SizedBox(height: 30),
             Expanded(
-              child: LayoutBuilder(
+              child: filtered.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.search_off_rounded,
+                              size: 56, color: Color(0xFFBCA999)),
+                          const SizedBox(height: 12),
+                          Text(
+                            AppLocalizations.of(context)!.noResultsFound,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
+                        ],
+                      ),
+                    )
+                  : LayoutBuilder(
                 builder: (context, constraints) {
                   return PageView.builder(
                     controller: _controller,
-                    itemCount: products.length,
+                    itemCount: filtered.length,
                     onPageChanged: (index) =>
                         setState(() => currentIndex = index),
                     itemBuilder: (context, index) {
-                      final item = products[index];
+                      final item = filtered[index];
                       return AnimatedBuilder(
                         animation: _controller,
                         builder: (context, child) {
@@ -134,7 +192,7 @@ class _CategoryPageState extends State<CategoryPage> {
             const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: List.generate(products.length, (index) {
+              children: List.generate(filtered.length, (index) {
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 250),
                   margin: const EdgeInsets.symmetric(horizontal: 4),

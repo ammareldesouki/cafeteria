@@ -65,16 +65,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: false,
       ),
-
-      // ── ElevatedButton ────────────────────────────────levatedButtonTheme: TElevatedButtonTheme.darkElevatedButtonTheme,
-
-      /// ── InputDecoration ───────────────────────────────nputDecorationTheme: TTextFormFieldTheme.darkInputDecorationTheme,
-
-      /// ── Text ──────────────────────────────────────────extTheme: TTextTheme.darkTextTheme,
-
-      // ── Card / Surface ────────────────────────────────
-      // cardColor: darkCard,
-      // dividerColor: Colors.white12,
+      textTheme: TTextTheme.darkTextTheme,
     );
   }
 

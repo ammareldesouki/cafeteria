@@ -9,13 +9,13 @@ class RoleSelectionPage extends StatelessWidget {
 
   void _onRoleSelected(BuildContext context, UserRole role) {
     if (role == UserRole.cafeteriaStaff) {
-      Navigator.pushNamed(context, RouteNames.signIn);
+      Navigator.pushNamed(context, RouteNames.signAsStaff);
       return;
     }
 
     Navigator.pushNamed(
       context,
-      RouteNames.signUp,
+      RouteNames.signIn,
       arguments: role,
     );
   }

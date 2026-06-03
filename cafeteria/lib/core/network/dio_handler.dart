@@ -9,6 +9,7 @@ class NetworkDioHandler {
   static const String _tokenKey = 'auth_token';
   static const String _userIdKey = 'user_id';
   static const String _roleKey = 'user_role';
+  static const String _userNameKey = 'user_name';
 
   factory NetworkDioHandler() {
     return _instance!;
@@ -49,6 +50,7 @@ class NetworkDioHandler {
   late Dio dio;
 
   String? currentUserId;
+  String? currentUserName;
   String? currentRole;
   String? currentWorkStatus;
 
@@ -59,6 +61,7 @@ class NetworkDioHandler {
     }
     currentUserId = _prefs.getString(_userIdKey);
     currentRole = _prefs.getString(_roleKey);
+    currentUserName = _prefs.getString(_userNameKey);
   }
 
   Future<void> setAuthToken(String token) async {
@@ -70,12 +73,17 @@ class NetworkDioHandler {
     required String userId,
     required String role,
     required String? workStatus,
+    String? userName,
   }) async {
     currentUserId = userId;
     currentRole = role;
     currentWorkStatus = workStatus;
+    currentUserName = userName;
     await _prefs.setString(_userIdKey, userId);
     await _prefs.setString(_roleKey, role);
+    if (userName != null) {
+      await _prefs.setString(_userNameKey, userName);
+    }
   }
 
   Future<void> clearAuthToken() async {
@@ -83,7 +91,9 @@ class NetworkDioHandler {
     await _prefs.remove(_tokenKey);
     await _prefs.remove(_userIdKey);
     await _prefs.remove(_roleKey);
+    await _prefs.remove(_userNameKey);
     currentUserId = null;
+    currentUserName = null;
     currentRole = null;
     currentWorkStatus = "None";
   }

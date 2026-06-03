@@ -168,7 +168,7 @@ class _SignupPageState extends State<SignupPage> {
                       // ── Password ───────────────────────────────────────
                       AppTextField(
                         label: AppLocalizations.of(context)!.password,
-                        hint: '********',
+                        hint: "******************",
                         controller: _passwordController,
                         isPassword: true,
                         validator: (v) {
@@ -187,6 +187,8 @@ class _SignupPageState extends State<SignupPage> {
                       // ── Confirm Password ───────────────────────────────
                       AppTextField(
                         label: 'Confirm Password',
+                        hint: "******************",
+
                         controller: _confirmPasswordController,
                         isPassword: true,
                         validator: (v) {

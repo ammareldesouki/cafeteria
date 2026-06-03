@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
+
 class WelcomeBanner extends StatelessWidget {
   final String userName;
   const WelcomeBanner({super.key, required this.userName});
@@ -55,14 +57,14 @@ class WelcomeBanner extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Welcome back,',
+                    AppLocalizations.of(context)!.welcome,
                     style: TextStyle(
                       fontSize: 14,
                       color: const Color(0xFF3B1A08).withOpacity(0.65),
                     ),
                   ),
                   Text(
-                    '$userName!',
+                    '$userName',
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
@@ -70,9 +72,9 @@ class WelcomeBanner extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
-                  const Text(
-                    'Ready to order your favorite beverages?',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context)!.readyToOrder,
+                    style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFF7A4D28),
                     ),

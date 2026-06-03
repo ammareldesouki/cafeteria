@@ -63,6 +63,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         userId: model.user.id,
         role: model.user.role,
         workStatus: null,
+        userName: model.user.name,
       );
       return model;
     } on DioException catch (e) {
@@ -91,6 +92,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         userId: model.user.id,
         role: model.user.role,
         workStatus: null,
+        userName: model.user.name,
       );
       return model;
     } on DioException catch (e) {
@@ -118,6 +120,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         userId: model.user.id,
         role: model.user.role,
         workStatus: null,
+        userName: model.user.name,
       );
       return model;
     } on DioException catch (e) {
@@ -144,6 +147,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
         userId: model.user.id,
         role: model.user.role,
         workStatus: null,
+        userName: model.user.name,
       );
       return model;
     } on DioException catch (e) {

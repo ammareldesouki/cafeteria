@@ -93,27 +93,12 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
             }
           },
           child: Scaffold(
-            body: Stack(
-              children: [
-                IndexedStack(
-                  index: _index,
-                  children: [
-                    HomePage(
-                      userName: widget.userName,
-                      userId: widget.userId,
-                    ),
-                    const FavPage(),
-                    const CartPage(),
-                    const OrderPage(),
-                  ],
-                ),
-                // ── Top Header ──
-                Positioned(
-                  top: MediaQuery
-                      .of(context)
-                      .padding
-                      .top + 10,
-                  right: 20,
+            appBar: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+              actions: [
+                Padding(
+                  padding: const EdgeInsets.only(right: 20.0),
                   child: BlocBuilder<AuthBloc, AuthState>(
                     builder: (context, state) {
                       String name = widget.userName;
@@ -141,6 +126,18 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
                     },
                   ),
                 ),
+              ],
+            ),
+            body: IndexedStack(
+              index: _index,
+              children: [
+                HomePage(
+                  userName: widget.userName,
+                  userId: widget.userId,
+                ),
+                const FavPage(),
+                const CartPage(),
+                const OrderPage(),
               ],
             ),
             bottomNavigationBar: _navBar(
@@ -181,9 +178,9 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
   }
 
   Widget _navBar({required List<BottomNavigationBarItem> items}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       decoration: BoxDecoration(
-
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.08),
@@ -195,11 +192,10 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
       child: BottomNavigationBar(
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
-
         elevation: 0,
         type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.brown,
-        unselectedItemColor: Colors.black,
+        selectedItemColor: isDark ? const Color(0xFFD7BFAE) : Colors.brown,
+        unselectedItemColor: isDark ? Colors.white60 : Colors.black,
         selectedLabelStyle: const TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,

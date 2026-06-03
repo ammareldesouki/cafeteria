@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../features/auth/di/injaction.dart';
 import '../../features/auth/presentation/manager/auth_bloc.dart';
+import '../../features/auth/presentation/pages/login_as_staff.dart';
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/role_selection_page.dart';
 import '../../features/auth/presentation/pages/signup_page.dart';
@@ -117,6 +118,10 @@ class AppRouter {
       case RouteNames.resetPassword:
         final args = settings.arguments as Map<String, String>?;
         return _buildRoute(ResetPasswordPage(arguments: args), settings);
+
+     case RouteNames.signAsStaff:
+        return _buildRoute(const SignInPageAsStaff(), settings);
+
       default:
         return _buildRoute(
           Scaffold(

@@ -20,4 +20,5 @@ abstract class RouteNames {
   static const String checkout='/checkout';
   static const String layout="/layout";
   static const String cafeteriaPanel = "/cafeteriaPanel";
+  static const String signAsStaff = "/signAsStaff";
 }

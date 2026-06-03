@@ -15,6 +15,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appTagline => 'Fresh food, fast service';
 
   @override
+  String get welcome => 'Welcome';
+
+  @override
   String get login => 'Login';
 
   @override
@@ -267,6 +270,18 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get sides => 'Sides';
+
+  @override
+  String get readyToOrder => 'Ready to order your favorite beverages?';
+
+  @override
+  String get coldDrinksSubtitle => 'Refreshing iced beverages';
+
+  @override
+  String get hotDrinksSubtitle => 'Warm comforting beverages';
+
+  @override
+  String get sidesSubtitle => 'Choose your selection of side items';
 
   @override
   String get soups => 'Soups';

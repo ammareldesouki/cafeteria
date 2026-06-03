@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/menu_item_entity.dart';
 import '../manager/home_bloc.dart';
 
@@ -78,7 +79,7 @@ class _HomeSearchBarState extends State<HomeSearchBar> {
                   context.read<HomeBloc>().add(SearchQueryChanged(v));
                 },
                 decoration: InputDecoration(
-                  hintText: 'Search for items...',
+                  hintText:  AppLocalizations.of(context)!.searchPlaceholder,
                   hintStyle: const TextStyle(
                     color: Color(0xFFBDB0A6),
                     fontSize: 14,

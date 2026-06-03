@@ -109,7 +109,7 @@ class _HomePageState extends State<HomePage> {
 
                           CategoryCard(
                             title: AppLocalizations.of(context)!.coldDrinks,
-                            subtitle: 'Refreshing iced beverages',
+                            subtitle: AppLocalizations.of(context)!.coldDrinksSubtitle,
                             onTap: () => _onCategoryTap(
                               context,
                               AppLocalizations.of(context)!.coldDrinks,
@@ -126,7 +126,7 @@ class _HomePageState extends State<HomePage> {
 
                           CategoryCard(
                             title: AppLocalizations.of(context)!.hotDrinks,
-                            subtitle: 'Warm comforting beverages',
+                            subtitle: AppLocalizations.of(context)!.hotDrinksSubtitle,
                             onTap: () => _onCategoryTap(
                               context,
                               AppLocalizations.of(context)!.hotDrinks,
@@ -143,7 +143,7 @@ class _HomePageState extends State<HomePage> {
 
                           CategoryCard(
                             title: AppLocalizations.of(context)!.sides,
-                            subtitle: 'Choose your selection of side items',
+                            subtitle: AppLocalizations.of(context)!.sidesSubtitle,
                             onTap: () => _onCategoryTap(
                               context,
                               AppLocalizations.of(context)!.sides,

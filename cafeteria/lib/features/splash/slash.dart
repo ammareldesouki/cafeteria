@@ -25,13 +25,22 @@ class _LoadingPageState extends State<LoadingPage> {
       
       
       if (isLoggedIn) {
-        final role = NetworkDioHandler().currentRole;
+        final handler = NetworkDioHandler();
+        final role = handler.currentRole;
         if (role == 'admin') {
           Navigator.pushNamedAndRemoveUntil(
               context, RouteNames.cafeteriaPanel, (route) => false);
         } else {
           Navigator.pushNamedAndRemoveUntil(
-              context, RouteNames.layout, (route) => false);
+            context,
+            RouteNames.layout,
+            (route) => false,
+            arguments: {
+              'role': role ?? 'user',
+              'userName': handler.currentUserName ?? 'User',
+              'userId': handler.currentUserId ?? '',
+            },
+          );
         }
       } else {
         Navigator.pushNamedAndRemoveUntil(

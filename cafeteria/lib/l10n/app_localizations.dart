@@ -110,6 +110,12 @@ abstract class AppLocalizations {
   /// **'Fresh food, fast service'**
   String get appTagline;
 
+  /// No description provided for @welcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome'**
+  String get welcome;
+
   /// No description provided for @login.
   ///
   /// In en, this message translates to:
@@ -613,6 +619,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sides'**
   String get sides;
+
+  /// No description provided for @readyToOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to order your favorite beverages?'**
+  String get readyToOrder;
+
+  /// No description provided for @coldDrinksSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshing iced beverages'**
+  String get coldDrinksSubtitle;
+
+  /// No description provided for @hotDrinksSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Warm comforting beverages'**
+  String get hotDrinksSubtitle;
+
+  /// No description provided for @sidesSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your selection of side items'**
+  String get sidesSubtitle;
 
   /// No description provided for @soups.
   ///

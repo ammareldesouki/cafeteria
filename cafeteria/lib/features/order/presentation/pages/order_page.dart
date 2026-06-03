@@ -30,28 +30,6 @@ class _OrderPageState extends State<OrderPage> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ──
-            Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 4),
-              child: Row(
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Color(0xFF3B1A08),
-                    radius: 20,
-                    child: Icon(Icons.person, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.myOrders,
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .titleLarge,
-                  ),
-                  const Spacer(),
-                ],
-              ),
-            ),
 
             // ── Body ──
             Expanded(

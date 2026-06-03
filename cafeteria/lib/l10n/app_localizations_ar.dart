@@ -15,6 +15,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appTagline => 'طعام طازج، خدمة سريعة';
 
   @override
+  String get welcome => 'اهلا';
+
+  @override
   String get login => 'تسجيل الدخول';
 
   @override
@@ -267,6 +270,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get sides => 'الأطباق الجانبية';
+
+  @override
+  String get readyToOrder => 'هل أنت مستعد لطلب مشروباتك المفضلة؟';
+
+  @override
+  String get coldDrinksSubtitle => 'مشروبات مثلجة منعشة';
+
+  @override
+  String get hotDrinksSubtitle => 'مشروبات دافئة ومريحة';
+
+  @override
+  String get sidesSubtitle => 'اختر تشكيلتك من الأطباق الجانبية';
 
   @override
   String get soups => 'الشوربات';

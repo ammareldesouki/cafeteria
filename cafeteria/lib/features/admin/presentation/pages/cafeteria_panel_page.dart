@@ -583,7 +583,16 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
   void _showStockManagementSheet(MenuItemEntity item) {
     final l10n = AppLocalizations.of(context)!;
     final TextEditingController stockController =
-    TextEditingController(text: (item.stock ?? 0).toString());
+        TextEditingController(text: (item.stock ?? 0).toString());
+    
+    final Map<String, TextEditingController> variantControllers = {};
+    if (item.hasVariants == true && item.variants != null) {
+      for (var v in item.variants!) {
+        variantControllers[v.name] =
+            TextEditingController(text: (v.stock ?? 0).toString());
+      }
+    }
+
     final adminBloc = context.read<AdminBloc>();
 
     showModalBottomSheet(
@@ -607,8 +616,6 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
               const SizedBox(height: 20),
               if (item.hasVariants == true && item.variants != null)
                 ...item.variants!.map((v) {
-                  final variantController =
-                  TextEditingController(text: (v.stock ?? 0).toString());
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 16),
                     child: Row(
@@ -620,7 +627,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         SizedBox(
                           width: 100,
                           child: TextFormField(
-                            controller: variantController,
+                            controller: variantControllers[v.name],
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                                 labelText: l10n.inStock, isDense: true),
@@ -646,23 +653,33 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                       border: const OutlineInputBorder()),
                 ),
               const SizedBox(height: 24),
-              if (item.hasVariants != true)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () {
+                    if (item.hasVariants == true && item.variants != null) {
+                      for (var v in item.variants!) {
+                        final val = variantControllers[v.name]?.text ?? '0';
+                        adminBloc.add(SetVariantStockEvent(
+                          itemId: item.mongoId ?? item.id,
+                          variantName: v.name,
+                          stock: int.tryParse(val) ?? 0,
+                        ));
+                      }
+                    } else {
                       adminBloc.add(SetItemStockEvent(
                         itemId: item.mongoId ?? item.id,
                         stock: int.tryParse(stockController.text) ?? 0,
                       ));
-                      Navigator.pop(ctx);
-                    },
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: TColors.primary),
-                    child: Text(l10n.save,
-                        style: const TextStyle(color: Colors.white)),
-                  ),
+                    }
+                    Navigator.pop(ctx);
+                  },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: TColors.primary),
+                  child: Text(l10n.save,
+                      style: const TextStyle(color: Colors.white)),
                 ),
+              ),
               const SizedBox(height: 24),
             ],
           ),
@@ -941,12 +958,16 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
             children: [
               Icon(icon, size: 16, color: Colors.grey),
               const SizedBox(width: 8),
-              Text(
-                title,
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(color: Colors.grey),
+              Expanded(
+                child: Text(
+                  title,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Colors.grey),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ],
           ),

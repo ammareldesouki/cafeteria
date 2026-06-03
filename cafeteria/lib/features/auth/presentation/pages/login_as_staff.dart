@@ -10,14 +10,14 @@ import '../widgets/app_text_field.dart';
 import '../widgets/buttons.dart';
 import '../widgets/language_theme_toggles.dart';
 
-class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+class SignInPageAsStaff extends StatefulWidget {
+  const SignInPageAsStaff({super.key});
 
   @override
-  State<SignInPage> createState() => _SignInPageState();
+  State<SignInPageAsStaff> createState() => _SignInPageAsStaffState();
 }
 
-class _SignInPageState extends State<SignInPage> {
+class _SignInPageAsStaffState extends State<SignInPageAsStaff> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -51,7 +51,7 @@ class _SignInPageState extends State<SignInPage> {
         if (state is AuthSuccess) {
           final role = state.response.user.role;
           final targetRoute =
-              role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
+          role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
 
           Navigator.pushReplacementNamed(
             context,
@@ -126,8 +126,8 @@ class _SignInPageState extends State<SignInPage> {
                       // ── Password ───────────────────────────────────────
                       AppTextField(
                         label: AppLocalizations.of(context)!.password,
-                        controller: _passwordController,
                         hint: "******************",
+                        controller: _passwordController,
 
                         isPassword: true,
                         validator: (v) {
@@ -149,7 +149,7 @@ class _SignInPageState extends State<SignInPage> {
                                 RouteNames.forgotPassword,
                               ),
                           child: Text(
-                            AppLocalizations.of(context)!.forgotPassword,
+                              AppLocalizations.of(context)!.forgotPassword,
                               style: Theme
                                   .of(context)
                                   .textTheme!
@@ -170,55 +170,14 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                       const SizedBox(height: 16),
 
-                      // ── Google Sign In button ──────────────────────────
-                      PrimaryButton(
-                        label: 'Sign in with Google',
-                        icon: TImages.googleIcon,
-                        onTap: isLoading
-                            ? null
-                            : () => context
-                                .read<AuthBloc>()
-                                .add(const SignUpWithGoogleEvent()),
-                      ),
-                      const SizedBox(height: 20),
+
 
                       // ── Divider ────────────────────────────────────────
 
 
 
 
-                      // ── Sign In link ───────────────────────────────────
-                      Center(
-                        child: GestureDetector(
-                          onTap: () =>
-                              Navigator.pushNamed(context, RouteNames.signUp),
-                          child: RichText(
-                            text: TextSpan(
-                              text: AppLocalizations.of(context)!
-                                  .dontHaveAccount,
-                              style: Theme
-                                  .of(context)
-                                  .textTheme!
-                                  .bodyMedium,
 
-                              children: [
-                                TextSpan(
-                                  text: AppLocalizations.of(context)!
-                                      .createAccount,
-                                  style: Theme
-                                      .of(context)
-                                      .textTheme!
-                                      .bodyMedium!
-                                      .copyWith(
-                                    color: const Color(0xFFE46822),
-                                  ),
-                                  ),
-
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
                     ],
                   );
                 },
