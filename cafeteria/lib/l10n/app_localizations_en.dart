@@ -206,6 +206,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get categories => 'Categories';
 
   @override
+  String get category => 'Category';
+
+  @override
+  String get addVariant => 'Add Variant';
+
+  @override
+  String get variantName => 'Variant Name';
+
+  @override
+  String get variantSaved => 'Variant saved';
+
+  @override
+  String get variantDeleted => 'Variant deleted';
+
+  @override
   String get allItems => 'All Items';
 
   @override
@@ -848,4 +863,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get itemName => 'Item Name';
+
+  @override
+  String get goToCart => 'Go to Cart';
 }

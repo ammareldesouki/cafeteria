@@ -2,6 +2,7 @@ import 'package:cafeteria/core/route/route_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'core/keys/app_keys.dart';
 import 'core/local/locale_bloc.dart';
 import 'core/route/app_route.dart';
 import 'core/theme/theme.dart';
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
             builder: (context, locale) {
               return MaterialApp(
                 key: ValueKey('app_${locale.languageCode}_${themeMode.name}'),
+                scaffoldMessengerKey: rootScaffoldMessengerKey,
                 title: "OnTheWay",
                 // Theme
                 themeMode: themeMode,

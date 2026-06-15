@@ -15,6 +15,20 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/route/route_name.dart';
 import '../../../auth/di/injaction.dart';
 
+/// Holds the editable controllers for one existing variant in the edit sheet,
+/// tracking its original name so a rename can be detected on save.
+class _EditVariantRow {
+  String originalName;
+  final TextEditingController nameController;
+  final TextEditingController stockController;
+
+  _EditVariantRow({
+    required this.originalName,
+    required this.nameController,
+    required this.stockController,
+  });
+}
+
 class CafeteriaPanelPage extends StatefulWidget {
   const CafeteriaPanelPage({super.key});
 
@@ -688,25 +702,58 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
     );
   }
 
+  /// The three fixed categories. Keys are the values stored in the DB; labels
+  /// are localized. Cold Drink → 'cold', Hot Drinks → 'hot', Side Items → 'neutral'.
+  String _normalizeCategory(String? raw) {
+    if (raw == 'cold') return 'cold';
+    if (raw == 'hot') return 'hot';
+    return 'neutral';
+  }
+
   void _showAddEditItemSheet([MenuItemEntity? item]) {
     final l10n = AppLocalizations.of(context)!;
     final nameController = TextEditingController(text: item?.name);
     final priceController =
     TextEditingController(text: item?.price.toString());
-    final categoryController = TextEditingController(text: item?.category);
+    String selectedCategory = _normalizeCategory(item?.category);
     final descController = TextEditingController(text: item?.description);
     final imageController = TextEditingController(text: item?.image);
     final stockController =
     TextEditingController(text: item?.stock?.toString() ?? "0");
     bool hasVariants = item?.hasVariants ?? false;
+    final adminBloc = context.read<AdminBloc>();
+    final itemId = item == null ? null : (item.mongoId ?? item.id);
+
+    // Create-mode variant rows (collected in-memory, sent with CreateMenuItem).
     final variantNameControllers = <TextEditingController>[];
     final variantStockControllers = <TextEditingController>[];
-    final adminBloc = context.read<AdminBloc>();
+
+    // Edit-mode variants (CRUD'd live against the server). Each row tracks its
+    // original name so we know whether a rename happened on save.
+    final editVariants = <_EditVariantRow>[];
+    if (item != null && item.variants != null) {
+      for (final v in item.variants!) {
+        editVariants.add(_EditVariantRow(
+          originalName: v.name,
+          nameController: TextEditingController(text: v.name),
+          stockController:
+              TextEditingController(text: (v.stock ?? 0).toString()),
+        ));
+      }
+    }
+    final newVariantNameController = TextEditingController();
+    final newVariantStockController = TextEditingController(text: "0");
 
     if (item == null && hasVariants) {
       variantNameControllers.add(TextEditingController());
       variantStockControllers.add(TextEditingController(text: "0"));
     }
+
+    final categoryItems = [
+      DropdownMenuItem(value: 'cold', child: Text(l10n.coldDrinks)),
+      DropdownMenuItem(value: 'hot', child: Text(l10n.hotDrinks)),
+      DropdownMenuItem(value: 'neutral', child: Text(l10n.sides)),
+    ];
 
     showModalBottomSheet(
       context: context,
@@ -726,6 +773,54 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
             void addVariantRow() {
               variantNameControllers.add(TextEditingController());
               variantStockControllers.add(TextEditingController(text: "0"));
+            }
+
+            // ── Live variant CRUD (edit mode) ───────────────────────────────
+            void saveExistingVariant(_EditVariantRow row) {
+              final newName = row.nameController.text.trim();
+              if (newName.isEmpty) return;
+              final stock = int.tryParse(row.stockController.text) ?? 0;
+              if (newName != row.originalName) {
+                // Rename = remove old + add new (no rename endpoint).
+                adminBloc.add(RemoveVariantEvent(
+                    itemId: itemId!, variantName: row.originalName));
+                adminBloc.add(
+                    AddVariantEvent(itemId: itemId, name: newName, stock: stock));
+                setState(() => row.originalName = newName);
+              } else {
+                adminBloc.add(SetVariantStockEvent(
+                    itemId: itemId!, variantName: row.originalName, stock: stock));
+              }
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.variantSaved)),
+              );
+            }
+
+            void deleteExistingVariant(_EditVariantRow row) {
+              adminBloc.add(RemoveVariantEvent(
+                  itemId: itemId!, variantName: row.originalName));
+              setState(() => editVariants.remove(row));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(l10n.variantDeleted)),
+              );
+            }
+
+            void addNewVariant() {
+              final name = newVariantNameController.text.trim();
+              if (name.isEmpty) return;
+              final stock = int.tryParse(newVariantStockController.text) ?? 0;
+              adminBloc.add(
+                  AddVariantEvent(itemId: itemId!, name: name, stock: stock));
+              setState(() {
+                editVariants.add(_EditVariantRow(
+                  originalName: name,
+                  nameController: TextEditingController(text: name),
+                  stockController:
+                      TextEditingController(text: stock.toString()),
+                ));
+                newVariantNameController.clear();
+                newVariantStockController.text = "0";
+              });
             }
 
             return Padding(
@@ -751,10 +846,13 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         decoration:
                         InputDecoration(labelText: l10n.price)),
                     const SizedBox(height: 12),
-                    TextFormField(
-                        controller: categoryController,
-                        decoration:
-                        InputDecoration(labelText: l10n.categories)),
+                    DropdownButtonFormField<String>(
+                      value: selectedCategory,
+                      decoration: InputDecoration(labelText: l10n.category),
+                      items: categoryItems,
+                      onChanged: (val) => setState(
+                          () => selectedCategory = val ?? 'neutral'),
+                    ),
                     const SizedBox(height: 12),
                     TextFormField(
                         controller: descController,
@@ -778,6 +876,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         }
                       }),
                     ),
+                    // ── CREATE mode: in-memory variant rows / stock field ──
                     if (item == null) ...[
                       const SizedBox(height: 12),
                       if (!hasVariants)
@@ -791,8 +890,8 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         )
                       else ...[
                         Align(
-                          alignment: Alignment.centerRight,
-                          child: Text("الانواع",
+                          alignment: Alignment.centerLeft,
+                          child: Text(l10n.varaity,
                               style:
                               Theme.of(stfContext).textTheme.titleMedium),
                         ),
@@ -807,7 +906,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                                   child: TextFormField(
                                     controller: variantNameControllers[i],
                                     decoration: InputDecoration(
-                                      labelText: l10n.varaity,
+                                      labelText: l10n.variantName,
                                       border: const OutlineInputBorder(),
                                       suffixIcon: i == 0
                                           ? null
@@ -845,10 +944,96 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                           child: OutlinedButton.icon(
                             onPressed: () => setState(addVariantRow),
                             icon: const Icon(Icons.add),
-                            label: Text(l10n.loadMore),
+                            label: Text(l10n.addVariant),
                           ),
                         ),
                       ],
+                    ],
+                    // ── EDIT mode: live variant CRUD ───────────────────────
+                    if (item != null && hasVariants) ...[
+                      const SizedBox(height: 12),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(l10n.varaity,
+                            style: Theme.of(stfContext).textTheme.titleMedium),
+                      ),
+                      const SizedBox(height: 10),
+                      ...editVariants.map((row) {
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 3,
+                                child: TextFormField(
+                                  controller: row.nameController,
+                                  decoration: InputDecoration(
+                                    labelText: l10n.variantName,
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                flex: 2,
+                                child: TextFormField(
+                                  controller: row.stockController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: InputDecoration(
+                                    labelText: l10n.inStock,
+                                    border: const OutlineInputBorder(),
+                                  ),
+                                ),
+                              ),
+                              IconButton(
+                                tooltip: l10n.save,
+                                onPressed: () => saveExistingVariant(row),
+                                icon: const Icon(Icons.check,
+                                    color: Colors.green),
+                              ),
+                              IconButton(
+                                tooltip: l10n.remove,
+                                onPressed: () => deleteExistingVariant(row),
+                                icon: const Icon(Icons.delete_outline,
+                                    color: Colors.red),
+                              ),
+                            ],
+                          ),
+                        );
+                      }),
+                      // Add-new-variant row
+                      Row(
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: TextFormField(
+                              controller: newVariantNameController,
+                              decoration: InputDecoration(
+                                labelText: l10n.variantName,
+                                border: const OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            flex: 2,
+                            child: TextFormField(
+                              controller: newVariantStockController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: l10n.inStock,
+                                border: const OutlineInputBorder(),
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            tooltip: l10n.addVariant,
+                            onPressed: addNewVariant,
+                            icon: const Icon(Icons.add_circle,
+                                color: TColors.primary),
+                          ),
+                        ],
+                      ),
                     ],
                     const SizedBox(height: 24),
                     SizedBox(
@@ -875,7 +1060,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               name: nameController.text,
                               price:
                               double.tryParse(priceController.text) ?? 0.0,
-                              category: categoryController.text,
+                              category: selectedCategory,
                               description: descController.text,
                               image: imageController.text,
                               hasVariants: hasVariants,
@@ -886,10 +1071,10 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                             ));
                           } else {
                             adminBloc.add(UpdateMenuItemEvent(
-                              itemId: item.mongoId ?? item.id,
+                              itemId: itemId!,
                               name: nameController.text,
                               price: double.tryParse(priceController.text),
-                              category: categoryController.text,
+                              category: selectedCategory,
                               description: descController.text,
                               image: imageController.text,
                               hasVariants: hasVariants,

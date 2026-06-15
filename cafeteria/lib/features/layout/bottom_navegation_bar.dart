@@ -37,10 +37,10 @@ class CBottomNavigationBar extends StatefulWidget {
   });
 
   @override
-  State<CBottomNavigationBar> createState() => _CBottomNavigationBarState();
+  State<CBottomNavigationBar> createState() => CBottomNavigationBarState();
 }
 
-class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
+class CBottomNavigationBarState extends State<CBottomNavigationBar> {
   int _index = 0;
 
   @override
@@ -96,37 +96,36 @@ class _CBottomNavigationBarState extends State<CBottomNavigationBar> {
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              actions: [
-                Padding(
-                  padding: const EdgeInsets.only(right: 20.0),
-                  child: BlocBuilder<AuthBloc, AuthState>(
-                    builder: (context, state) {
-                      String name = widget.userName;
-                      UserEntity? user;
-                      if (state is UserProfileLoaded) {
-                        name = state.user.name;
-                        user = state.user;
-                      }
-                      return ProfileHeader(
-                        userName: name,
-                        onTap: () {
-                          if (user != null) {
-                            showDialog(
-                              context: context,
-                              builder: (context) =>
-                                  AccountMenuDialog(user: user!),
-                            );
-                          } else {
-                            // Fallback if not loaded yet
-                            context.read<AuthBloc>().add(
-                                const GetUserInfoEvent());
-                          }
-                        },
-                      );
-                    },
-                  ),
+              centerTitle: false,
+              title: Padding(
+                padding: const EdgeInsetsDirectional.only(start: 4.0),
+                child: BlocBuilder<AuthBloc, AuthState>(
+                  builder: (context, state) {
+                    String name = widget.userName;
+                    UserEntity? user;
+                    if (state is UserProfileLoaded) {
+                      name = state.user.name;
+                      user = state.user;
+                    }
+                    return ProfileHeader(
+                      userName: name,
+                      onTap: () {
+                        if (user != null) {
+                          showDialog(
+                            context: context,
+                            builder: (context) =>
+                                AccountMenuDialog(user: user!),
+                          );
+                        } else {
+                          // Fallback if not loaded yet
+                          context.read<AuthBloc>().add(
+                              const GetUserInfoEvent());
+                        }
+                      },
+                    );
+                  },
                 ),
-              ],
+              ),
             ),
             body: IndexedStack(
               index: _index,

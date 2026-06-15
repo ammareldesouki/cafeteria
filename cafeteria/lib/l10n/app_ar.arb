@@ -70,6 +70,11 @@
   "fieldRequired": "هذا الحقل مطلوب",
   "menu": "القائمة",
   "categories": "الفئات",
+  "category": "الفئة",
+  "addVariant": "إضافة نوع",
+  "variantName": "اسم النوع",
+  "variantSaved": "تم حفظ النوع",
+  "variantDeleted": "تم حذف النوع",
   "allItems": "جميع العناصر",
   "search": "بحث",
   "searchPlaceholder": "ابحث عن طعام أو مشروبات...",
@@ -286,6 +291,7 @@
   "pendingWallet": "الإيرادات المعلقة",
   "additemMenu": "اضف عنصر للقائمة",
   "price": "المبلغ",
-  "itemName": "اسم المنتج"
+  "itemName": "اسم المنتج",
+  "goToCart": "اذهب للسلة"
 
 }

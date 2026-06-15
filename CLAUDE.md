@@ -57,6 +57,8 @@ npm run lint       # Biome lint only
 
 **Auth**: uses [`better-auth`](https://better-auth.com) plus custom routes; the app and better-auth share a single Mongo connection (`config/env.ts`). The Flutter app authenticates against this and stores the JWT (see SharedPreferences `auth_token`). Deployed on Railway/PM2 (`ecosystem.config.js`, `railway.json`).
 
+**Wallet / order settlement** (non-obvious domain logic, spans `order.service.ts` + `wallet.service.ts` + `userWallet.service.ts`): orders are placed unpaid with **no** wallet movement. Money moves only on the `delivered`/`paid` transitions, computed as the **delta** between the order's before/after `(status, paymentStatus)` in `order.service.ts → settleWallets`. There are two wallets — a **per-user debt ledger** (`user_wallets`, negative = customer owes) and the **singleton cafeteria wallet** (`cafeteria_wallets`, realized revenue). Balance + ledger writes are atomic via `utils/walletTransaction.ts`. Full model in `src/docs/WALLET_SYSTEM_EXPLAINED.md`.
+
 ---
 
 ## Architecture
@@ -72,7 +74,7 @@ feature/
 ├── domain/
 │   ├── entities/        # Pure business objects (no JSON)
 │   ├── repositories/    # Abstract interfaces
-│   └── use_cases/       # One class per operation, returns Either<Failure, T>
+│   └── use_cases/       # One class per operation (see error-handling note below)
 └── presentation/
     ├── manager/         # BLoC: *_bloc.dart, *_event.dart, *_state.dart
     ├── pages/           # Full screens
@@ -112,7 +114,7 @@ When adding a new route: add its constant to `RouteNames`, add a `case` in `AppR
 - Base URL: defined by `ApiConstants.baseUrl` in `lib/core/constants/`. Currently points at the deployed Railway backend (`https://cafeteria-production-85c5.up.railway.app/api/v1`). For local backend dev, switch to `http://10.0.2.2:3001/api/v1` (Android emulator) / `http://localhost:3001/api/v1` (iOS simulator)
 - Auth token is injected automatically by `NetworkDioHandler` as `Authorization: Bearer <token>`
 - Token persistence: stored/retrieved via `SharedPreferences` with key `auth_token`
-- Error handling: all repository methods return `Either<Failure, T>` (dartz)
+- Error handling is **not uniform**: `auth` and `home` return `Either<Failure, T>` (dartz) and unwrap in the BLoC; newer features (`cart`, `order`, `favourite`, `wallet`) return plain `Future<T>` and `throw`, with the BLoC catching in `try/catch`. Match the convention of the feature you're editing.
 
 ---
 
@@ -149,6 +151,9 @@ ARB files are the source of truth: `lib/l10n/app_en.arb` (template) and `lib/l10
 |-----|-------|
 | `auth_token` | JWT bearer token |
 | `user_id` | Current user ID |
-| `user_role` | `customer` or `admin` |
+| `user_name` | Current user's display name (used by `WelcomeBanner` / profile on auto-login) |
+| `user_role` | `user` or `admin` |
 | `theme_mode` | `light` or `dark` |
 | `locale_code` | `en` or `ar` |
+
+These are loaded into `NetworkDioHandler` on startup (`_loadFromPrefs`) and written in `setCurrentUser` at login. `admin` users route to the cafeteria panel; everyone else gets the customer layout (see `lib/features/splash/slash.dart`).

@@ -206,6 +206,21 @@ class AppLocalizationsAr extends AppLocalizations {
   String get categories => 'الفئات';
 
   @override
+  String get category => 'الفئة';
+
+  @override
+  String get addVariant => 'إضافة نوع';
+
+  @override
+  String get variantName => 'اسم النوع';
+
+  @override
+  String get variantSaved => 'تم حفظ النوع';
+
+  @override
+  String get variantDeleted => 'تم حذف النوع';
+
+  @override
   String get allItems => 'جميع العناصر';
 
   @override
@@ -846,4 +861,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get itemName => 'اسم المنتج';
+
+  @override
+  String get goToCart => 'اذهب للسلة';
 }

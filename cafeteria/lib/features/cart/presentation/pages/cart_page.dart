@@ -195,7 +195,7 @@ class _CartFooter extends StatelessWidget {
                 ),
               ),
               Text(
-                '\$${totalPrice.toStringAsFixed(2)}',
+                '${totalPrice.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
                 style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,

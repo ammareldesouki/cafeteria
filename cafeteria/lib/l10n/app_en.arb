@@ -66,6 +66,11 @@
   "fieldRequired": "This field is required",
   "menu": "Menu",
   "categories": "Categories",
+  "category": "Category",
+  "addVariant": "Add Variant",
+  "variantName": "Variant Name",
+  "variantSaved": "Variant saved",
+  "variantDeleted": "Variant deleted",
   "allItems": "All Items",
   "search": "Search",
   "searchPlaceholder": "Search for food or drinks...",
@@ -287,7 +292,8 @@
   "pendingWallet": "Pending Revenue",
   "additemMenu": "Add Item To Menu",
   "price": "Price",
-  "itemName":"Item Name"
+  "itemName":"Item Name",
+  "goToCart": "Go to Cart"
 
 
 

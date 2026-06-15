@@ -91,9 +91,6 @@ export const menuService = {
 	async addVariant(itemId: string, variant: MenuItemVariant) {
 		const existing = await menuRepository.findById(itemId);
 		if (!existing) throw new Error("Menu item not found");
-		if (!existing.hasVariants) {
-			throw new Error("This item does not support variants.");
-		}
 
 		// Check for duplicate variant names (case-insensitive)
 		const duplicate = (existing.variants ?? []).find(
@@ -103,6 +100,8 @@ export const menuService = {
 			throw new Error(`Variant "${variant.name}" already exists.`);
 		}
 
+		// Adding a variant promotes a simple item into a variant item
+		// (clears the top-level stock, which is no longer meaningful).
 		const updated = await menuRepository.addVariant(itemId, variant);
 		if (!updated) throw new Error("Failed to add variant");
 		return updated;

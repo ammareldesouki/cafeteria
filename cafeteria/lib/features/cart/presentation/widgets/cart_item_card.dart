@@ -204,7 +204,7 @@ class _CartItemCardState extends State<CartItemCard> {
 
                     // Subtotal
                     Text(
-                      '\$${widget.item.subtotal.toStringAsFixed(2)}',
+                      '${widget.item.subtotal.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,

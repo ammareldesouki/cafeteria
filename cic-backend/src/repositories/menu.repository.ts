@@ -149,10 +149,12 @@ export const menuRepository = {
 		variant: MenuItemVariant,
 	): Promise<MenuItem | null> {
 		const result = await collection.findOneAndUpdate(
-			{ _id: new ObjectId(itemId), hasVariants: true },
+			{ _id: new ObjectId(itemId) },
 			{
 				$push: { variants: variant } as any,
-				$set: { updatedAt: new Date() },
+				// Adding a variant makes this a variant item; top-level stock
+				// is no longer tracked for variant items.
+				$set: { hasVariants: true, stock: 0, updatedAt: new Date() },
 			},
 			{ returnDocument: "after" },
 		);

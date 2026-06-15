@@ -207,7 +207,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     required int stock,
   }) async {
     final response = await _dioHandler.dio.patch(
-      '/admin/menu/$itemId/variants/$variantName/stock',
+      '/admin/menu/$itemId/variants/${Uri.encodeComponent(variantName)}/stock',
       data: {'stock': stock},
     );
     return MenuItemModel.fromMap(response.data as Map<String, dynamic>);
@@ -232,7 +232,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     required String variantName,
   }) async {
     final response = await _dioHandler.dio.delete(
-      '/admin/menu/$itemId/variants/$variantName',
+      '/admin/menu/$itemId/variants/${Uri.encodeComponent(variantName)}',
     );
     return MenuItemModel.fromMap(response.data as Map<String, dynamic>);
   }

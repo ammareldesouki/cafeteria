@@ -2,6 +2,7 @@ import 'package:cafeteria/core/route/route_name.dart';
 import 'package:cafeteria/features/home/presentation/pages/category_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../keys/app_keys.dart';
 
 import '../../features/auth/di/injaction.dart';
 import '../../features/auth/presentation/manager/auth_bloc.dart';
@@ -44,12 +45,14 @@ class AppRouter {
         );
       case RouteNames.layout:
         final args = settings.arguments as Map<String, String>? ?? {};
-        return MaterialPageRoute(
-          builder: (_) => CBottomNavigationBar(
+        return _buildRoute(
+          CBottomNavigationBar(
+            key: bottomNavKey,
             role: args['role'] ?? 'user',
             userName: args['userName'] ?? 'User',
             userId: args['userId'] ?? '',
           ),
+          settings,
         );
 
       case RouteNames.home:
@@ -87,11 +90,7 @@ class AppRouter {
           settings,
         );
 
-      case RouteNames.layout:
-        return _buildRoute(
-          const CBottomNavigationBar(role: 'user', userName: '', userId: ''),
-          settings,
-        );
+
 
       case RouteNames.cafeteriaPanel:
         return _buildRoute(

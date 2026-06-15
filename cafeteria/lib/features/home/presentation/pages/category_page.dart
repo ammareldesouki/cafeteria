@@ -9,6 +9,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/constants/colors.dart';
+import '../../../../core/keys/app_keys.dart';
+import '../../../../core/route/route_name.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../favourite/presentation/manager/favourite_bloc.dart';
 import '../../../favourite/presentation/manager/favourite_event.dart';
@@ -210,6 +212,66 @@ class _CategoryPageState extends State<CategoryPage> {
             const SizedBox(height: 24),
           ],
         ),
+      ),
+      bottomNavigationBar: _buildBottomNavBar(context),
+    );
+  }
+
+  Widget _buildBottomNavBar(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
+    return Container(
+      decoration: BoxDecoration(
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
+      child: BottomNavigationBar(
+        currentIndex: 0, // category page is nested under Home tab
+        onTap: (index) {
+          Navigator.of(context).popUntil((route) => route.settings.name == RouteNames.layout);
+          bottomNavKey.currentState?.switchToTab(index);
+        },
+        elevation: 0,
+        type: BottomNavigationBarType.fixed,
+        selectedItemColor: isDark ? const Color(0xFFD7BFAE) : Colors.brown,
+        unselectedItemColor: isDark ? Colors.white60 : Colors.black,
+        selectedLabelStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+        ),
+        unselectedLabelStyle: const TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w400,
+        ),
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        items: [
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.home_outlined),
+            activeIcon: const Icon(Icons.home_rounded),
+            label: l10n.home,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.favorite_border_rounded),
+            activeIcon: const Icon(Icons.favorite_rounded),
+            label: l10n.favorites,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.shopping_cart_outlined),
+            activeIcon: const Icon(Icons.shopping_cart_rounded),
+            label: l10n.cart,
+          ),
+          BottomNavigationBarItem(
+            icon: const Icon(Icons.receipt_long_outlined),
+            activeIcon: const Icon(Icons.receipt_long_rounded),
+            label: l10n.order,
+          ),
+        ],
       ),
     );
   }
@@ -478,13 +540,12 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
     return BlocListener<CartBloc, CartState>(
       listener: (context, state) {
         if (state is CartAddSuccess) {
-          Navigator.pop(context);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                  '${item.name} ${AppLocalizations.of(context)!.addToCart} 🛒'),
-              backgroundColor: const Color(0xFF3B1A08),
-            ),
+          // ── Keep sheet open ── show top overlay above the modal ──
+          final l10n = AppLocalizations.of(context)!;
+          _showTopCartToast(
+            context: context,
+            itemName: item.name,
+            l10n: l10n,
           );
         }
         if (state is CartError) {
@@ -496,6 +557,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
           );
         }
       },
+
       child: Container(
         padding:
         EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
@@ -943,6 +1005,168 @@ class _QtyButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon, size: 18, color: const Color(0xFF3B1A08)),
+      ),
+    );
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Top Cart Toast — always above the modal bottom sheet
+// ═══════════════════════════════════════════════════════════════════════════
+
+/// Shows a custom animated notification at the very TOP of the screen
+/// using the root Overlay so it renders above modals and every route.
+void _showTopCartToast({
+  required BuildContext context,
+  required String itemName,
+  required AppLocalizations l10n,
+}) {
+  final overlay = Overlay.of(context, rootOverlay: true);
+  OverlayEntry? entry;
+  var removed = false;
+
+  void remove() {
+    if (!removed) {
+      removed = true;
+      entry?.remove();
+    }
+  }
+
+  entry = OverlayEntry(
+    builder: (_) => _TopCartNotification(
+      itemName: itemName,
+      addToCartLabel: l10n.addToCart,
+      goToCartLabel: l10n.goToCart,
+      onGoToCart: () {
+        remove();
+        // Pop back to the layout route
+        Navigator.of(context).popUntil(
+          (route) => route.settings.name == RouteNames.layout,
+        );
+        // Then switch the bottom nav to cart tab (index 2)
+        bottomNavKey.currentState?.switchToTab(2);
+      },
+      onDismiss: remove,
+    ),
+  );
+
+  overlay.insert(entry);
+  Future.delayed(const Duration(seconds: 4), remove);
+}
+
+class _TopCartNotification extends StatefulWidget {
+  final String itemName;
+  final String addToCartLabel;
+  final String goToCartLabel;
+  final VoidCallback onGoToCart;
+  final VoidCallback onDismiss;
+
+  const _TopCartNotification({
+    required this.itemName,
+    required this.addToCartLabel,
+    required this.goToCartLabel,
+    required this.onGoToCart,
+    required this.onDismiss,
+  });
+
+  @override
+  State<_TopCartNotification> createState() => _TopCartNotificationState();
+}
+
+class _TopCartNotificationState extends State<_TopCartNotification>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+  late final Animation<Offset> _slide;
+  late final Animation<double> _fade;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 380),
+    );
+    _slide = Tween<Offset>(
+      begin: const Offset(0, -1),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic));
+    _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
+    _ctrl.forward();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+    return Positioned(
+      top: topPadding + 12,
+      left: 16,
+      right: 16,
+      child: SlideTransition(
+        position: _slide,
+        child: FadeTransition(
+          opacity: _fade,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B1A08),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.28),
+                    blurRadius: 20,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.check_circle_rounded,
+                      color: Color(0xFF7FD47F), size: 22),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '${widget.itemName} ${widget.addToCartLabel} 🛒',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  GestureDetector(
+                    onTap: widget.onGoToCart,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFC87A),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(
+                        widget.goToCartLabel,
+                        style: const TextStyle(
+                          color: Color(0xFF3B1A08),
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ),
     );
   }

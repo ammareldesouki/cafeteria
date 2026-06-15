@@ -488,6 +488,36 @@ abstract class AppLocalizations {
   /// **'Categories'**
   String get categories;
 
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @addVariant.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Variant'**
+  String get addVariant;
+
+  /// No description provided for @variantName.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant Name'**
+  String get variantName;
+
+  /// No description provided for @variantSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant saved'**
+  String get variantSaved;
+
+  /// No description provided for @variantDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Variant deleted'**
+  String get variantDeleted;
+
   /// No description provided for @allItems.
   ///
   /// In en, this message translates to:
@@ -1765,6 +1795,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Item Name'**
   String get itemName;
+
+  /// No description provided for @goToCart.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Cart'**
+  String get goToCart;
 }
 
 class _AppLocalizationsDelegate
