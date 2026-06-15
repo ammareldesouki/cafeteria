@@ -148,14 +148,27 @@ export const menuRepository = {
 		itemId: string,
 		variant: MenuItemVariant,
 	): Promise<MenuItem | null> {
+		// Aggregation-pipeline update so we can coalesce a missing/null
+		// `variants` field to an array before appending (older simple items
+		// were stored with `variants: null`, which $push cannot target).
+		// Adding a variant also promotes the item into a variant item.
 		const result = await collection.findOneAndUpdate(
 			{ _id: new ObjectId(itemId) },
-			{
-				$push: { variants: variant } as any,
-				// Adding a variant makes this a variant item; top-level stock
-				// is no longer tracked for variant items.
-				$set: { hasVariants: true, stock: 0, updatedAt: new Date() },
-			},
+			[
+				{
+					$set: {
+						variants: {
+							$concatArrays: [
+								{ $ifNull: ["$variants", []] },
+								[variant],
+							],
+						},
+						hasVariants: true,
+						stock: 0,
+						updatedAt: new Date(),
+					},
+				},
+			] as any,
 			{ returnDocument: "after" },
 		);
 		return result;
