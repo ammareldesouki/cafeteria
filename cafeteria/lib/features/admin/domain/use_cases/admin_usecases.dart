@@ -1,5 +1,6 @@
 import '../entities/analytics_entity.dart';
 import '../entities/paginated_orders_entity.dart';
+import '../entities/pending_user_entity.dart';
 import '../repositories/admin_repository.dart';
 import '../../../order/domain/entities/order_entity.dart';
 
@@ -10,6 +11,23 @@ class GetDashboardAnalyticsUseCase {
 
   Future<DashboardAnalyticsEntity> call() =>
       _repository.getDashboardAnalytics();
+}
+
+class GetPendingUsersUseCase {
+  final AdminRepository _repository;
+
+  GetPendingUsersUseCase(this._repository);
+
+  Future<PendingUsersResult> call() => _repository.getPendingUsers();
+}
+
+class SettleUserDebtUseCase {
+  final AdminRepository _repository;
+
+  SettleUserDebtUseCase(this._repository);
+
+  Future<void> call({required String userId, double? amount}) =>
+      _repository.settleUserDebt(userId: userId, amount: amount);
 }
 
 class GetAdminOrdersUseCase {

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -14,6 +15,7 @@ import '../../../auth/presentation/widgets/language_theme_toggles.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../core/route/route_name.dart';
 import '../../../auth/di/injaction.dart';
+import 'pending_revenue_page.dart';
 
 class CafeteriaPanelPage extends StatefulWidget {
   const CafeteriaPanelPage({super.key});
@@ -24,6 +26,7 @@ class CafeteriaPanelPage extends StatefulWidget {
 
 class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
   final TextEditingController _searchController = TextEditingController();
+  Timer? _searchDebounce;
 
   String? _selectedDateRange;
   String? _selectedPaymentStatus;
@@ -36,12 +39,18 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchController.dispose();
     super.dispose();
   }
 
+  /// Live search: re-query as the user types, debounced so we don't hit the
+  /// API on every keystroke.
   void _onSearchChanged(String value) {
-    _fetchFilteredOrders();
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 350), () {
+      if (mounted) _fetchFilteredOrders();
+    });
   }
 
   void _fetchFilteredOrders() {
@@ -247,10 +256,31 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                 const SizedBox(height: 24),
                 _buildOrdersHeader(currentState),
                 const SizedBox(height: 12),
-                _buildSearchBar(
-                  _searchController,
-                  _onSearchChanged,
-                  l10n.searchPlaceholder,
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildSearchBar(
+                        _searchController,
+                        _onSearchChanged,
+                        l10n.searchPlaceholder,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    // Opens the Pending Revenue (debt-by-user) screen.
+                    GestureDetector(
+                      onTap: _openPendingRevenue,
+                      child: Container(
+                        width: 52,
+                        height: 52,
+                        decoration: const BoxDecoration(
+                          color: Color(0xFF3B1A08),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.groups_rounded,
+                            color: Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
                 if (currentState.orders.data.isEmpty)
@@ -436,21 +466,36 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
   }
 
   Widget _buildSearchBar(TextEditingController controller,
-      Function(String) onSubmitted, String hint) {
-    return TextFormField(
-      controller: controller,
-      onFieldSubmitted: onSubmitted,
-      textInputAction: TextInputAction.search,
-      decoration: InputDecoration(
-        prefixIcon: const Icon(Icons.search),
-        hintText: hint,
-        filled: true,
-        fillColor: Colors.grey.shade100,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20),
-        border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(30),
-            borderSide: BorderSide.none),
-      ),
+      Function(String) onChanged, String hint) {
+    return ValueListenableBuilder<TextEditingValue>(
+      valueListenable: controller,
+      builder: (context, value, _) {
+        return TextFormField(
+          controller: controller,
+          onChanged: onChanged, // live search (debounced in the handler)
+          onFieldSubmitted: onChanged,
+          textInputAction: TextInputAction.search,
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.search),
+            suffixIcon: value.text.isEmpty
+                ? null
+                : IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () {
+                      controller.clear();
+                      onChanged('');
+                    },
+                  ),
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.grey.shade100,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 20),
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30),
+                borderSide: BorderSide.none),
+          ),
+        );
+      },
     );
   }
 
@@ -1028,6 +1073,133 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
     );
   }
 
+  /// Confirm then mark an order as paid (settles the customer's debt and
+  /// realizes cafeteria revenue on the backend).
+  /// Open the Pending Revenue (debt-by-user) screen with its own AdminBloc.
+  void _openPendingRevenue() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => sl<AdminBloc>()..add(FetchPendingUsersEvent()),
+          child: const PendingRevenuePage(),
+        ),
+      ),
+    );
+  }
+
+  /// Two equal-width, side-by-side dialog buttons (Cancel + a colored confirm).
+  Widget _dialogButtons(
+    BuildContext dialogCtx, {
+    required String confirmText,
+    required Color confirmColor,
+    required VoidCallback onConfirm,
+  }) {
+    final l10n = AppLocalizations.of(context)!;
+    return Row(
+      children: [
+        Expanded(
+          child: SizedBox(
+            height: 46,
+            child: OutlinedButton(
+              onPressed: () => Navigator.pop(dialogCtx),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFD9C7B8)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(l10n.cancel,
+                  style: const TextStyle(color: Color(0xFF8B7355))),
+            ),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: SizedBox(
+            height: 46,
+            child: ElevatedButton(
+              onPressed: onConfirm,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: confirmColor,
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(confirmText,
+                  style: const TextStyle(color: Colors.white)),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  void _confirmMarkPaid(OrderEntity order, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.markPaidConfirmTitle),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.markPaidConfirmBody(
+                order.totalPrice.toStringAsFixed(2),
+                l10n.pound,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _dialogButtons(
+              ctx,
+              confirmText: l10n.markAsPaid,
+              confirmColor: Colors.green,
+              onConfirm: () {
+                Navigator.pop(ctx);
+                context.read<AdminBloc>().add(
+                      UpdateAdminOrderEvent(
+                        orderId: order.id,
+                        paymentStatus: 'paid',
+                      ),
+                    );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _confirmCancelOrder(OrderEntity order, AppLocalizations l10n) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(l10n.cancelOrder),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(l10n.cancelOrderConfirm),
+            const SizedBox(height: 24),
+            _dialogButtons(
+              ctx,
+              confirmText: l10n.confirm,
+              confirmColor: const Color(0xFFE57373),
+              onConfirm: () {
+                Navigator.pop(ctx);
+                context.read<AdminBloc>().add(
+                      UpdateAdminOrderEvent(
+                        orderId: order.id,
+                        status: 'cancelled',
+                      ),
+                    );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildAdminOrderCard(OrderEntity order) {
     final l10n = AppLocalizations.of(context)!;
 
@@ -1065,11 +1237,10 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
       );
     } else if (order.paymentStatus == 'unpaid' &&
         order.status != 'cancelled') {
-      adminActionText = l10n.cashOnDelivery;
+      // Settle a debt: mark an (often delivered) unpaid order as paid.
+      adminActionText = l10n.markAsPaid;
       adminActionColor = Colors.green;
-      adminAction = () => context.read<AdminBloc>().add(
-        UpdateAdminOrderEvent(orderId: order.id, paymentStatus: 'paid'),
-      );
+      adminAction = () => _confirmMarkPaid(order, l10n);
     }
 
     return Container(
@@ -1278,10 +1449,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
               SizedBox(
                 width: double.infinity,
                 child: TextButton(
-                  onPressed: () {
-                    context.read<AdminBloc>().add(UpdateAdminOrderEvent(
-                        orderId: order.id, status: 'cancelled'));
-                  },
+                  onPressed: () => _confirmCancelOrder(order, l10n),
                   child: Text(l10n.cancelOrder,
                       style: const TextStyle(color: Colors.red)),
                 ),

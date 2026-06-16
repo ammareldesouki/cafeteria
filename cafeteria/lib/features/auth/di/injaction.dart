@@ -187,6 +187,8 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => GetDashboardAnalyticsUseCase(sl()));
   sl.registerLazySingleton(() => GetAdminOrdersUseCase(sl()));
   sl.registerLazySingleton(() => UpdateAdminOrderUseCase(sl()));
+  sl.registerLazySingleton(() => GetPendingUsersUseCase(sl()));
+  sl.registerLazySingleton(() => SettleUserDebtUseCase(sl()));
   sl.registerLazySingleton(() => GetAdminMenuItemsUseCase(sl()));
   sl.registerLazySingleton(() => CreateMenuItemUseCase(sl()));
   sl.registerLazySingleton(() => UpdateMenuItemUseCase(sl()));
@@ -201,6 +203,8 @@ Future<void> setupLocator() async {
   sl.registerFactory(() =>
       AdminBloc(
         getDashboardAnalytics: sl(),
+        getPendingUsers: sl(),
+        settleUserDebt: sl(),
         getAdminOrders: sl(),
         updateAdminOrder: sl(),
         getAdminMenuItems: sl(),

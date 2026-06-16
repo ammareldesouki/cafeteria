@@ -2,10 +2,15 @@ import 'package:cafeteria/core/network/dio_handler.dart';
 import '../../../home/data/models/menu_item_model.dart';
 import '../../domain/entities/analytics_entity.dart';
 import '../../domain/entities/paginated_orders_entity.dart';
+import '../../domain/entities/pending_user_entity.dart';
 import '../../../order/data/models/order_model.dart';
 
 abstract class AdminRemoteDataSource {
   Future<DashboardAnalyticsModel> getDashboardAnalytics();
+
+  Future<PendingUsersResult> getPendingUsers();
+
+  Future<void> settleUserDebt({required String userId, double? amount});
 
   Future<PaginatedOrdersModel> getAdminOrders({
     required int page,
@@ -83,6 +88,36 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     final response = await _dioHandler.dio.get('/admin/analytics');
     return DashboardAnalyticsModel.fromJson(
       response.data as Map<String, dynamic>,
+    );
+  }
+
+  @override
+  Future<PendingUsersResult> getPendingUsers() async {
+    final response = await _dioHandler.dio.get('/admin/pending-users');
+    final data = response.data as Map<String, dynamic>;
+    final users = (data['users'] as List<dynamic>? ?? [])
+        .map((e) {
+          final m = e as Map<String, dynamic>;
+          return PendingUserEntity(
+            userId: m['userId']?.toString() ?? '',
+            username: m['username']?.toString() ?? '',
+            pendingAmount: (m['pendingAmount'] as num? ?? 0).toDouble(),
+            unpaidOrders: (m['unpaidOrders'] as num? ?? 0).toInt(),
+          );
+        })
+        .toList();
+    return PendingUsersResult(
+      totalPending: (data['totalPending'] as num? ?? 0).toDouble(),
+      userCount: (data['userCount'] as num? ?? 0).toInt(),
+      users: users,
+    );
+  }
+
+  @override
+  Future<void> settleUserDebt({required String userId, double? amount}) async {
+    await _dioHandler.dio.post(
+      '/admin/users/$userId/settle',
+      data: {if (amount != null) 'amount': amount},
     );
   }
 

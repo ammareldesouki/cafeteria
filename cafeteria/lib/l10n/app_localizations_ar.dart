@@ -644,6 +644,57 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cashOnDelivery => 'الدفع عند الاستلام';
 
   @override
+  String get markAsPaid => 'تأكيد الدفع';
+
+  @override
+  String get pendingRevenueTitle => 'المبالغ المستحقة';
+
+  @override
+  String get searchByUsername => 'ابحث باسم المستخدم';
+
+  @override
+  String get totalRevenue => 'إجمالي المستحق';
+
+  @override
+  String usersCount(int count) {
+    return '$count مستخدم';
+  }
+
+  @override
+  String unpaidOrdersCount(int count) {
+    return '$count طلب غير مدفوع';
+  }
+
+  @override
+  String get markPaid => 'تحديد كمدفوع';
+
+  @override
+  String get payAll => 'دفع الكل';
+
+  @override
+  String get partialAmount => 'مبلغ جزئي';
+
+  @override
+  String get enterAmount => 'أدخل المبلغ';
+
+  @override
+  String get noPendingPayments => 'لا توجد مبالغ مستحقة';
+
+  @override
+  String get settlePaymentTitle => 'تسجيل دفعة';
+
+  @override
+  String get amountExceedsDebt => 'المبلغ لا يمكن أن يتجاوز المستحق';
+
+  @override
+  String get markPaidConfirmTitle => 'تأكيد الدفع';
+
+  @override
+  String markPaidConfirmBody(String amount, String currency) {
+    return 'هل تريد تسجيل هذا الطلب كمدفوع؟ العميل عليه $amount $currency.';
+  }
+
+  @override
   String get creditCard => 'بطاقة ائتمان';
 
   @override

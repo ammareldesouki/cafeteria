@@ -10,7 +10,12 @@ import {
 	adminAddVariant,
 	adminRemoveVariant,
 } from "@/controllers/menu.controller";
-import { getAllOrders, updateOrder } from "@/controllers/admin.controller";
+import {
+	getAllOrders,
+	updateOrder,
+	getPendingUsers,
+	settleUserDebt,
+} from "@/controllers/admin.controller";
 import {
 	validateCreateMenuItem,
 	validateUpdateMenuItem,
@@ -68,6 +73,10 @@ router.patch(
 	validateAdminOrderUpdate,
 	updateOrder,
 );
+
+// Pending revenue (debt) management
+router.get("/pending-users", requireAdmin, getPendingUsers);
+router.post("/users/:userId/settle", requireAdmin, settleUserDebt);
 
 // Mount sub-routes
 router.use(walletRoutes);

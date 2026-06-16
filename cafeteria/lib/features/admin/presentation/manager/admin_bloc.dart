@@ -10,6 +10,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final GetDashboardAnalyticsUseCase getDashboardAnalytics;
   final GetAdminOrdersUseCase getAdminOrders;
   final UpdateAdminOrderUseCase updateAdminOrder;
+  final GetPendingUsersUseCase getPendingUsers;
+  final SettleUserDebtUseCase settleUserDebt;
 
   // Menu UseCases
   final GetAdminMenuItemsUseCase getAdminMenuItems;
@@ -33,6 +35,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     required this.getDashboardAnalytics,
     required this.getAdminOrders,
     required this.updateAdminOrder,
+    required this.getPendingUsers,
+    required this.settleUserDebt,
     required this.getAdminMenuItems,
     required this.createMenuItem,
     required this.updateMenuItem,
@@ -46,6 +50,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<FetchAdminOrdersEvent>(_onFetchAdminOrders);
     on<UpdateAdminOrderEvent>(_onUpdateAdminOrder);
     on<PollDashboardDataEvent>(_onPollDashboardData);
+    on<FetchPendingUsersEvent>(_onFetchPendingUsers);
+    on<SettleUserDebtEvent>(_onSettleUserDebt);
 
     // Menu Handlers
     on<FetchAdminMenuEvent>(_onFetchAdminMenu);
@@ -170,6 +176,37 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     } catch (e) {
       emit(AdminError(_friendlyError(e)));
       if (_lastLoadedState != null) emit(_lastLoadedState!);
+    }
+  }
+
+  Future<void> _onFetchPendingUsers(
+    FetchPendingUsersEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    emit(PendingUsersLoading());
+    try {
+      final result = await getPendingUsers();
+      emit(PendingUsersLoaded(result));
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+    }
+  }
+
+  Future<void> _onSettleUserDebt(
+    SettleUserDebtEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await settleUserDebt(userId: event.userId, amount: event.amount);
+      // Reload the pending list so the settled/reduced user updates.
+      final result = await getPendingUsers();
+      emit(PendingUsersLoaded(result));
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      // Re-fetch so the list returns to a consistent state.
+      try {
+        emit(PendingUsersLoaded(await getPendingUsers()));
+      } catch (_) {}
     }
   }
 

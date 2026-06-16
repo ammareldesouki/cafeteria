@@ -340,35 +340,62 @@ class _OrderCard extends StatelessWidget {
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Text(
-          l10n.cancelOrderConfirm,
-          style: const TextStyle(color: Color(0xFF8B7355)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              l10n.no,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              l10n.cancelOrderConfirm,
               style: const TextStyle(color: Color(0xFF8B7355)),
             ),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              context.read<OrderBloc>().add(CancelOrderEvent(order.id));
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFFE57373),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+            const SizedBox(height: 24),
+            // Two equal-width buttons, side by side.
+            Row(
+              children: [
+                Expanded(
+                  child: SizedBox(
+                    height: 46,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(dialogContext),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color(0xFFD9C7B8)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        l10n.cancel,
+                        style: const TextStyle(color: Color(0xFF8B7355)),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: SizedBox(
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(dialogContext);
+                        context.read<OrderBloc>().add(CancelOrderEvent(order.id));
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFE57373),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: Text(
+                        l10n.confirm,
+                        style: const TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ),
-            child: Text(
-              l10n.cancelOrder,
-              style: const TextStyle(color: Colors.white),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

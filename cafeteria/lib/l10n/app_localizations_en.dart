@@ -646,6 +646,57 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cashOnDelivery => 'Cash on Delivery';
 
   @override
+  String get markAsPaid => 'Mark as Paid';
+
+  @override
+  String get pendingRevenueTitle => 'Pending Revenue';
+
+  @override
+  String get searchByUsername => 'Search by username';
+
+  @override
+  String get totalRevenue => 'Total Revenue';
+
+  @override
+  String usersCount(int count) {
+    return '$count user(s)';
+  }
+
+  @override
+  String unpaidOrdersCount(int count) {
+    return '$count unpaid order(s)';
+  }
+
+  @override
+  String get markPaid => 'Mark Paid';
+
+  @override
+  String get payAll => 'Pay All';
+
+  @override
+  String get partialAmount => 'Partial amount';
+
+  @override
+  String get enterAmount => 'Enter amount';
+
+  @override
+  String get noPendingPayments => 'No pending payments';
+
+  @override
+  String get settlePaymentTitle => 'Settle payment';
+
+  @override
+  String get amountExceedsDebt => 'Amount can\'t exceed what\'s owed';
+
+  @override
+  String get markPaidConfirmTitle => 'Confirm payment';
+
+  @override
+  String markPaidConfirmBody(String amount, String currency) {
+    return 'Mark this order as paid? The customer owes $amount $currency.';
+  }
+
+  @override
   String get creditCard => 'Credit Card';
 
   @override

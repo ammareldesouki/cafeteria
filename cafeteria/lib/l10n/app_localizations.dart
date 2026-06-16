@@ -1358,6 +1358,96 @@ abstract class AppLocalizations {
   /// **'Cash on Delivery'**
   String get cashOnDelivery;
 
+  /// No description provided for @markAsPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as Paid'**
+  String get markAsPaid;
+
+  /// No description provided for @pendingRevenueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Revenue'**
+  String get pendingRevenueTitle;
+
+  /// No description provided for @searchByUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by username'**
+  String get searchByUsername;
+
+  /// No description provided for @totalRevenue.
+  ///
+  /// In en, this message translates to:
+  /// **'Total Revenue'**
+  String get totalRevenue;
+
+  /// No description provided for @usersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} user(s)'**
+  String usersCount(int count);
+
+  /// No description provided for @unpaidOrdersCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unpaid order(s)'**
+  String unpaidOrdersCount(int count);
+
+  /// No description provided for @markPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark Paid'**
+  String get markPaid;
+
+  /// No description provided for @payAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay All'**
+  String get payAll;
+
+  /// No description provided for @partialAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Partial amount'**
+  String get partialAmount;
+
+  /// No description provided for @enterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter amount'**
+  String get enterAmount;
+
+  /// No description provided for @noPendingPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'No pending payments'**
+  String get noPendingPayments;
+
+  /// No description provided for @settlePaymentTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Settle payment'**
+  String get settlePaymentTitle;
+
+  /// No description provided for @amountExceedsDebt.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount can\'t exceed what\'s owed'**
+  String get amountExceedsDebt;
+
+  /// No description provided for @markPaidConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm payment'**
+  String get markPaidConfirmTitle;
+
+  /// No description provided for @markPaidConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark this order as paid? The customer owes {amount} {currency}.'**
+  String markPaidConfirmBody(String amount, String currency);
+
   /// No description provided for @creditCard.
   ///
   /// In en, this message translates to:

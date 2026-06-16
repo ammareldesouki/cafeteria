@@ -94,4 +94,14 @@ export const userWalletRepository = {
 			.toArray();
 		return result.length > 0 ? Math.abs(result[0].total) : 0;
 	},
+
+	/**
+	 * All users who currently owe money (negative balance), with the amount owed.
+	 */
+	async getUsersWithDebt(): Promise<{ userId: string; debt: number }[]> {
+		const rows = await walletCollection
+			.find({ balance: { $lt: 0 } })
+			.toArray();
+		return rows.map((w) => ({ userId: w.userId, debt: -w.balance }));
+	},
 };

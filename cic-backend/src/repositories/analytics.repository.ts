@@ -3,7 +3,9 @@
  * MongoDB aggregation queries for dashboard analytics
  */
 import mongoose from "mongoose";
-import { OrderStatus, PaymentStatus } from "@/types/order.types";
+import { OrderStatus } from "@/types/order.types";
+import { walletRepository } from "@/repositories/wallet.repository";
+import { userWalletRepository } from "@/repositories/userWallet.repository";
 
 const collection = mongoose.connection.collection("orders");
 
@@ -23,41 +25,21 @@ export const analyticsRepository = {
 	},
 
 	/**
-	 * Get realized revenue: total of orders that have actually been paid.
+	 * Realized revenue = the cafeteria wallet balance (cash actually received,
+	 * via per-order payments and manual debt settlements). Wallet-derived so it
+	 * stays consistent with partial payments.
 	 */
 	async getTotalRevenue(): Promise<number> {
-		const result = await collection
-			.aggregate([
-				{
-					$match: {
-						paymentStatus: PaymentStatus.PAID,
-						status: { $ne: OrderStatus.CANCELLED },
-					},
-				},
-				{ $group: { _id: null, total: { $sum: "$totalPrice" } } },
-			])
-			.toArray();
-
-		return result.length > 0 ? result[0].total : 0;
+		const wallet = await walletRepository.getWallet();
+		return wallet?.balance ?? 0;
 	},
 
 	/**
-	 * Get pending revenue: money owed by customers for orders that were
-	 * delivered but not paid (this is what makes user balances negative).
+	 * Pending revenue = total money still owed by customers, i.e. the sum of all
+	 * negative user-wallet balances. Equals the total shown on the Pending
+	 * Revenue screen and drops when a (partial) payment is recorded.
 	 */
 	async getPendingRevenue(): Promise<number> {
-		const result = await collection
-			.aggregate([
-				{
-					$match: {
-						status: OrderStatus.DELIVERED,
-						paymentStatus: PaymentStatus.UNPAID,
-					},
-				},
-				{ $group: { _id: null, total: { $sum: "$totalPrice" } } },
-			])
-			.toArray();
-
-		return result.length > 0 ? result[0].total : 0;
+		return userWalletRepository.sumNegativeBalances();
 	},
 };

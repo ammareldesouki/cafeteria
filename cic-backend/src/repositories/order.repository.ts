@@ -148,4 +148,53 @@ export const orderRepository = {
 	async findByStatus(status: OrderStatus): Promise<Order[]> {
 		return collection.find({ status }).sort({ createdAt: -1 }).toArray();
 	},
+
+	/**
+	 * Delivered-but-unpaid orders grouped by user: how many each user owes for.
+	 * Returns the latest known username per user.
+	 */
+	async deliveredUnpaidByUser(): Promise<
+		{ userId: string; username?: string; count: number }[]
+	> {
+		const rows = await collection
+			.aggregate([
+				{
+					$match: {
+						status: OrderStatus.DELIVERED,
+						paymentStatus: PaymentStatus.UNPAID,
+					},
+				},
+				{ $sort: { createdAt: -1 } },
+				{
+					$group: {
+						_id: "$userId",
+						username: { $first: "$username" },
+						count: { $sum: 1 },
+					},
+				},
+			])
+			.toArray();
+		return rows.map((r) => ({
+			userId: r._id as string,
+			username: r.username as string | undefined,
+			count: r.count as number,
+		}));
+	},
+
+	/**
+	 * Mark all of a user's delivered-but-unpaid orders as paid. Updates only the
+	 * payment status (the wallet is settled separately by the caller, so this
+	 * must NOT trigger wallet settlement to avoid double-crediting).
+	 */
+	async markUserDeliveredOrdersPaid(userId: string): Promise<number> {
+		const result = await collection.updateMany(
+			{
+				userId,
+				status: OrderStatus.DELIVERED,
+				paymentStatus: PaymentStatus.UNPAID,
+			},
+			{ $set: { paymentStatus: PaymentStatus.PAID, updatedAt: new Date() } },
+		);
+		return result.modifiedCount;
+	},
 };

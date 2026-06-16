@@ -2,9 +2,14 @@ import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../../order/domain/entities/order_entity.dart';
 import '../entities/analytics_entity.dart';
 import '../entities/paginated_orders_entity.dart';
+import '../entities/pending_user_entity.dart';
 
 abstract class AdminRepository {
   Future<DashboardAnalyticsEntity> getDashboardAnalytics();
+
+  Future<PendingUsersResult> getPendingUsers();
+
+  Future<void> settleUserDebt({required String userId, double? amount});
 
   Future<PaginatedOrdersEntity> getAdminOrders({
     required int page,

@@ -4,6 +4,7 @@
  */
 import type { Request, Response, NextFunction } from "express";
 import { orderService } from "@/services/order.service";
+import { userWalletService } from "@/services/userWallet.service";
 import { OrderStatus, PaymentStatus } from "@/types/order.types";
 import { handleServiceError } from "@/middlewares/serviceErrorHandler.middleware";
 
@@ -73,6 +74,47 @@ export const updateOrder = async (
 		const order = await orderService.updateOrderByAdmin(orderId, updates);
 
 		res.json(order);
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
+};
+
+/**
+ * List users with an outstanding (delivered-unpaid) balance.
+ * GET /admin/pending-users
+ */
+export const getPendingUsers = async (
+	_req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const result = await userWalletService.getPendingUsers();
+		res.json(result);
+	} catch (err) {
+		next(err);
+	}
+};
+
+/**
+ * Settle a user's debt — full (no body) or partial (`{ amount }`).
+ * POST /admin/users/:userId/settle
+ */
+export const settleUserDebt = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const userId = req.params.userId as string;
+		const { amount } = req.body as { amount?: number };
+
+		const result = await userWalletService.settleUserDebt(userId, amount);
+		res.json(result);
 	} catch (err) {
 		try {
 			handleServiceError(err, res);

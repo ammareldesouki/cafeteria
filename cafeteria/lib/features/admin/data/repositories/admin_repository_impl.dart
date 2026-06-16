@@ -1,6 +1,7 @@
 import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../domain/entities/analytics_entity.dart';
 import '../../domain/entities/paginated_orders_entity.dart';
+import '../../domain/entities/pending_user_entity.dart';
 import '../../domain/repositories/admin_repository.dart';
 import '../../../order/domain/entities/order_entity.dart';
 import '../data_sources/admin_remote_datasource.dart';
@@ -13,6 +14,14 @@ class AdminRepositoryImpl implements AdminRepository {
   @override
   Future<DashboardAnalyticsEntity> getDashboardAnalytics() =>
       remoteDataSource.getDashboardAnalytics();
+
+  @override
+  Future<PendingUsersResult> getPendingUsers() =>
+      remoteDataSource.getPendingUsers();
+
+  @override
+  Future<void> settleUserDebt({required String userId, double? amount}) =>
+      remoteDataSource.settleUserDebt(userId: userId, amount: amount);
 
   @override
   Future<PaginatedOrdersEntity> getAdminOrders({

@@ -1,6 +1,7 @@
 import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../domain/entities/analytics_entity.dart';
 import '../../domain/entities/paginated_orders_entity.dart';
+import '../../domain/entities/pending_user_entity.dart';
 
 abstract class AdminState {}
 
@@ -54,4 +55,12 @@ class AdminError extends AdminState {
   final String message;
 
   AdminError(this.message);
+}
+
+class PendingUsersLoading extends AdminState {}
+
+class PendingUsersLoaded extends AdminState {
+  final PendingUsersResult result;
+
+  PendingUsersLoaded(this.result);
 }

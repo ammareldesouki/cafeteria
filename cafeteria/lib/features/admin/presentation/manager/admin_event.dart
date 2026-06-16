@@ -129,3 +129,14 @@ class RemoveVariantEvent extends AdminEvent {
 
   RemoveVariantEvent({required this.itemId, required this.variantName});
 }
+
+class FetchPendingUsersEvent extends AdminEvent {}
+
+class SettleUserDebtEvent extends AdminEvent {
+  final String userId;
+
+  /// null = settle the full debt; otherwise a partial amount.
+  final double? amount;
+
+  SettleUserDebtEvent({required this.userId, this.amount});
+}

@@ -32,14 +32,14 @@ class LanguageThemeToggles extends StatelessWidget {
           ),
         ),
         
-        // Theme Toggle
-        IconButton(
-          onPressed: () => context.read<ThemeBloc>().add(ToggleThemeEvent()),
-          icon: Icon(
-            isDark ? Icons.light_mode : Icons.dark_mode,
-            color: isDark ? Colors.amber : Colors.blueGrey,
-          ),
-        ),
+        // // Theme Toggle
+        // IconButton(
+        //   onPressed: () => context.read<ThemeBloc>().add(ToggleThemeEvent()),
+        //   icon: Icon(
+        //     isDark ? Icons.light_mode : Icons.dark_mode,
+        //     color: isDark ? Colors.amber : Colors.blueGrey,
+        //   ),
+        // ),
       ],
     );
   }
