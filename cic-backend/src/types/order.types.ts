@@ -21,6 +21,8 @@ export interface OrderItem {
 	menuItemName?: string;
 	variantName?: string;
 	note?: string;
+	/** Selected sugar amount (spoons), copied from the cart item. */
+	sugar?: number;
 	quantity: number;
 	unitPrice: number;
 }

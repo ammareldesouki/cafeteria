@@ -47,6 +47,7 @@ class CreateMenuItemEvent extends AdminEvent {
   final bool hasVariants;
   final int stock;
   final List<VariantEntity>? variants;
+  final bool hasSugar;
 
   CreateMenuItemEvent({
     required this.name,
@@ -57,6 +58,7 @@ class CreateMenuItemEvent extends AdminEvent {
     required this.hasVariants,
     required this.stock,
     this.variants,
+    this.hasSugar = false,
   });
 }
 
@@ -68,6 +70,8 @@ class UpdateMenuItemEvent extends AdminEvent {
   final String? description;
   final String? image;
   final bool? hasVariants;
+  final List<VariantEntity>? variants;
+  final bool? hasSugar;
 
   UpdateMenuItemEvent({
     required this.itemId,
@@ -77,6 +81,8 @@ class UpdateMenuItemEvent extends AdminEvent {
     this.description,
     this.image,
     this.hasVariants,
+    this.variants,
+    this.hasSugar,
   });
 }
 

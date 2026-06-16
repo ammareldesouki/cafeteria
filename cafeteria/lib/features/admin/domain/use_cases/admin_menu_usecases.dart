@@ -23,6 +23,7 @@ class CreateMenuItemUseCase {
     required bool hasVariants,
     required int stock,
     List<VariantEntity>? variants,
+    bool? hasSugar,
   }) => _repository.createMenuItem(
     name: name,
     price: price,
@@ -32,6 +33,7 @@ class CreateMenuItemUseCase {
     hasVariants: hasVariants,
     stock: stock,
     variants: variants,
+    hasSugar: hasSugar,
   );
 }
 
@@ -48,6 +50,8 @@ class UpdateMenuItemUseCase {
     String? description,
     String? image,
     bool? hasVariants,
+    List<VariantEntity>? variants,
+    bool? hasSugar,
   }) => _repository.updateMenuItem(
     itemId: itemId,
     name: name,
@@ -56,6 +60,8 @@ class UpdateMenuItemUseCase {
     description: description,
     image: image,
     hasVariants: hasVariants,
+    variants: variants,
+    hasSugar: hasSugar,
   );
 }
 

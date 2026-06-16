@@ -33,6 +33,7 @@ abstract class AdminRemoteDataSource {
     required bool hasVariants,
     required int stock,
     List<Map<String, dynamic>>? variants,
+    bool? hasSugar,
   });
 
   Future<MenuItemModel> updateMenuItem({
@@ -43,6 +44,8 @@ abstract class AdminRemoteDataSource {
     String? description,
     String? image,
     bool? hasVariants,
+    List<Map<String, dynamic>>? variants,
+    bool? hasSugar,
   });
 
   Future<void> deleteMenuItem(String itemId);
@@ -144,6 +147,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     required bool hasVariants,
     required int stock,
     List<Map<String, dynamic>>? variants,
+    bool? hasSugar,
   }) async {
     final body = {
       'name': name,
@@ -155,6 +159,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
       'stock': stock,
     };
     if (variants != null) body['variants'] = variants;
+    if (hasSugar != null) body['hasSugar'] = hasSugar;
 
     final response = await _dioHandler.dio.post('/admin/menu', data: body);
     return MenuItemModel.fromMap(response.data as Map<String, dynamic>);
@@ -169,6 +174,8 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     String? description,
     String? image,
     bool? hasVariants,
+    List<Map<String, dynamic>>? variants,
+    bool? hasSugar,
   }) async {
     final body = <String, dynamic>{};
     if (name != null) body['name'] = name;
@@ -177,6 +184,8 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     if (description != null) body['description'] = description;
     if (image != null) body['image'] = image;
     if (hasVariants != null) body['hasVariants'] = hasVariants;
+    if (variants != null) body['variants'] = variants;
+    if (hasSugar != null) body['hasSugar'] = hasSugar;
 
     final response = await _dioHandler.dio.put(
         '/admin/menu/$itemId', data: body);

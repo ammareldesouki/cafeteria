@@ -106,7 +106,21 @@ export const orderService = {
 			throw new EmptyCartError();
 		}
 
-		const stockItems = cart.items.map((item) => ({
+		// Drop cart lines whose menu item no longer exists (deleted items),
+		// so a stale cart entry can't block checkout with a confusing
+		// "insufficient stock" error.
+		const { menuRepository } = await import("@/repositories/menu.repository");
+		const validCartItems = [];
+		for (const item of cart.items) {
+			const exists = await menuRepository.findById(item.menuItemId.toString());
+			if (exists) validCartItems.push(item);
+		}
+
+		if (validCartItems.length === 0) {
+			throw new EmptyCartError();
+		}
+
+		const stockItems = validCartItems.map((item) => ({
 			menuItemId: item.menuItemId.toString(),
 			variantName: item.variantName,
 			quantity: item.quantity,
@@ -118,10 +132,9 @@ export const orderService = {
 		const orderItems: OrderItem[] = [];
 		for (let i = 0; i < reservations.length; i++) {
 			const res = reservations[i];
-			const cartItem = cart.items[i];
+			const cartItem = validCartItems[i];
 
 			// Look up item name from menu
-			const { menuRepository } = await import("@/repositories/menu.repository");
 			const menuItem = await menuRepository.findById(
 				cartItem.menuItemId.toString(),
 			);
@@ -134,6 +147,7 @@ export const orderService = {
 				menuItemName: menuItem?.name,
 				...(res.variantName && { variantName: res.variantName }),
 				...(cartItem?.note && { note: cartItem.note }),
+				...(typeof cartItem?.sugar === "number" && { sugar: cartItem.sugar }),
 				quantity: res.quantity,
 				unitPrice: res.unitPrice,
 			});

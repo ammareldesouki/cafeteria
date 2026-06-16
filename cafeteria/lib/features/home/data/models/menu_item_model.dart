@@ -12,6 +12,7 @@ class MenuItemModel extends MenuItemEntity {
     required super.inStock,
     super.hasVariants,
     super.variants,
+    super.hasSugar,
     super.stock,
     super.trackStock,
   });
@@ -47,6 +48,7 @@ class MenuItemModel extends MenuItemEntity {
       inStock: map['inStock'] ?? map['in_stock'] ?? false,
       hasVariants: map['hasVariants'] ?? false,
       variants: variants,
+      hasSugar: map['hasSugar'] ?? false,
       stock: (map['stock'] as num?)?.toInt(),
       trackStock: map['trackStock'] ?? true,
     );

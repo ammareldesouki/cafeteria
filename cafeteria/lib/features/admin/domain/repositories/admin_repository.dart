@@ -33,6 +33,7 @@ abstract class AdminRepository {
     required bool hasVariants,
     required int stock,
     List<VariantEntity>? variants,
+    bool? hasSugar,
   });
 
   Future<MenuItemEntity> updateMenuItem({
@@ -43,6 +44,8 @@ abstract class AdminRepository {
     String? description,
     String? image,
     bool? hasVariants,
+    List<VariantEntity>? variants,
+    bool? hasSugar,
   });
 
   Future<void> deleteMenuItem(String itemId);

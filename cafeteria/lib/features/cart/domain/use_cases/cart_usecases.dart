@@ -17,12 +17,14 @@ class AddCartItemUseCase {
     required int quantity,
     String? variantName,
     String? note,
+    int? sugar,
   }) =>
       _repository.addCartItem(
         menuItemId: menuItemId,
         quantity: quantity,
         variantName: variantName,
         note: note,
+        sugar: sugar,
       );
 }
 

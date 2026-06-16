@@ -6,6 +6,7 @@ class OrderItemModel extends OrderItemEntity {
     super.menuItemName,
     super.variantName,
     super.note,
+    super.sugar,
     required super.quantity,
     required super.unitPrice,
   });
@@ -15,6 +16,7 @@ class OrderItemModel extends OrderItemEntity {
         menuItemName: json['menuItemName'] as String?,
         variantName: json['variantName'] as String?,
         note: json['note'] as String?,
+        sugar: (json['sugar'] as num?)?.toInt(),
         quantity: (json['quantity'] as num).toInt(),
         unitPrice: (json['unitPrice'] as num).toDouble(),
       );

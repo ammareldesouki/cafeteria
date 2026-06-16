@@ -8,6 +8,7 @@ abstract class CartRepository {
     required int quantity,
     String? variantName,
     String? note,
+    int? sugar,
   });
 
   Future<CartItemEntity> updateCartItem({

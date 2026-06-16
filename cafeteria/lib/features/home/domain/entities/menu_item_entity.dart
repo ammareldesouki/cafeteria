@@ -22,6 +22,9 @@ class MenuItemEntity extends Equatable {
   final bool hasVariants;
   final List<VariantEntity>? variants;
 
+  /// When true, the customer can pick a sugar amount when ordering.
+  final bool hasSugar;
+
   /// Available stock count. null means unlimited (hot drinks).
   final int? stock;
 
@@ -40,6 +43,7 @@ class MenuItemEntity extends Equatable {
     required this.inStock,
     this.hasVariants = false,
     this.variants,
+    this.hasSugar = false,
     this.stock,
     this.trackStock = true,
   });

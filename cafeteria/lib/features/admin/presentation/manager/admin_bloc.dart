@@ -250,6 +250,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         hasVariants: event.hasVariants,
         stock: event.stock,
         variants: event.variants,
+        hasSugar: event.hasSugar,
       );
       add(FetchAdminMenuEvent());
     } catch (e) {
@@ -271,6 +272,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         description: event.description,
         image: event.image,
         hasVariants: event.hasVariants,
+        variants: event.variants,
+        hasSugar: event.hasSugar,
       );
       add(FetchAdminMenuEvent());
     } catch (e) {

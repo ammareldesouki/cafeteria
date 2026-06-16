@@ -12,6 +12,8 @@ export interface CartItem {
 	menuItemId: ObjectId;
 	variantName?: string;
 	note?: string;
+	/** Selected sugar amount (spoons) for items that offer it. */
+	sugar?: number;
 	quantity: number;
 }
 
@@ -29,6 +31,19 @@ export const cartRepository = {
 	 */
 	async findByUserId(userId: string): Promise<Cart | null> {
 		return collection.findOne({ userId });
+	},
+
+	/**
+	 * Remove a menu item from every cart (called when the item is deleted).
+	 */
+	async removeMenuItemFromAllCarts(menuItemId: ObjectId): Promise<void> {
+		await collection.updateMany(
+			{ "items.menuItemId": menuItemId },
+			{
+				$pull: { items: { menuItemId } } as any,
+				$set: { updatedAt: new Date() },
+			},
+		);
 	},
 
 	/**
@@ -54,6 +69,7 @@ export const cartRepository = {
 		variantName: string | undefined,
 		quantity: number,
 		note?: string,
+		sugar?: number,
 	): Promise<Cart | null> {
 		const existingItem = await this.getItem(userId, menuItemId, variantName, note);
 
@@ -100,6 +116,7 @@ export const cartRepository = {
 			menuItemId,
 			...(normalizedVariantName && { variantName: normalizedVariantName }),
 			...(note && { note }),
+			...(typeof sugar === "number" && { sugar }),
 			quantity,
 		};
 

@@ -90,6 +90,7 @@ class CartBloc extends Bloc<CartEvent, CartState> {
         quantity: event.quantity,
         variantName: event.variantName,
         note: event.note,
+        sugar: event.sugar,
       );
 
       // Optimistically insert the new item, then re-fetch for accuracy

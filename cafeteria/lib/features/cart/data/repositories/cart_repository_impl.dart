@@ -16,12 +16,14 @@ class CartRepositoryImpl implements CartRepository {
     required int quantity,
     String? variantName,
     String? note,
+    int? sugar,
   }) =>
       remoteDataSource.addCartItem(
         menuItemId: menuItemId,
         quantity: quantity,
         variantName: variantName,
         note: note,
+        sugar: sugar,
       );
 
   @override

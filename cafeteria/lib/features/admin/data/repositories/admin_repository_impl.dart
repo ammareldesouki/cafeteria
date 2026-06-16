@@ -56,6 +56,7 @@ class AdminRepositoryImpl implements AdminRepository {
     required bool hasVariants,
     required int stock,
     List<VariantEntity>? variants,
+    bool? hasSugar,
   }) => remoteDataSource.createMenuItem(
     name: name,
     price: price,
@@ -67,6 +68,7 @@ class AdminRepositoryImpl implements AdminRepository {
     variants: variants
         ?.map((v) => {'name': v.name, 'stock': v.stock ?? 0})
         .toList(),
+    hasSugar: hasSugar,
   );
 
   @override
@@ -78,6 +80,8 @@ class AdminRepositoryImpl implements AdminRepository {
     String? description,
     String? image,
     bool? hasVariants,
+    List<VariantEntity>? variants,
+    bool? hasSugar,
   }) => remoteDataSource.updateMenuItem(
     itemId: itemId,
     name: name,
@@ -86,6 +90,10 @@ class AdminRepositoryImpl implements AdminRepository {
     description: description,
     image: image,
     hasVariants: hasVariants,
+    variants: variants
+        ?.map((v) => {'name': v.name, 'stock': v.stock ?? 0})
+        .toList(),
+    hasSugar: hasSugar,
   );
 
   @override

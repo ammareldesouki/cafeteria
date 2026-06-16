@@ -23,6 +23,7 @@ import '../../features/order/presentation/manager/order_bloc.dart';
 import '../../features/order/presentation/pages/checkout_page.dart';
 import '../../features/splash/slash.dart';
 import '../../features/admin/presentation/manager/admin_bloc.dart';
+import '../../features/admin/presentation/manager/admin_event.dart';
 import '../../features/admin/presentation/pages/cafeteria_panel_page.dart';
 
 class AppRouter {
@@ -94,8 +95,8 @@ class AppRouter {
 
       case RouteNames.cafeteriaPanel:
         return _buildRoute(
-          BlocProvider.value(
-            value: sl<AdminBloc>(),
+          BlocProvider(
+            create: (_) => sl<AdminBloc>()..add(LoadDashboardDataEvent()),
             child: const CafeteriaPanelPage(),
           ),
           settings,

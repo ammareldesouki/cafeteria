@@ -199,6 +199,14 @@ class _OrderCard extends StatelessWidget {
                               color: Color(0xFF8B7355),
                             ),
                           ),
+                        if (item.sugar != null)
+                          Text(
+                            '${l10n.sugar}: ${l10n.sugarSpoons(item.sugar!)}',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF8B7355),
+                            ),
+                          ),
                         if (item.note != null && item.note!.isNotEmpty)
                           Text(
                             '${l10n.specialInstructions}: ${item.note}',

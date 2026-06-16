@@ -168,6 +168,16 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                   ),
                                                 ),
                                               ],
+                                              if (item.sugar != null) ...[
+                                                const SizedBox(height: 2),
+                                                Text(
+                                                  '${AppLocalizations.of(context)!.sugar}: ${AppLocalizations.of(context)!.sugarSpoons(item.sugar!)}',
+                                                  style: const TextStyle(
+                                                    fontSize: 12,
+                                                    color: Color(0xFF8B7355),
+                                                  ),
+                                                ),
+                                              ],
                                               if (item.note != null) ...[
                                                 const SizedBox(height: 2),
                                                 Text(

@@ -69,6 +69,14 @@
   "category": "Category",
   "addVariant": "Add Variant",
   "variantName": "Variant Name",
+  "sugarOption": "Offers sugar",
+  "sugar": "Sugar",
+  "sugarSpoons": "{count} spoon(s)",
+  "@sugarSpoons": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "variantSaved": "Variant saved",
   "variantDeleted": "Variant deleted",
   "allItems": "All Items",

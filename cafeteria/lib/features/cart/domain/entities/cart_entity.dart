@@ -5,6 +5,7 @@ class CartItemEntity {
   final String image;
   final String? variantName;
   final String? note;
+  final int? sugar;
   final int quantity;
   final double unitPrice;
   final double subtotal;
@@ -22,6 +23,7 @@ class CartItemEntity {
     required this.image,
     this.variantName,
     this.note,
+    this.sugar,
     required this.quantity,
     required this.unitPrice,
     required this.subtotal,

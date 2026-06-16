@@ -465,6 +465,7 @@ class _CustomizeSheet extends StatefulWidget {
 class _CustomizeSheetState extends State<_CustomizeSheet> {
   int _quantity = 1;
   String? _selectedVariant;
+  int _sugar = 0;
   final TextEditingController _noteController = TextEditingController();
 
   MenuItemEntity get item => widget.item;
@@ -531,6 +532,7 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
         note: _noteController.text.trim().isNotEmpty
             ? _noteController.text.trim()
             : null,
+        sugar: item.hasSugar ? _sugar : null,
       ),
     );
   }
@@ -861,6 +863,54 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                       ),
                     );
                   }).toList(),
+                ),
+              ],
+
+              // Sugar (only when the item offers it)
+              if (item.hasSugar) ...[
+                const SizedBox(height: 22),
+                Row(
+                  children: [
+                    const Icon(Icons.water_drop_outlined,
+                        size: 18, color: Color(0xFF8B7355)),
+                    const SizedBox(width: 6),
+                    Text(
+                      AppLocalizations.of(context)!.sugar,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Color(0xFF3B1A08),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    _QtyButton(
+                      icon: Icons.remove,
+                      onTap: _sugar > 0
+                          ? () => setState(() => _sugar--)
+                          : null,
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        AppLocalizations.of(context)!.sugarSpoons(_sugar),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3B1A08),
+                        ),
+                      ),
+                    ),
+                    _QtyButton(
+                      icon: Icons.add,
+                      onTap: _sugar < 10
+                          ? () => setState(() => _sugar++)
+                          : null,
+                    ),
+                  ],
                 ),
               ],
 

@@ -28,6 +28,8 @@ export interface MenuItem {
 	trackStock: boolean;
 	hasVariants: boolean;
 	variants?: MenuItemVariant[];
+	/** When true, customers can pick a sugar amount when ordering. */
+	hasSugar?: boolean;
 	category?: string;
 	image?: string;
 	in_stock?: boolean;
@@ -43,6 +45,7 @@ export type CreateMenuItemInput = {
 	trackStock?: boolean;
 	hasVariants: boolean;
 	variants?: MenuItemVariant[];
+	hasSugar?: boolean;
 	category?: string;
 	image?: string;
 };
@@ -77,6 +80,7 @@ export const menuRepository = {
 			stock: data.stock ?? 0,
 			trackStock: data.trackStock ?? true,
 			variants: data.hasVariants ? (data.variants ?? []) : undefined,
+			hasSugar: data.hasSugar ?? false,
 			in_stock: true,
 			createdAt: now,
 			updatedAt: now,

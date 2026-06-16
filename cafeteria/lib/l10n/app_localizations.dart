@@ -506,6 +506,24 @@ abstract class AppLocalizations {
   /// **'Variant Name'**
   String get variantName;
 
+  /// No description provided for @sugarOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Offers sugar'**
+  String get sugarOption;
+
+  /// No description provided for @sugar.
+  ///
+  /// In en, this message translates to:
+  /// **'Sugar'**
+  String get sugar;
+
+  /// No description provided for @sugarSpoons.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} spoon(s)'**
+  String sugarSpoons(int count);
+
   /// No description provided for @variantSaved.
   ///
   /// In en, this message translates to:

@@ -3,6 +3,7 @@ class OrderItemEntity {
   final String? menuItemName;
   final String? variantName;
   final String? note;
+  final int? sugar;
   final int quantity;
   final double unitPrice;
 
@@ -11,6 +12,7 @@ class OrderItemEntity {
     this.menuItemName,
     this.variantName,
     this.note,
+    this.sugar,
     required this.quantity,
     required this.unitPrice,
   });

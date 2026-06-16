@@ -129,6 +129,16 @@ class _CartItemCardState extends State<CartItemCard> {
                               ),
                             ),
                           ],
+                          if (widget.item.sugar != null) ...[
+                            const SizedBox(height: 2),
+                            Text(
+                              '${AppLocalizations.of(context)!.sugar}: ${AppLocalizations.of(context)!.sugarSpoons(widget.item.sugar!)}',
+                              style: const TextStyle(
+                                fontSize: 13,
+                                color: Color(0xFF8B7355),
+                              ),
+                            ),
+                          ],
                           const SizedBox(height: 4),
                           Text(
                             '${AppLocalizations.of(context)!.pound}${widget.item

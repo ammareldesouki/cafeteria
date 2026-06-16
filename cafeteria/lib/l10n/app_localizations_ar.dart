@@ -215,6 +215,17 @@ class AppLocalizationsAr extends AppLocalizations {
   String get variantName => 'اسم النوع';
 
   @override
+  String get sugarOption => 'يوفر سكر';
+
+  @override
+  String get sugar => 'السكر';
+
+  @override
+  String sugarSpoons(int count) {
+    return '$count ملعقة';
+  }
+
+  @override
   String get variantSaved => 'تم حفظ النوع';
 
   @override

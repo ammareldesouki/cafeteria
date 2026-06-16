@@ -73,6 +73,14 @@
   "category": "الفئة",
   "addVariant": "إضافة نوع",
   "variantName": "اسم النوع",
+  "sugarOption": "يوفر سكر",
+  "sugar": "السكر",
+  "sugarSpoons": "{count} ملعقة",
+  "@sugarSpoons": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "variantSaved": "تم حفظ النوع",
   "variantDeleted": "تم حذف النوع",
   "allItems": "جميع العناصر",

@@ -53,6 +53,10 @@ export const menuService = {
 	async deleteItem(itemId: string) {
 		const deleted = await menuRepository.delete(itemId);
 		if (!deleted) throw new Error("Menu item not found");
+		// Remove the now-deleted item from every cart so it can't block checkout.
+		const { cartRepository } = await import("@/repositories/cart.repository");
+		const { ObjectId } = await import("mongodb");
+		await cartRepository.removeMenuItemFromAllCarts(new ObjectId(itemId));
 		return { success: true };
 	},
 

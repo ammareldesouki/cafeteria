@@ -7,12 +7,14 @@ class AddCartItemEvent extends CartEvent {
   final int quantity;
   final String? variantName;
   final String? note;
+  final int? sugar;
 
   AddCartItemEvent({
     required this.menuItemId,
     required this.quantity,
     this.variantName,
     this.note,
+    this.sugar,
   });
 }
 

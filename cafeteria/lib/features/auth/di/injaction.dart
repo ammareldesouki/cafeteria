@@ -196,8 +196,9 @@ Future<void> setupLocator() async {
   sl.registerLazySingleton(() => AddVariantUseCase(sl()));
   sl.registerLazySingleton(() => RemoveVariantUseCase(sl()));
 
-  /// ── Admin Bloc ──────────────────────────
-  sl.registerLazySingleton(() =>
+  /// ── Admin Bloc (factory: fresh instance per screen so a disposed
+  ///    BlocProvider closing it never leaves a stale, closed singleton) ──
+  sl.registerFactory(() =>
       AdminBloc(
         getDashboardAnalytics: sl(),
         getAdminOrders: sl(),

@@ -215,6 +215,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get variantName => 'Variant Name';
 
   @override
+  String get sugarOption => 'Offers sugar';
+
+  @override
+  String get sugar => 'Sugar';
+
+  @override
+  String sugarSpoons(int count) {
+    return '$count spoon(s)';
+  }
+
+  @override
   String get variantSaved => 'Variant saved';
 
   @override

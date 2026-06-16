@@ -10,6 +10,7 @@ export const validateAddCartItem = (
 	next: NextFunction,
 ) => {
 	let { menuItemId, variantName, quantity, note } = req.body || {};
+	const { sugar } = req.body || {};
 
 	if (variantName === null) {
 		variantName = undefined;
@@ -59,6 +60,16 @@ export const validateAddCartItem = (
 		return res.status(400).json({
 			error: "INVALID_QUANTITY",
 			message: "quantity must be a positive integer",
+		});
+	}
+
+	if (
+		sugar !== undefined &&
+		(typeof sugar !== "number" || !Number.isInteger(sugar) || sugar < 0)
+	) {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "sugar must be a non-negative integer if provided",
 		});
 	}
 

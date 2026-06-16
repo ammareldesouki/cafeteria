@@ -16,6 +16,7 @@ export interface CartItemResponse {
 	image?: string;
 	variantName?: string;
 	note?: string;
+	sugar?: number;
 	quantity: number;
 	unitPrice: number;
 	subtotal: number;
@@ -58,6 +59,7 @@ export const cartService = {
 		quantity: number,
 		variantName?: string,
 		note?: string,
+		sugar?: number,
 	): Promise<CartItemResponse> {
 		if (!Number.isInteger(quantity) || quantity <= 0) {
 			throw new InvalidQuantityError(quantity, "must be a positive integer");
@@ -119,6 +121,7 @@ export const cartService = {
 			variantName,
 			quantity,
 			note,
+			sugar,
 		);
 
 		const cartItem = await cartRepository.getItem(
@@ -145,6 +148,7 @@ export const cartService = {
 			image: menuItem.image,
 			...(variantName && { variantName }),
 			...(note && { note }),
+			...(typeof cartItem.sugar === "number" && { sugar: cartItem.sugar }),
 			quantity: cartItem.quantity,
 			unitPrice: menuItem.price,
 			subtotal: menuItem.price * cartItem.quantity,
@@ -267,6 +271,7 @@ export const cartService = {
 			menuItemId: ObjectId;
 			variantName?: string;
 			note?: string;
+			sugar?: number;
 			quantity: number;
 		}>;
 	}): Promise<CartResponse> {
@@ -300,6 +305,7 @@ export const cartService = {
 				image: menuItem.image,
 				...(item.variantName && { variantName: item.variantName }),
 				...(item.note && { note: item.note }),
+				...(typeof item.sugar === "number" && { sugar: item.sugar }),
 				quantity: item.quantity,
 				unitPrice,
 				subtotal,

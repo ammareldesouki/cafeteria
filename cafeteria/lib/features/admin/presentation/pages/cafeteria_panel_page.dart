@@ -15,20 +15,6 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../core/route/route_name.dart';
 import '../../../auth/di/injaction.dart';
 
-/// Holds the editable controllers for one existing variant in the edit sheet,
-/// tracking its original name so a rename can be detected on save.
-class _EditVariantRow {
-  String originalName;
-  final TextEditingController nameController;
-  final TextEditingController stockController;
-
-  _EditVariantRow({
-    required this.originalName,
-    required this.nameController,
-    required this.stockController,
-  });
-}
-
 class CafeteriaPanelPage extends StatefulWidget {
   const CafeteriaPanelPage({super.key});
 
@@ -721,32 +707,22 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
     final stockController =
     TextEditingController(text: item?.stock?.toString() ?? "0");
     bool hasVariants = item?.hasVariants ?? false;
+    bool hasSugar = item?.hasSugar ?? false;
     final adminBloc = context.read<AdminBloc>();
     final itemId = item == null ? null : (item.mongoId ?? item.id);
 
-    // Create-mode variant rows (collected in-memory, sent with CreateMenuItem).
+    // Variant rows are held in-memory for BOTH create and edit, and saved
+    // together with the item on submit (create -> CreateMenuItem with variants,
+    // edit -> UpdateMenuItem with the full variants array, which the backend
+    // replaces). Seed existing variants when editing.
     final variantNameControllers = <TextEditingController>[];
     final variantStockControllers = <TextEditingController>[];
-
-    // Edit-mode variants (CRUD'd live against the server). Each row tracks its
-    // original name so we know whether a rename happened on save.
-    final editVariants = <_EditVariantRow>[];
-    if (item != null && item.variants != null) {
-      for (final v in item.variants!) {
-        editVariants.add(_EditVariantRow(
-          originalName: v.name,
-          nameController: TextEditingController(text: v.name),
-          stockController:
-              TextEditingController(text: (v.stock ?? 0).toString()),
-        ));
+    if (item?.variants != null) {
+      for (final v in item!.variants!) {
+        variantNameControllers.add(TextEditingController(text: v.name));
+        variantStockControllers
+            .add(TextEditingController(text: (v.stock ?? 0).toString()));
       }
-    }
-    final newVariantNameController = TextEditingController();
-    final newVariantStockController = TextEditingController(text: "0");
-
-    if (item == null && hasVariants) {
-      variantNameControllers.add(TextEditingController());
-      variantStockControllers.add(TextEditingController(text: "0"));
     }
 
     final categoryItems = [
@@ -773,54 +749,6 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
             void addVariantRow() {
               variantNameControllers.add(TextEditingController());
               variantStockControllers.add(TextEditingController(text: "0"));
-            }
-
-            // ── Live variant CRUD (edit mode) ───────────────────────────────
-            void saveExistingVariant(_EditVariantRow row) {
-              final newName = row.nameController.text.trim();
-              if (newName.isEmpty) return;
-              final stock = int.tryParse(row.stockController.text) ?? 0;
-              if (newName != row.originalName) {
-                // Rename = remove old + add new (no rename endpoint).
-                adminBloc.add(RemoveVariantEvent(
-                    itemId: itemId!, variantName: row.originalName));
-                adminBloc.add(
-                    AddVariantEvent(itemId: itemId, name: newName, stock: stock));
-                setState(() => row.originalName = newName);
-              } else {
-                adminBloc.add(SetVariantStockEvent(
-                    itemId: itemId!, variantName: row.originalName, stock: stock));
-              }
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.variantSaved)),
-              );
-            }
-
-            void deleteExistingVariant(_EditVariantRow row) {
-              adminBloc.add(RemoveVariantEvent(
-                  itemId: itemId!, variantName: row.originalName));
-              setState(() => editVariants.remove(row));
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(l10n.variantDeleted)),
-              );
-            }
-
-            void addNewVariant() {
-              final name = newVariantNameController.text.trim();
-              if (name.isEmpty) return;
-              final stock = int.tryParse(newVariantStockController.text) ?? 0;
-              adminBloc.add(
-                  AddVariantEvent(itemId: itemId!, name: name, stock: stock));
-              setState(() {
-                editVariants.add(_EditVariantRow(
-                  originalName: name,
-                  nameController: TextEditingController(text: name),
-                  stockController:
-                      TextEditingController(text: stock.toString()),
-                ));
-                newVariantNameController.clear();
-                newVariantStockController.text = "0";
-              });
             }
 
             return Padding(
@@ -869,96 +797,43 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                       value: hasVariants,
                       onChanged: (val) => setState(() {
                         hasVariants = val;
-                        if (item == null && hasVariants) ensureVariantRow();
-                        if (item == null && !hasVariants) {
+                        if (hasVariants) {
+                          ensureVariantRow();
+                        } else {
                           variantNameControllers.clear();
                           variantStockControllers.clear();
                         }
                       }),
                     ),
-                    // ── CREATE mode: in-memory variant rows / stock field ──
-                    if (item == null) ...[
-                      const SizedBox(height: 12),
-                      if (!hasVariants)
-                        TextFormField(
-                          controller: stockController,
-                          keyboardType: TextInputType.number,
-                          decoration: InputDecoration(
-                            labelText: l10n.inStock,
-                            border: const OutlineInputBorder(),
-                          ),
-                        )
-                      else ...[
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(l10n.varaity,
-                              style:
-                              Theme.of(stfContext).textTheme.titleMedium),
-                        ),
-                        const SizedBox(height: 10),
-                        ...List.generate(variantNameControllers.length, (i) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 12),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 3,
-                                  child: TextFormField(
-                                    controller: variantNameControllers[i],
-                                    decoration: InputDecoration(
-                                      labelText: l10n.variantName,
-                                      border: const OutlineInputBorder(),
-                                      suffixIcon: i == 0
-                                          ? null
-                                          : IconButton(
-                                        tooltip: l10n.remove,
-                                        onPressed: () => setState(() {
-                                          variantNameControllers
-                                              .removeAt(i);
-                                          variantStockControllers
-                                              .removeAt(i);
-                                        }),
-                                        icon: const Icon(Icons.close),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  flex: 2,
-                                  child: TextFormField(
-                                    controller: variantStockControllers[i],
-                                    keyboardType: TextInputType.number,
-                                    decoration: InputDecoration(
-                                      labelText: l10n.inStock,
-                                      border: const OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          );
-                        }),
-                        SizedBox(
-                          width: double.infinity,
-                          child: OutlinedButton.icon(
-                            onPressed: () => setState(addVariantRow),
-                            icon: const Icon(Icons.add),
-                            label: Text(l10n.addVariant),
-                          ),
-                        ),
-                      ],
-                    ],
-                    // ── EDIT mode: live variant CRUD ───────────────────────
-                    if (item != null && hasVariants) ...[
-                      const SizedBox(height: 12),
+                    SwitchListTile(
+                      title: Text(l10n.sugarOption),
+                      secondary: const Icon(Icons.water_drop_outlined),
+                      value: hasSugar,
+                      onChanged: (val) => setState(() => hasSugar = val),
+                    ),
+                    const SizedBox(height: 12),
+                    // Simple stock field (create only — editing stock for an
+                    // existing simple item is done in the stock/inventory tab),
+                    // or the variant editor (create + edit).
+                    if (!hasVariants)
+                      (item == null)
+                          ? TextFormField(
+                              controller: stockController,
+                              keyboardType: TextInputType.number,
+                              decoration: InputDecoration(
+                                labelText: l10n.inStock,
+                                border: const OutlineInputBorder(),
+                              ),
+                            )
+                          : const SizedBox.shrink()
+                    else ...[
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(l10n.varaity,
                             style: Theme.of(stfContext).textTheme.titleMedium),
                       ),
                       const SizedBox(height: 10),
-                      ...editVariants.map((row) {
+                      ...List.generate(variantNameControllers.length, (i) {
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 12),
                           child: Row(
@@ -966,7 +841,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               Expanded(
                                 flex: 3,
                                 child: TextFormField(
-                                  controller: row.nameController,
+                                  controller: variantNameControllers[i],
                                   decoration: InputDecoration(
                                     labelText: l10n.variantName,
                                     border: const OutlineInputBorder(),
@@ -977,7 +852,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               Expanded(
                                 flex: 2,
                                 child: TextFormField(
-                                  controller: row.stockController,
+                                  controller: variantStockControllers[i],
                                   keyboardType: TextInputType.number,
                                   decoration: InputDecoration(
                                     labelText: l10n.inStock,
@@ -986,14 +861,11 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                                 ),
                               ),
                               IconButton(
-                                tooltip: l10n.save,
-                                onPressed: () => saveExistingVariant(row),
-                                icon: const Icon(Icons.check,
-                                    color: Colors.green),
-                              ),
-                              IconButton(
                                 tooltip: l10n.remove,
-                                onPressed: () => deleteExistingVariant(row),
+                                onPressed: () => setState(() {
+                                  variantNameControllers.removeAt(i);
+                                  variantStockControllers.removeAt(i);
+                                }),
                                 icon: const Icon(Icons.delete_outline,
                                     color: Colors.red),
                               ),
@@ -1001,38 +873,13 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                           ),
                         );
                       }),
-                      // Add-new-variant row
-                      Row(
-                        children: [
-                          Expanded(
-                            flex: 3,
-                            child: TextFormField(
-                              controller: newVariantNameController,
-                              decoration: InputDecoration(
-                                labelText: l10n.variantName,
-                                border: const OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            flex: 2,
-                            child: TextFormField(
-                              controller: newVariantStockController,
-                              keyboardType: TextInputType.number,
-                              decoration: InputDecoration(
-                                labelText: l10n.inStock,
-                                border: const OutlineInputBorder(),
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            tooltip: l10n.addVariant,
-                            onPressed: addNewVariant,
-                            icon: const Icon(Icons.add_circle,
-                                color: TColors.primary),
-                          ),
-                        ],
+                      SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton.icon(
+                          onPressed: () => setState(addVariantRow),
+                          icon: const Icon(Icons.add),
+                          label: Text(l10n.addVariant),
+                        ),
                       ),
                     ],
                     const SizedBox(height: 24),
@@ -1040,22 +887,30 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
-                          if (item == null) {
-                            final variants = hasVariants
-                                ? List.generate(
-                                variantNameControllers.length, (i) {
-                              final name =
-                              variantNameControllers[i].text.trim();
-                              final stock = int.tryParse(
-                                  variantStockControllers[i].text) ??
-                                  0;
-                              return VariantEntity(
-                                  name: name, stock: stock);
-                            })
-                                .where((v) => v.name.trim().isNotEmpty)
-                                .toList()
-                                : null;
+                          // Collect non-empty variant rows.
+                          final variants = hasVariants
+                              ? List.generate(
+                                  variantNameControllers.length,
+                                  (i) => VariantEntity(
+                                    name: variantNameControllers[i].text.trim(),
+                                    stock: int.tryParse(
+                                            variantStockControllers[i].text) ??
+                                        0,
+                                  ),
+                                )
+                                  .where((v) => v.name.isNotEmpty)
+                                  .toList()
+                              : <VariantEntity>[];
 
+                          // A variant item must have at least one variant.
+                          if (hasVariants && variants.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(l10n.varaityIsRequired)),
+                            );
+                            return;
+                          }
+
+                          if (item == null) {
                             adminBloc.add(CreateMenuItemEvent(
                               name: nameController.text,
                               price:
@@ -1067,7 +922,8 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               stock: hasVariants
                                   ? 0
                                   : (int.tryParse(stockController.text) ?? 0),
-                              variants: variants,
+                              variants: hasVariants ? variants : null,
+                              hasSugar: hasSugar,
                             ));
                           } else {
                             adminBloc.add(UpdateMenuItemEvent(
@@ -1078,6 +934,9 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               description: descController.text,
                               image: imageController.text,
                               hasVariants: hasVariants,
+                              // Replace the whole variants array on the server.
+                              variants: hasVariants ? variants : <VariantEntity>[],
+                              hasSugar: hasSugar,
                             ));
                           }
                           Navigator.pop(ctx);
@@ -1360,6 +1219,12 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                             if (item.variantName != null)
                               Text(
                                 "${l10n.item}: ${item.variantName}",
+                                style: const TextStyle(
+                                    fontSize: 12, color: Colors.black),
+                              ),
+                            if (item.sugar != null)
+                              Text(
+                                "${l10n.sugar}: ${l10n.sugarSpoons(item.sugar!)}",
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.black),
                               ),
