@@ -1076,8 +1076,14 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
   /// Confirm then mark an order as paid (settles the customer's debt and
   /// realizes cafeteria revenue on the backend).
   /// Open the Pending Revenue (debt-by-user) screen with its own AdminBloc.
-  void _openPendingRevenue() {
-    Navigator.of(context).push(
+  /// Pause this panel's dashboard poll timer while it's covered, so the
+  /// occluded panel doesn't keep rebuilding underneath the pushed route
+  /// (which triggers a Flutter semantics assertion on some versions); resume
+  /// (and refresh) when we come back.
+  Future<void> _openPendingRevenue() async {
+    final panelBloc = context.read<AdminBloc>();
+    panelBloc.add(StopPollingEvent());
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => BlocProvider(
           create: (_) => sl<AdminBloc>()..add(FetchPendingUsersEvent()),
@@ -1085,6 +1091,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
         ),
       ),
     );
+    if (mounted) panelBloc.add(LoadDashboardDataEvent());
   }
 
   /// Two equal-width, side-by-side dialog buttons (Cancel + a colored confirm).

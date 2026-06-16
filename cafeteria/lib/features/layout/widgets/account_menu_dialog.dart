@@ -4,6 +4,10 @@ import '../../../l10n/app_localizations.dart';
 import '../../auth/domain/entities/user_entity.dart';
 import '../../auth/presentation/manager/auth_bloc.dart';
 import '../../auth/presentation/widgets/language_theme_toggles.dart';
+import '../../auth/di/injaction.dart';
+import '../../wallet/presentation/manager/wallet_bloc.dart';
+import '../../wallet/presentation/manager/wallet_event.dart';
+import '../../wallet/presentation/manager/wallet_state.dart';
 import '../../wallet/presentation/widgets/wallet_transactions_view.dart';
 
 class AccountMenuDialog extends StatefulWidget {
@@ -238,75 +242,105 @@ class _AccountMenuDialogState extends State<AccountMenuDialog> with SingleTicker
             trailing: const LanguageThemeToggles(key: ValueKey('dialog_toggles')),
           ),
           const Divider(color: Color(0xFFFDF9F5)),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.palette_outlined, color: Color(0xFF8B7355)),
-            title: Text(
-              AppLocalizations.of(context)!.appAppearance,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-            ),
-            subtitle: Text(AppLocalizations.of(context)!.lightDarkMode, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-          ),
+        
         ],
       ),
     );
   }
 
   Widget _buildWalletTab() {
-    final bool isNegative = widget.user.balance < 0;
-    return Column(
-      children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFF3B1A08),
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    // One live WalletBloc drives BOTH the balance and the transaction list,
+    // fetched fresh from /me/wallet/details (so the balance is never stale).
+    return BlocProvider(
+      create: (_) => sl<WalletBloc>()..add(const FetchWalletDetailsEvent()),
+      child: BlocBuilder<WalletBloc, WalletState>(
+        builder: (context, state) {
+          // Live balance when loaded; fall back to the cached one while loading.
+          final double balance =
+              state is WalletLoaded ? state.details.balance : widget.user.balance;
+          final bool isNegative = balance < 0;
+          final l10n = AppLocalizations.of(context)!;
+
+          return Column(
             children: [
-              Row(
-                children: [
-                  const Icon(Icons.account_balance_wallet_outlined, color: Colors.white, size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    AppLocalizations.of(context)!.walletBalance,
-                    style: const TextStyle(color: Colors.white70, fontSize: 13),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              Text(
-                '${widget.user.balance.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 28,
-                  fontWeight: FontWeight.bold,
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF3B1A08),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.account_balance_wallet_outlined,
+                            color: Colors.white, size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.walletBalance,
+                          style: const TextStyle(
+                              color: Colors.white70, fontSize: 13),
+                        ),
+                        const Spacer(),
+                        if (state is WalletLoading)
+                          const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white54),
+                          )
+                        else
+                          InkWell(
+                            onTap: () => context
+                                .read<WalletBloc>()
+                                .add(const FetchWalletDetailsEvent()),
+                            child: const Icon(Icons.refresh_rounded,
+                                color: Colors.white70, size: 18),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      '${balance.toStringAsFixed(2)} ${l10n.pound}',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    if (isNegative)
+                      Text(
+                        l10n.youOwe(
+                          balance.abs().toStringAsFixed(2),
+                          l10n.pound,
+                        ),
+                        style: const TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500),
+                      ),
+                  ],
                 ),
               ),
-              if (isNegative)
-                Text(
-                  AppLocalizations.of(context)!.youOwe(
-                    widget.user.balance.abs().toStringAsFixed(2),
-                    AppLocalizations.of(context)!.pound,
-                  ),
-                  style: const TextStyle(color: Colors.redAccent, fontSize: 12, fontWeight: FontWeight.w500),
+              const SizedBox(height: 20),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  l10n.recentBalanceUpdates,
+                  style: const TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF3B1A08)),
                 ),
+              ),
+              const SizedBox(height: 10),
+              const Expanded(child: WalletTransactionsView()),
             ],
-          ),
-        ),
-        const SizedBox(height: 20),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: Text(
-            AppLocalizations.of(context)!.recentBalanceUpdates,
-            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF3B1A08)),
-          ),
-        ),
-        const SizedBox(height: 10),
-        const Expanded(child: WalletTransactionsView()),
-      ],
+          );
+        },
+      ),
     );
   }
 

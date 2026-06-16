@@ -29,6 +29,8 @@ class OrderEntity {
   final List<OrderItemEntity> items;
   final double totalPrice;
   final String? deliveryLocation;
+  final String? note;
+  final DateTime? scheduledFor;
   final String status;
   final String paymentStatus;
   final DateTime createdAt;
@@ -43,6 +45,8 @@ class OrderEntity {
     required this.items,
     required this.totalPrice,
     this.deliveryLocation,
+    this.note,
+    this.scheduledFor,
     required this.status,
     required this.paymentStatus,
     required this.createdAt,

@@ -36,6 +36,10 @@ export interface Order {
 	items: OrderItem[];
 	totalPrice: number;
 	deliveryLocation?: string;
+	/** Order-level note / special instructions from the customer. */
+	note?: string;
+	/** When the customer wants the order (same-day). Absent = as soon as possible. */
+	scheduledFor?: Date;
 	status: OrderStatus;
 	paymentStatus: PaymentStatus;
 	createdAt: Date;

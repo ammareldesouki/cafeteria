@@ -2,23 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../l10n/app_localizations.dart';
-import '../../../auth/di/injaction.dart';
 import '../../domain/entities/wallet_transaction_entity.dart';
 import '../manager/wallet_bloc.dart';
-import '../manager/wallet_event.dart';
 import '../manager/wallet_state.dart';
 
-/// Self-contained transaction history list. Provides its own WalletBloc and
-/// fetches `/me/wallet/details` on build.
+/// Transaction history list. Reads the [WalletBloc] provided by an ancestor
+/// (so the same live `/me/wallet/details` fetch drives the balance too).
 class WalletTransactionsView extends StatelessWidget {
   const WalletTransactionsView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) =>
-          sl<WalletBloc>()..add(const FetchWalletDetailsEvent()),
-      child: BlocBuilder<WalletBloc, WalletState>(
+    return BlocBuilder<WalletBloc, WalletState>(
         builder: (context, state) {
           if (state is WalletLoading || state is WalletInitial) {
             return const Center(
@@ -60,7 +55,6 @@ class WalletTransactionsView extends StatelessWidget {
 
           return const SizedBox.shrink();
         },
-      ),
     );
   }
 }

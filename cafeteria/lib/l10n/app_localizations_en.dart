@@ -928,4 +928,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get goToCart => 'Go to Cart';
+
+  @override
+  String get asSoonAsPossible => 'As soon as possible';
+
+  @override
+  String get scheduleForLater => 'Schedule for later';
+
+  @override
+  String get selectDateTime => 'Select date & time';
+
+  @override
+  String get orderNotes => 'Order Notes';
+
+  @override
+  String get orderNotesHint => 'Any special instructions for the cafeteria...';
 }

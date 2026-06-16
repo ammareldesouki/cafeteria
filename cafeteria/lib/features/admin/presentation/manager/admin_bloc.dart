@@ -52,6 +52,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<PollDashboardDataEvent>(_onPollDashboardData);
     on<FetchPendingUsersEvent>(_onFetchPendingUsers);
     on<SettleUserDebtEvent>(_onSettleUserDebt);
+    on<StopPollingEvent>((event, emit) => _pollTimer?.cancel());
 
     // Menu Handlers
     on<FetchAdminMenuEvent>(_onFetchAdminMenu);

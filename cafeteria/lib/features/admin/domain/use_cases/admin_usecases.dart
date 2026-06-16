@@ -42,6 +42,7 @@ class GetAdminOrdersUseCase {
     String? dateRange,
     String? status,
     String? paymentStatus,
+    String? userId,
   }) => _repository.getAdminOrders(
     page: page,
     limit: limit,
@@ -49,6 +50,7 @@ class GetAdminOrdersUseCase {
     dateRange: dateRange,
     status: status,
     paymentStatus: paymentStatus,
+    userId: userId,
   );
 }
 

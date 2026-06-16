@@ -2,7 +2,11 @@ import 'package:cafeteria/core/network/dio_handler.dart';
 import '../models/order_model.dart';
 
 abstract class OrderRemoteDataSource {
-  Future<OrderModel> createOrder({required String? deliveryLocation});
+  Future<OrderModel> createOrder({
+    required String? deliveryLocation,
+    String? note,
+    DateTime? scheduledFor,
+  });
   Future<List<OrderModel>> getOrders();
   Future<OrderModel> getOrderById(String orderId);
   Future<OrderModel> cancelOrder(String orderId);
@@ -14,10 +18,20 @@ class OrderRemoteDataSourceImpl implements OrderRemoteDataSource {
   OrderRemoteDataSourceImpl(this._dioHandler);
 
   @override
-  Future<OrderModel> createOrder({required String? deliveryLocation}) async {
+  Future<OrderModel> createOrder({
+    required String? deliveryLocation,
+    String? note,
+    DateTime? scheduledFor,
+  }) async {
     final body = <String, dynamic>{};
     if (deliveryLocation != null && deliveryLocation.isNotEmpty) {
       body['deliveryLocation'] = deliveryLocation;
+    }
+    if (note != null && note.isNotEmpty) {
+      body['note'] = note;
+    }
+    if (scheduledFor != null) {
+      body['scheduledFor'] = scheduledFor.toUtc().toIso8601String();
     }
 
     final response = await _dioHandler.dio.post('/orders', data: body);

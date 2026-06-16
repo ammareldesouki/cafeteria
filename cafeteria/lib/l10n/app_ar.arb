@@ -323,6 +323,11 @@
   "additemMenu": "اضف عنصر للقائمة",
   "price": "المبلغ",
   "itemName": "اسم المنتج",
-  "goToCart": "اذهب للسلة"
+  "goToCart": "اذهب للسلة",
+  "asSoonAsPossible": "في أقرب وقت",
+  "scheduleForLater": "جدولة لوقت لاحق",
+  "selectDateTime": "اختر التاريخ والوقت",
+  "orderNotes": "ملاحظات الطلب",
+  "orderNotesHint": "أي تعليمات خاصة للكافيتيريا..."
 
 }

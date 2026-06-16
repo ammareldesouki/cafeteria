@@ -5,8 +5,16 @@ class CreateOrderUseCase {
   final OrderRepository _repository;
   CreateOrderUseCase(this._repository);
 
-  Future<OrderEntity> call({required String? deliveryLocation}) =>
-      _repository.createOrder(deliveryLocation: deliveryLocation);
+  Future<OrderEntity> call({
+    required String? deliveryLocation,
+    String? note,
+    DateTime? scheduledFor,
+  }) =>
+      _repository.createOrder(
+        deliveryLocation: deliveryLocation,
+        note: note,
+        scheduledFor: scheduledFor,
+      );
 }
 
 class GetOrdersUseCase {

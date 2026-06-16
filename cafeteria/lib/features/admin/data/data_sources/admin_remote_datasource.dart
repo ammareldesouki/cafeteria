@@ -19,6 +19,7 @@ abstract class AdminRemoteDataSource {
     String? dateRange,
     String? status,
     String? paymentStatus,
+    String? userId,
   });
 
   Future<OrderModel> updateAdminOrder({
@@ -129,6 +130,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     String? dateRange,
     String? status,
     String? paymentStatus,
+    String? userId,
   }) async {
     final queryParams = <String, dynamic>{'page': page, 'limit': limit};
 
@@ -138,6 +140,7 @@ class AdminRemoteDataSourceImpl implements AdminRemoteDataSource {
     if (status != null && status.isNotEmpty) queryParams['status'] = status;
     if (paymentStatus != null && paymentStatus.isNotEmpty)
       queryParams['paymentStatus'] = paymentStatus;
+    if (userId != null && userId.isNotEmpty) queryParams['userId'] = userId;
 
     final response = await _dioHandler.dio.get(
       '/admin/orders',

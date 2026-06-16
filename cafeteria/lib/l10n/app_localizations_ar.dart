@@ -926,4 +926,19 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get goToCart => 'اذهب للسلة';
+
+  @override
+  String get asSoonAsPossible => 'في أقرب وقت';
+
+  @override
+  String get scheduleForLater => 'جدولة لوقت لاحق';
+
+  @override
+  String get selectDateTime => 'اختر التاريخ والوقت';
+
+  @override
+  String get orderNotes => 'ملاحظات الطلب';
+
+  @override
+  String get orderNotesHint => 'أي تعليمات خاصة للكافيتيريا...';
 }

@@ -18,6 +18,7 @@ abstract class AdminRepository {
     String? dateRange,
     String? status,
     String? paymentStatus,
+    String? userId,
   });
 
   Future<OrderEntity> updateAdminOrder({

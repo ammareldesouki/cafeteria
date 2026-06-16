@@ -32,6 +32,8 @@ class OrderModel extends OrderEntity {
     required super.items,
     required super.totalPrice,
     super.deliveryLocation,
+    super.note,
+    super.scheduledFor,
     required super.status,
     required super.paymentStatus,
     required super.createdAt,
@@ -40,6 +42,7 @@ class OrderModel extends OrderEntity {
 
   factory OrderModel.fromJson(Map<String, dynamic> json) {
     final rawItems = json['items'] as List<dynamic>? ?? [];
+    final rawScheduled = json['scheduledFor'] as String?;
     return OrderModel(
       id: json['_id']?.toString() ?? '',
       userId: json['userId']?.toString() ?? '',
@@ -51,6 +54,8 @@ class OrderModel extends OrderEntity {
           .toList(),
       totalPrice: (json['totalPrice'] as num?)?.toDouble() ?? 0.0,
       deliveryLocation: json['deliveryLocation'] as String?,
+      note: json['note'] as String?,
+      scheduledFor: rawScheduled != null ? DateTime.parse(rawScheduled) : null,
       status: json['status']?.toString() ?? 'pending',
       paymentStatus: json['paymentStatus']?.toString() ?? 'unpaid',
       createdAt: json['createdAt'] != null

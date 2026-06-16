@@ -57,6 +57,8 @@ class OrderBloc extends Bloc<OrderEvent, OrderState> {
     try {
       final order = await createOrderUseCase(
         deliveryLocation: event.deliveryLocation,
+        note: event.note,
+        scheduledFor: event.scheduledFor,
       );
       emit(OrderPlaced(order));
     } catch (e) {

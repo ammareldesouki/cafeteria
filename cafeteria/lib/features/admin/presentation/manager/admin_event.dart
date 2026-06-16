@@ -132,6 +132,10 @@ class RemoveVariantEvent extends AdminEvent {
 
 class FetchPendingUsersEvent extends AdminEvent {}
 
+/// Pause the dashboard auto-refresh timer (e.g. while another route is open
+/// on top, so the occluded panel doesn't keep rebuilding).
+class StopPollingEvent extends AdminEvent {}
+
 class SettleUserDebtEvent extends AdminEvent {
   final String userId;
 

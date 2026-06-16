@@ -14,12 +14,19 @@ export const validateCreateOrder = (
 	res: Response,
 	next: NextFunction,
 ) => {
-	const { deliveryLocation } = req.body;
+	const { deliveryLocation, note } = req.body;
 
 	if (deliveryLocation !== undefined && typeof deliveryLocation !== "string") {
 		return res.status(400).json({
 			error: "INVALID_REQUEST",
 			message: "deliveryLocation must be a string if provided",
+		});
+	}
+
+	if (note !== undefined && typeof note !== "string") {
+		return res.status(400).json({
+			error: "INVALID_REQUEST",
+			message: "note must be a string if provided",
 		});
 	}
 

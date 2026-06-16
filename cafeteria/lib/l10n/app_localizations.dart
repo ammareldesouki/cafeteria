@@ -1909,6 +1909,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Go to Cart'**
   String get goToCart;
+
+  /// No description provided for @asSoonAsPossible.
+  ///
+  /// In en, this message translates to:
+  /// **'As soon as possible'**
+  String get asSoonAsPossible;
+
+  /// No description provided for @scheduleForLater.
+  ///
+  /// In en, this message translates to:
+  /// **'Schedule for later'**
+  String get scheduleForLater;
+
+  /// No description provided for @selectDateTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date & time'**
+  String get selectDateTime;
+
+  /// No description provided for @orderNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Order Notes'**
+  String get orderNotes;
+
+  /// No description provided for @orderNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Any special instructions for the cafeteria...'**
+  String get orderNotesHint;
 }
 
 class _AppLocalizationsDelegate

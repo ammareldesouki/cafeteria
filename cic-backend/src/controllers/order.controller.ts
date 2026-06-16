@@ -24,14 +24,24 @@ export const createOrder = async (
 		const userPhone = (req as any).user.phoneNumber;
 
 		const deliveryLocation = req.body.deliveryLocation as string | undefined;
-const order= await orderService.createOrderFromCart(
+		// Optional order-level note / special instructions.
+		const note = req.body.note as string | undefined;
+		// Optional scheduled time (ISO string). Absent/invalid = order now.
+		const rawScheduled = req.body.scheduledFor as string | undefined;
+		let scheduledFor: Date | undefined;
+		if (rawScheduled) {
+			const d = new Date(rawScheduled);
+			if (!Number.isNaN(d.getTime())) scheduledFor = d;
+		}
 
+		const order = await orderService.createOrderFromCart(
 			userId,
 			userEmail,
 			deliveryLocation,
 			username,
 			userPhone,
-		
+			scheduledFor,
+			note,
 		);
 
 		res.status(201).json(order);

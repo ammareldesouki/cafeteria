@@ -31,6 +31,7 @@ class AdminRepositoryImpl implements AdminRepository {
     String? dateRange,
     String? status,
     String? paymentStatus,
+    String? userId,
   }) => remoteDataSource.getAdminOrders(
     page: page,
     limit: limit,
@@ -38,6 +39,7 @@ class AdminRepositoryImpl implements AdminRepository {
     dateRange: dateRange,
     status: status,
     paymentStatus: paymentStatus,
+    userId: userId,
   );
 
   @override

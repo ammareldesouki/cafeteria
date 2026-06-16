@@ -2,7 +2,10 @@ abstract class OrderEvent {}
 
 class CreateOrderEvent extends OrderEvent {
   final String? deliveryLocation;
-  CreateOrderEvent({this.deliveryLocation});
+  final String? note;
+  final DateTime? scheduledFor;
+
+  CreateOrderEvent({this.deliveryLocation, this.note, this.scheduledFor});
 }
 
 class GetOrdersEvent extends OrderEvent {}

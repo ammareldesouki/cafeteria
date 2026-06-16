@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../core/constants/colors.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../auth/di/injaction.dart';
+import '../../../order/domain/entities/order_entity.dart';
 import '../../domain/entities/pending_user_entity.dart';
+import '../../domain/use_cases/admin_usecases.dart';
 import '../manager/admin_bloc.dart';
 import '../manager/admin_event.dart';
 import '../manager/admin_state.dart';
@@ -212,6 +215,8 @@ class _PendingRevenuePageState extends State<PendingRevenuePage> {
               children: [
                 Text(
                   u.username,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -220,6 +225,8 @@ class _PendingRevenuePageState extends State<PendingRevenuePage> {
                 ),
                 Text(
                   l10n.unpaidOrdersCount(u.unpaidOrders),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontSize: 12,
                     color: Color(0xFF8B7355),
@@ -244,19 +251,21 @@ class _PendingRevenuePageState extends State<PendingRevenuePage> {
             ),
           ),
           const SizedBox(width: 8),
-          ElevatedButton(
-            onPressed: () => _showSettleDialog(context, l10n, u),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF5BA85B),
-              elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-              shape: RoundedRectangleBorder(
+          // Plain tappable container (avoids ElevatedButton's tap-target
+          // sizing, which can demand infinite width inside an RTL Row).
+          GestureDetector(
+            onTap: () => _showSettleDialog(context, l10n, u),
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF5BA85B),
                 borderRadius: BorderRadius.circular(20),
               ),
-            ),
-            child: Text(
-              l10n.markPaid,
-              style: const TextStyle(color: Colors.white, fontSize: 13),
+              child: Text(
+                l10n.markPaid,
+                style: const TextStyle(color: Colors.white, fontSize: 13),
+              ),
             ),
           ),
         ],
@@ -269,111 +278,212 @@ class _PendingRevenuePageState extends State<PendingRevenuePage> {
     AppLocalizations l10n,
     PendingUserEntity u,
   ) {
-    final amountController = TextEditingController();
-    String? errorText;
-
     showDialog(
       context: pageContext,
-      builder: (ctx) => StatefulBuilder(
-        builder: (ctx, setDialogState) {
-          void submit({required bool payAll}) {
-            double? amount;
-            if (!payAll) {
-              final parsed = double.tryParse(amountController.text.trim());
-              if (parsed == null || parsed <= 0) {
-                setDialogState(() => errorText = l10n.enterAmount);
-                return;
-              }
-              if (parsed > u.pendingAmount) {
-                setDialogState(() => errorText = l10n.amountExceedsDebt);
-                return;
-              }
-              amount = parsed;
-            }
-            Navigator.pop(ctx);
-            pageContext.read<AdminBloc>().add(
-                  SettleUserDebtEvent(userId: u.userId, amount: amount),
-                );
-          }
-
-          return AlertDialog(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            title: Text(l10n.settlePaymentTitle),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${u.username} • ${u.pendingAmount.toStringAsFixed(2)} ${l10n.pound}',
-                  style: const TextStyle(color: Color(0xFF8B7355)),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: amountController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) {
-                    if (errorText != null) {
-                      setDialogState(() => errorText = null);
-                    }
-                  },
-                  decoration: InputDecoration(
-                    labelText: l10n.partialAmount,
-                    hintText: l10n.enterAmount,
-                    errorText: errorText,
-                    border: const OutlineInputBorder(),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 46,
-                        child: OutlinedButton(
-                          onPressed: () => Navigator.pop(ctx),
-                          style: OutlinedButton.styleFrom(
-                            side:
-                                const BorderSide(color: Color(0xFFD9C7B8)),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                          ),
-                          child: Text(l10n.cancel,
-                              style:
-                                  const TextStyle(color: Color(0xFF8B7355))),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SizedBox(
-                        height: 46,
-                        child: ElevatedButton(
-                          onPressed: () => submit(
-                            payAll: amountController.text.trim().isEmpty,
-                          ),
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF5BA85B),
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10)),
-                          ),
-                          child: Text(
-                            amountController.text.trim().isEmpty
-                                ? l10n.payAll
-                                : l10n.confirm,
-                            style: const TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        },
+      builder: (_) => _SettleOrdersDialog(
+        user: u,
+        onSettled: () =>
+            pageContext.read<AdminBloc>().add(FetchPendingUsersEvent()),
       ),
+    );
+  }
+}
+
+/// Lists a user's delivered-but-unpaid orders with checkboxes (select all or a
+/// subset) and marks the chosen ones paid — each PATCH flips the order's
+/// paymentStatus to paid and settles the wallet on the backend.
+class _SettleOrdersDialog extends StatefulWidget {
+  final PendingUserEntity user;
+  final VoidCallback onSettled;
+
+  const _SettleOrdersDialog({required this.user, required this.onSettled});
+
+  @override
+  State<_SettleOrdersDialog> createState() => _SettleOrdersDialogState();
+}
+
+class _SettleOrdersDialogState extends State<_SettleOrdersDialog> {
+  bool _loading = true;
+  bool _submitting = false;
+  String? _error;
+  List<OrderEntity> _orders = [];
+  final Set<String> _selected = {};
+
+  @override
+  void initState() {
+    super.initState();
+    _load();
+  }
+
+  Future<void> _load() async {
+    try {
+      final res = await sl<GetAdminOrdersUseCase>()(
+        page: 1,
+        limit: 100,
+        userId: widget.user.userId,
+        status: 'delivered',
+        paymentStatus: 'unpaid',
+      );
+      if (!mounted) return;
+      setState(() {
+        _orders = res.data;
+        _selected
+          ..clear()
+          ..addAll(_orders.map((o) => o.id)); // default: all selected
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _error = e.toString();
+        _loading = false;
+      });
+    }
+  }
+
+  double get _selectedTotal => _orders
+      .where((o) => _selected.contains(o.id))
+      .fold(0.0, (s, o) => s + o.totalPrice);
+
+  Future<void> _submit(AppLocalizations l10n) async {
+    if (_selected.isEmpty) return;
+    setState(() => _submitting = true);
+    final update = sl<UpdateAdminOrderUseCase>();
+    try {
+      // Mark each selected order paid (flips status + settles wallet).
+      for (final id in _selected.toList()) {
+        await update(orderId: id, paymentStatus: 'paid');
+      }
+      if (!mounted) return;
+      Navigator.pop(context);
+      widget.onSettled();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.markAsPaid)),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _submitting = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final allSelected =
+        _orders.isNotEmpty && _selected.length == _orders.length;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+      contentPadding: const EdgeInsets.fromLTRB(8, 0, 8, 8),
+      title: Text(widget.user.username),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: _loading
+            ? const Padding(
+                padding: EdgeInsets.all(32),
+                child: Center(
+                  child: CircularProgressIndicator(color: Color(0xFF3B1A08)),
+                ),
+              )
+            : _error != null
+                ? Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text(_error!,
+                        style: const TextStyle(color: Colors.red)),
+                  )
+                : _orders.isEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(l10n.noPendingPayments,
+                            style: const TextStyle(color: Color(0xFF8B7355))),
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Select all
+                          CheckboxListTile(
+                            dense: true,
+                            controlAffinity: ListTileControlAffinity.leading,
+                            activeColor: const Color(0xFF5BA85B),
+                            value: allSelected,
+                            title: Text(l10n.payAll),
+                            onChanged: (v) => setState(() {
+                              _selected.clear();
+                              if (v == true) {
+                                _selected.addAll(_orders.map((o) => o.id));
+                              }
+                            }),
+                          ),
+                          const Divider(height: 1),
+                          Flexible(
+                            child: ListView(
+                              shrinkWrap: true,
+                              children: _orders.map((o) {
+                                final shortId = o.id.length > 6
+                                    ? o.id.substring(o.id.length - 6)
+                                    : o.id;
+                                final items = o.items
+                                    .map((it) =>
+                                        '${it.quantity}x ${it.menuItemName ?? l10n.item}')
+                                    .join(', ');
+                                return CheckboxListTile(
+                                  dense: true,
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  activeColor: const Color(0xFF5BA85B),
+                                  value: _selected.contains(o.id),
+                                  title: Text(
+                                    '#$shortId • ${o.totalPrice.toStringAsFixed(2)} ${l10n.pound}',
+                                    style: const TextStyle(fontSize: 14),
+                                  ),
+                                  subtitle: Text(items,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis),
+                                  onChanged: (v) => setState(() {
+                                    if (v == true) {
+                                      _selected.add(o.id);
+                                    } else {
+                                      _selected.remove(o.id);
+                                    }
+                                  }),
+                                );
+                              }).toList(),
+                            ),
+                          ),
+                        ],
+                      ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: _submitting ? null : () => Navigator.pop(context),
+          child: Text(l10n.cancel,
+              style: const TextStyle(color: Color(0xFF8B7355))),
+        ),
+        ElevatedButton(
+          onPressed:
+              (_submitting || _selected.isEmpty) ? null : () => _submit(l10n),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF5BA85B),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          child: _submitting
+              ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                      color: Colors.white, strokeWidth: 2),
+                )
+              : Text(
+                  '${l10n.markPaid} (${_selectedTotal.toStringAsFixed(2)} ${l10n.pound})',
+                  style: const TextStyle(color: Colors.white),
+                ),
+        ),
+      ],
     );
   }
 }

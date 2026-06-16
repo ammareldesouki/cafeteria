@@ -324,7 +324,12 @@
   "additemMenu": "Add Item To Menu",
   "price": "Price",
   "itemName":"Item Name",
-  "goToCart": "Go to Cart"
+  "goToCart": "Go to Cart",
+  "asSoonAsPossible": "As soon as possible",
+  "scheduleForLater": "Schedule for later",
+  "selectDateTime": "Select date & time",
+  "orderNotes": "Order Notes",
+  "orderNotesHint": "Any special instructions for the cafeteria..."
 
 
 

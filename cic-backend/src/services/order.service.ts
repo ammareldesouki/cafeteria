@@ -97,8 +97,10 @@ export const orderService = {
 		userId: string,
 		userEmail: string,
 		deliveryLocation?: string,
-		username?: string, // 4th
+		username?: string,
 		userPhone?: string,
+		scheduledFor?: Date,
+		note?: string,
 	): Promise<Order> {
 		const cart = await cartRepository.findByUserId(userId);
 
@@ -166,6 +168,8 @@ export const orderService = {
 			items: orderItems,
 			totalPrice,
 			...(deliveryLocation && { deliveryLocation }),
+			...(note && { note }),
+			...(scheduledFor && { scheduledFor }),
 			status: OrderStatus.PENDING,
 			paymentStatus: PaymentStatus.UNPAID,
 			createdAt: new Date(),
