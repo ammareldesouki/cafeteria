@@ -19,7 +19,17 @@ function buildFilterQuery(filters: OrderFilters): any {
 	if (filters.status) query.status = filters.status;
 	
 	if (filters.search) {
-		query.userName = { $regex: filters.search, $options: "i" };
+		// Match if the term is contained (case-insensitive) in ANY of these
+		// fields. Escape regex specials so user input is treated literally.
+		const safe = filters.search.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+		const rx = { $regex: safe, $options: "i" };
+		query.$or = [
+			{ username: rx }, // stored lowercase in the order document
+			{ userEmail: rx },
+			{ userPhone: rx },
+			{ deliveryLocation: rx },
+			{ "items.menuItemName": rx },
+		];
 	}
 	
 	if (filters.dateRange) {
