@@ -424,18 +424,7 @@ class _ProductCard extends StatelessWidget {
 
   // ── Pass BOTH FavouriteBloc and CartBloc into the sheet ──────────────────
   void _showCustomizeSheet(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.white,
-      builder: (_) => MultiBlocProvider(
-        providers: [
-          BlocProvider.value(value: context.read<FavouriteBloc>()),
-          BlocProvider.value(value: context.read<CartBloc>()),
-        ],
-        child: _CustomizeSheet(item: item),
-      ),
-    );
+    showCustomizeSheet(context, item);
   }
 
   Widget _placeholderImage() => Container(
@@ -454,19 +443,69 @@ class _ProductCard extends StatelessWidget {
 // Customize Sheet
 // ═══════════════════════════════════════════════════════════════════════════
 
-class _CustomizeSheet extends StatefulWidget {
-  final MenuItemEntity item;
-  const _CustomizeSheet({required this.item});
-
-  @override
-  State<_CustomizeSheet> createState() => _CustomizeSheetState();
+/// Open the customize sheet for [item], optionally pre-filled with a saved
+/// selection (used by Favourites to reorder). Requires FavouriteBloc and
+/// CartBloc to be available in [context].
+void showCustomizeSheet(
+  BuildContext context,
+  MenuItemEntity item, {
+  String? variant,
+  int? sugar,
+  String? note,
+}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    builder: (_) => MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: context.read<FavouriteBloc>()),
+        BlocProvider.value(value: context.read<CartBloc>()),
+      ],
+      child: CustomizeSheet(
+        item: item,
+        initialVariant: variant,
+        initialSugar: sugar,
+        initialNote: note,
+      ),
+    ),
+  );
 }
 
-class _CustomizeSheetState extends State<_CustomizeSheet> {
-  int _quantity = 1;
-  String? _selectedVariant;
-  int _sugar = 0;
-  final TextEditingController _noteController = TextEditingController();
+/// Bottom sheet to customize an item (variant / sugar / quantity / note) and
+/// add it to the cart. Public so it can be reopened pre-filled from Favourites.
+class CustomizeSheet extends StatefulWidget {
+  final MenuItemEntity item;
+  final String? initialVariant;
+  final int? initialSugar;
+  final String? initialNote;
+
+  const CustomizeSheet({
+    super.key,
+    required this.item,
+    this.initialVariant,
+    this.initialSugar,
+    this.initialNote,
+  });
+
+  @override
+  State<CustomizeSheet> createState() => _CustomizeSheetState();
+}
+
+class _CustomizeSheetState extends State<CustomizeSheet> {
+  late int _quantity;
+  late String? _selectedVariant;
+  late int _sugar;
+  late final TextEditingController _noteController;
+
+  @override
+  void initState() {
+    super.initState();
+    _quantity = 1;
+    _selectedVariant = widget.initialVariant;
+    _sugar = widget.initialSugar ?? 0;
+    _noteController = TextEditingController(text: widget.initialNote ?? '');
+  }
 
   MenuItemEntity get item => widget.item;
 
@@ -660,7 +699,15 @@ class _CustomizeSheetState extends State<_CustomizeSheet> {
                             if (isFav) {
                               cubit.add(RemoveFavouriteEvent(item.mongoId));
                             } else {
-                              cubit.add(AddFavouriteEvent(item.mongoId));
+                              // Remember the current selection with the favourite.
+                              cubit.add(AddFavouriteEvent(
+                                item.mongoId,
+                                variantName: _selectedVariant,
+                                sugar: item.hasSugar ? _sugar : null,
+                                note: _noteController.text.trim().isNotEmpty
+                                    ? _noteController.text.trim()
+                                    : null,
+                              ));
                             }
                           },
                           child: AnimatedSwitcher(

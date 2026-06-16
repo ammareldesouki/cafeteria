@@ -38,7 +38,12 @@ class FavouriteBloc extends Bloc<FavouriteEvent, FavouriteState> {
     on<AddFavouriteEvent>((event, emit) async {
       emit(FavouriteActionLoading(_favourites, event.itemId));
       try {
-        await addFavouriteUseCase(event.itemId);
+        await addFavouriteUseCase(
+          event.itemId,
+          variantName: event.variantName,
+          sugar: event.sugar,
+          note: event.note,
+        );
         add(GetFavouritesEvent());
       } catch (e) {
         emit(FavouriteError(e.toString()));

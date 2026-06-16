@@ -5,7 +5,17 @@ class AddFavouriteUseCase {
 
   AddFavouriteUseCase(this.repository);
 
-  Future<void> call(String itemId) {
-    return repository.addFavourite(itemId);
+  Future<void> call(
+    String itemId, {
+    String? variantName,
+    int? sugar,
+    String? note,
+  }) {
+    return repository.addFavourite(
+      itemId,
+      variantName: variantName,
+      sugar: sugar,
+      note: note,
+    );
   }
 }

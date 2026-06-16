@@ -18,10 +18,19 @@ export const addFavorite = async (
 	try {
 		// Parse input
 		const userId = (req as any).user.id;
-		const { itemId } = req.body;
+		const { itemId, variantName, sugar, note } = req.body as {
+			itemId: string;
+			variantName?: string;
+			sugar?: number;
+			note?: string;
+		};
 
 		// Call service
-		const favorite = await favoriteService.addFavorite(userId, itemId);
+		const favorite = await favoriteService.addFavorite(userId, itemId, {
+			variantName,
+			sugar,
+			note,
+		});
 
 		// Return response
 		res.status(201).json(favorite);

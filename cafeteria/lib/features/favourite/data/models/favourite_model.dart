@@ -1,3 +1,4 @@
+import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../domain/entities/favourite_entity.dart';
 
 class FavouriteModel extends FavouriteEntity {
@@ -9,11 +10,32 @@ class FavouriteModel extends FavouriteEntity {
     required super.price,
     required super.description,
     required super.category,
+    super.variantName,
+    super.sugar,
+    super.note,
+    super.hasVariants,
+    super.hasSugar,
+    super.variants,
+    super.stock,
+    super.trackStock,
   });
 
   factory FavouriteModel.fromJson(Map<String, dynamic> json) {
     // API nests all item details inside the "item" key
     final item = (json['item'] as Map<String, dynamic>?) ?? {};
+
+    // Parse variant list (same shape as the menu endpoint)
+    final rawVariants = item['variants'];
+    List<VariantEntity>? variants;
+    if (rawVariants is List && rawVariants.isNotEmpty) {
+      variants = rawVariants
+          .whereType<Map<String, dynamic>>()
+          .map((v) => VariantEntity(
+                name: _str(v['name']),
+                stock: (v['stock'] as num?)?.toInt(),
+              ))
+          .toList();
+    }
 
     return FavouriteModel(
       id: _str(json['_id']),
@@ -23,6 +45,14 @@ class FavouriteModel extends FavouriteEntity {
       price: (item['price'] as num? ?? 0).toDouble(),
       description: _str(item['description']),
       category: _str(item['category']),
+      variantName: json['variantName'] == null ? null : _str(json['variantName']),
+      sugar: (json['sugar'] as num?)?.toInt(),
+      note: json['note'] == null ? null : _str(json['note']),
+      hasVariants: item['hasVariants'] as bool? ?? false,
+      hasSugar: item['hasSugar'] as bool? ?? false,
+      variants: variants,
+      stock: (item['stock'] as num?)?.toInt(),
+      trackStock: item['trackStock'] as bool? ?? true,
     );
   }
 

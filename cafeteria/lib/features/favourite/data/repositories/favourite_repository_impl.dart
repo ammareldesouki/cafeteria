@@ -13,8 +13,18 @@ class FavouriteRepositoryImpl implements FavouriteRepository {
   }
 
   @override
-  Future<void> addFavourite(String itemId) async {
-    return remoteDataSource.addFavourite(itemId);
+  Future<void> addFavourite(
+    String itemId, {
+    String? variantName,
+    int? sugar,
+    String? note,
+  }) async {
+    return remoteDataSource.addFavourite(
+      itemId,
+      variantName: variantName,
+      sugar: sugar,
+      note: note,
+    );
   }
 
   @override

@@ -4,14 +4,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/favourite_entity.dart';
 import '../manager/favourite_bloc.dart';
 import '../manager/favourite_event.dart';
-
-// ── Cart imports ──────────────────────────────────────────────────────────────
-import '../../../cart/presentation/manager/cart_bloc.dart';
-import '../../../cart/presentation/manager/cart_event.dart';
-import '../../../cart/presentation/manager/cart_state.dart';
+import '../../../home/presentation/pages/category_page.dart' show showCustomizeSheet;
 
 class FavouriteItemCard extends StatelessWidget {
   final FavouriteEntity item;
@@ -60,78 +57,62 @@ class FavouriteItemCard extends StatelessWidget {
 
               const SizedBox(width: 14),
 
-              // ── Name + price ──────────────────────────────────────────────
+              // ── Name + price + saved selection ────────────────────────────
               Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.name,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF3B1A08),
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _openSheet(context),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF3B1A08),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      '\$${item.price.toStringAsFixed(2)}',
-                      style: const TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFFC07722),
-                        fontWeight: FontWeight.w600,
+                      const SizedBox(height: 4),
+                      Text(
+                        '\$${item.price.toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFFC07722),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                      if (_selectionSummary(context) != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          _selectionSummary(context)!,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF8B7355),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
 
-              // ── Add to Cart button ────────────────────────────────────────
-              BlocBuilder<CartBloc, CartState>(
-                builder: (context, cartState) {
-                  final isAddingToCart = cartState is CartItemActionLoading;
-                  return GestureDetector(
-                    onTap: isAddingToCart
-                        ? null
-                        : () {
-                      context.read<CartBloc>().add(
-                        AddCartItemEvent(
-                          menuItemId: item.itemId,
-                          quantity: 1,
-                        ),
-                      );
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content:
-                          Text('${item.name} added to cart 🛒'),
-                          backgroundColor: const Color(0xFF3B1A08),
-                          duration: const Duration(seconds: 2),
-                        ),
-                      );
-                    },
-                    child: Container(
-                      width: 38,
-                      height: 38,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF3B1A08),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: isAddingToCart
-                          ? const Padding(
-                        padding: EdgeInsets.all(8),
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
-                          : const Icon(
-                        Icons.add_shopping_cart_rounded,
-                        color: Colors.white,
-                        size: 18,
-                      ),
-                    ),
-                  );
-                },
+              // ── Reorder: open the customize sheet pre-filled ──────────────
+              GestureDetector(
+                onTap: () => _openSheet(context),
+                child: Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF3B1A08),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Icon(
+                    Icons.add_shopping_cart_rounded,
+                    color: Colors.white,
+                    size: 18,
+                  ),
+                ),
               ),
 
               const SizedBox(width: 8),
@@ -163,6 +144,30 @@ class FavouriteItemCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// Open the customize sheet pre-filled with the favourite's saved selection.
+  void _openSheet(BuildContext context) {
+    showCustomizeSheet(
+      context,
+      item.toMenuItem(),
+      variant: item.variantName,
+      sugar: item.sugar,
+      note: item.note,
+    );
+  }
+
+  /// One-line summary of the saved selection (variant / sugar), or null.
+  String? _selectionSummary(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final parts = <String>[];
+    if (item.variantName != null && item.variantName!.isNotEmpty) {
+      parts.add(item.variantName!);
+    }
+    if (item.sugar != null) {
+      parts.add('${l10n.sugar}: ${l10n.sugarSpoons(item.sugar!)}');
+    }
+    return parts.isEmpty ? null : parts.join(' • ');
   }
 
   Widget _placeholder() => Container(

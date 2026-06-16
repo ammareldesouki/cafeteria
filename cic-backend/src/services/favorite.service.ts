@@ -13,20 +13,20 @@ export const favoriteService = {
 	 * Add a favorite
 	 * Validates that the menu item exists before adding
 	 */
-	async addFavorite(userId: string, itemId: string) {
+	async addFavorite(
+		userId: string,
+		itemId: string,
+		selection: { variantName?: string; sugar?: number; note?: string } = {},
+	) {
 		// Validate menu item exists
 		const item = await menuCollection.findOne({ _id: new ObjectId(itemId) });
 		if (!item) {
 			throw new Error("Menu item not found");
 		}
 
-		// Check if favorite already exists
-		const exists = await favoriteRepository.exists(userId, itemId);
-		if (exists) {
-			throw new Error("Item already favorited");
-		}
-
-		return favoriteRepository.create(userId, itemId);
+		// One favourite per user+item; re-favouriting updates the remembered
+		// selection rather than erroring.
+		return favoriteRepository.upsert(userId, itemId, selection);
 	},
 
 	/**

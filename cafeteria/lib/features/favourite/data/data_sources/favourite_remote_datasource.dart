@@ -4,7 +4,12 @@ import '../models/favourite_model.dart';
 
 abstract class FavouriteRemoteDataSource {
   Future<List<FavouriteModel>> getFavourites();
-  Future<void> addFavourite(String itemId);
+  Future<void> addFavourite(
+    String itemId, {
+    String? variantName,
+    int? sugar,
+    String? note,
+  });
   Future<void> removeFavourite(String itemId);
 }
 
@@ -26,10 +31,20 @@ class FavouriteRemoteDataSourceImpl implements FavouriteRemoteDataSource {
   }
 
   @override
-  Future<void> addFavourite(String itemId) async {
+  Future<void> addFavourite(
+    String itemId, {
+    String? variantName,
+    int? sugar,
+    String? note,
+  }) async {
     await _dioHandler.dio.post(
       '/favorites',
-      data: {'itemId': itemId},
+      data: {
+        'itemId': itemId,
+        if (variantName != null) 'variantName': variantName,
+        if (sugar != null) 'sugar': sugar,
+        if (note != null && note.isNotEmpty) 'note': note,
+      },
     );
   }
 
