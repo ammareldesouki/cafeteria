@@ -14,20 +14,48 @@ import { FIREBASE_SERVICE_ACCOUNT_PATH } from "@config/env";
 
 let initialized = false;
 
-function init() {
-	if (initialized) return;
+/**
+ * Resolve the service-account credentials from the environment.
+ * Prefers FIREBASE_SERVICE_ACCOUNT_BASE64 (a single base64 line — immune to the
+ * newline/quote mangling that breaks raw multi-line JSON in env vars), then
+ * falls back to FIREBASE_SERVICE_ACCOUNT_JSON.
+ */
+function loadServiceAccountFromEnv(): Record<string, unknown> | null {
+	const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
+	if (b64) {
+		try {
+			const decoded = Buffer.from(b64.trim(), "base64").toString("utf8");
+			return JSON.parse(decoded);
+		} catch (err) {
+			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_BASE64", err);
+		}
+	}
 
 	const envJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 	if (envJson) {
 		try {
-			const serviceAccount = JSON.parse(envJson);
-			admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-			initialized = true;
-			console.log("🔥 Firebase Admin initialized (from env var)");
-			return;
+			// Tolerate a value accidentally wrapped in surrounding quotes.
+			const trimmed = envJson.trim().replace(/^['"]|['"]$/g, "");
+			return JSON.parse(trimmed);
 		} catch (err) {
 			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON", err);
 		}
+	}
+
+	return null;
+}
+
+function init() {
+	if (initialized) return;
+
+	const serviceAccountFromEnv = loadServiceAccountFromEnv();
+	if (serviceAccountFromEnv) {
+		admin.initializeApp({
+			credential: admin.credential.cert(serviceAccountFromEnv as any),
+		});
+		initialized = true;
+		console.log("🔥 Firebase Admin initialized (from env var)");
+		return;
 	}
 
 	const path = resolve(process.cwd(), FIREBASE_SERVICE_ACCOUNT_PATH);
