@@ -777,7 +777,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
       for (final e in item!.extras!) {
         extraNameControllers.add(TextEditingController(text: e.name));
         extraPriceControllers.add(
-            TextEditingController(text: e.price.toStringAsFixed(0)));
+            TextEditingController(text: e.price.toStringAsFixed(2)));
       }
     }
 
@@ -1507,7 +1507,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                             if (item.selectedExtras != null &&
                                 item.selectedExtras!.isNotEmpty)
                               ...item.selectedExtras!.map((e) => Text(
-                                    "+ ${e.name} (+${e.price.toStringAsFixed(0)} ${l10n.pound})",
+                                    "+ ${e.name} (+${e.price.toStringAsFixed(2)} ${l10n.pound})",
                                     style: const TextStyle(
                                         fontSize: 11, color: Color(0xFFC07722)),
                                   )),

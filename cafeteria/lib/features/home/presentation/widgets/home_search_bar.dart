@@ -240,7 +240,7 @@ class _ResultTile extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
-            '${item.price.toStringAsFixed(0)} L.E',
+            '${item.price.toStringAsFixed(2)} L.E',
             style: const TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 13,

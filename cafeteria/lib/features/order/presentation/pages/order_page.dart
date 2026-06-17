@@ -210,7 +210,7 @@ class _OrderCard extends StatelessWidget {
                         if (item.selectedExtras != null &&
                             item.selectedExtras!.isNotEmpty)
                           ...item.selectedExtras!.map((e) => Text(
-                                '+ ${e.name} (+${e.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound})',
+                                '+ ${e.name} (+${e.price.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound})',
                                 style: const TextStyle(
                                   fontSize: 11,
                                   color: Color(0xFFC07722),

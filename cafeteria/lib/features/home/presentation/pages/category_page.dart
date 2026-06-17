@@ -433,7 +433,7 @@ class _ProductCard extends StatelessWidget {
                   const SizedBox(height: 6),
 
                   Text(
-                    '${item.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound}',
+                    '${item.price.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
                     style: Theme.of(context).textTheme!.titleMedium,
                   ),
 
@@ -764,7 +764,7 @@ Text(item.name,
 style: Theme.of(context).textTheme.bodyMedium),
 const SizedBox(height: 4),
 Text(
-'${item.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound}',
+'${item.price.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
 style: Theme.of(context).textTheme.titleLarge),
 ],
 ),
@@ -1075,7 +1075,7 @@ width: 1.5,
 ),
 ),
 child: Text(
-'${extra.name} (+${extra.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound})',
+'${extra.name} (+${extra.price.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound})',
 style: TextStyle(
 fontSize: 14,
 fontWeight: FontWeight.w600,
@@ -1161,7 +1161,7 @@ Text(
 _hasVariants && _selectedVariant == null
 ? AppLocalizations.of(context)!
     .varaityIsRequired
-    : '${AppLocalizations.of(context)!.add} $_quantity ${AppLocalizations.of(context)!.toCart}  –  ${_totalPrice.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound}',
+    : '${AppLocalizations.of(context)!.add} $_quantity ${AppLocalizations.of(context)!.toCart}  –  ${_totalPrice.toStringAsFixed(2)} ${AppLocalizations.of(context)!.pound}',
 style: const TextStyle(
 color: Colors.white,
 fontWeight: FontWeight.bold,

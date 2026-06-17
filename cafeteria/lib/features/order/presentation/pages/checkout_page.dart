@@ -231,7 +231,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                                   .only(
                                                                   top: 2),
                                                           child: Text(
-                                                            '+ ${e.name} (+${e.price.toStringAsFixed(0)} ${l10n.pound})',
+                                                            '+ ${e.name} (+${e.price.toStringAsFixed(2)} ${l10n.pound})',
                                                             style:
                                                                 const TextStyle(
                                                               fontSize: 11,
