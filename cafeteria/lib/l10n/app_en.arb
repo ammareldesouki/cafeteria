@@ -70,6 +70,7 @@
   "addVariant": "Add Variant",
   "variantName": "Variant Name",
   "sugarOption": "Offers sugar",
+  "itemNoLongerAvailable": "This item is no longer available",
   "sugar": "Sugar",
   "sugarSpoons": "{count} spoon(s)",
   "@sugarSpoons": {

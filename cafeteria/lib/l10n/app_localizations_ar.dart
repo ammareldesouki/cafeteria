@@ -218,6 +218,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get sugarOption => 'يوفر سكر';
 
   @override
+  String get itemNoLongerAvailable => 'هذا الصنف لم يعد متاحًا';
+
+  @override
   String get sugar => 'السكر';
 
   @override

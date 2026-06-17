@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../home/domain/entities/menu_item_entity.dart';
+import '../../../home/presentation/manager/home_bloc.dart';
+import '../../../home/presentation/pages/category_page.dart' show showCustomizeSheet;
 import '../../domain/entities/cart_entity.dart';
 import '../manager/cart_bloc.dart';
 import '../manager/cart_event.dart';
@@ -59,6 +62,45 @@ class _CartItemCardState extends State<CartItemCard> {
         ));
   }
 
+  /// Re-open the customize sheet for this item, pre-filled with the user's
+  /// saved selection (variant, sugar, note, quantity, extras). The full menu
+  /// item — with all its variants/extras — is looked up from HomeBloc.
+  void _openCustomizeSheet(BuildContext context) {
+    final homeState = context.read<HomeBloc>().state;
+    if (homeState is! HomeLoaded) return;
+
+    MenuItemEntity? menuItem;
+    for (final m in homeState.allItems) {
+      if (m.mongoId == widget.item.menuItemId) {
+        menuItem = m;
+        break;
+      }
+    }
+    if (menuItem == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.itemNoLongerAvailable),
+          backgroundColor: const Color(0xFF3B1A08),
+        ),
+      );
+      return;
+    }
+
+    // Quantity is intentionally not pre-filled: the sheet's "Add to Cart"
+    // merges into the existing line (increments quantity), so seeding it with
+    // the current amount would double it. Quantity stays editable via the cart
+    // card's +/- buttons.
+    showCustomizeSheet(
+      context,
+      menuItem,
+      variant: widget.item.variantName,
+      sugar: widget.item.sugar,
+      note: widget.item.note,
+      extraNames:
+          widget.item.selectedExtras?.map((e) => e.name).toList(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<CartBloc, CartState>(
@@ -66,7 +108,9 @@ class _CartItemCardState extends State<CartItemCard> {
         final isLoading = state is CartItemActionLoading &&
             state.itemId == widget.item.id;
 
-        return Container(
+        return GestureDetector(
+          onTap: isLoading ? null : () => _openCustomizeSheet(context),
+          child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -373,6 +417,7 @@ class _CartItemCardState extends State<CartItemCard> {
                 // ],
               ],
             ),
+          ),
           ),
         );
       },

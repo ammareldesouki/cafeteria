@@ -523,6 +523,8 @@ MenuItemEntity item, {
 String? variant,
 int? sugar,
 String? note,
+int? quantity,
+List<String>? extraNames,
 }) {
 showModalBottomSheet(
 context: context,
@@ -538,6 +540,8 @@ item: item,
 initialVariant: variant,
 initialSugar: sugar,
 initialNote: note,
+initialQuantity: quantity,
+initialExtraNames: extraNames,
 ),
 ),
 );
@@ -548,6 +552,8 @@ final MenuItemEntity item;
 final String? initialVariant;
 final int? initialSugar;
 final String? initialNote;
+final int? initialQuantity;
+final List<String>? initialExtraNames;
 
 const CustomizeSheet({
 super.key,
@@ -555,6 +561,8 @@ required this.item,
 this.initialVariant,
 this.initialSugar,
 this.initialNote,
+this.initialQuantity,
+this.initialExtraNames,
 });
 
 @override
@@ -571,10 +579,18 @@ final Set<int> _selectedExtras = {};
 @override
 void initState() {
 super.initState();
-_quantity = 1;
+_quantity = widget.initialQuantity ?? 1;
 _selectedVariant = widget.initialVariant;
 _sugar = widget.initialSugar ?? 0;
 _noteController = TextEditingController(text: widget.initialNote ?? '');
+
+// Pre-select extras whose names match the saved selection.
+final names = widget.initialExtraNames;
+if (names != null && names.isNotEmpty && widget.item.extras != null) {
+for (var i = 0; i < widget.item.extras!.length; i++) {
+if (names.contains(widget.item.extras![i].name)) _selectedExtras.add(i);
+}
+}
 }
 
 MenuItemEntity get item => widget.item;

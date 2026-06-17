@@ -512,6 +512,12 @@ abstract class AppLocalizations {
   /// **'Offers sugar'**
   String get sugarOption;
 
+  /// No description provided for @itemNoLongerAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This item is no longer available'**
+  String get itemNoLongerAvailable;
+
   /// No description provided for @sugar.
   ///
   /// In en, this message translates to:
