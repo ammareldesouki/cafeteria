@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../network/dio_handler.dart';
@@ -12,6 +13,16 @@ class FcmService {
   final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
+
+  /// High-importance channel (plays the default bell sound). The channelId
+  /// MUST match what the backend sends in `android.notification.channelId`.
+  static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
+    'high_importance_channel',
+    'Order Notifications',
+    description: 'New orders and upcoming scheduled orders',
+    importance: Importance.high,
+    playSound: true,
+  );
 
   String? _currentToken;
   bool _initialized = false;
@@ -49,6 +60,19 @@ class FcmService {
         android: androidSettings,
         iOS: iosSettings,
       ),
+    );
+
+    // Create the Android channel up-front so its sound/importance are applied.
+    await _notifications
+        .resolvePlatformSpecificImplementation<
+            AndroidFlutterLocalNotificationsPlugin>()
+        ?.createNotificationChannel(_channel);
+
+    // On iOS, show notifications (with sound) even while the app is foreground.
+    await _messaging.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: true,
     );
 
     // Listen for token refresh (fires once APNs token is ready on iOS)
@@ -119,19 +143,24 @@ class FcmService {
 
     log('FCM foreground: ${notification.title} — ${notification.body}');
 
+    // iOS already shows the banner + sound in the foreground via
+    // setForegroundNotificationPresentationOptions, so showing a local
+    // notification here too would double it. Android needs the manual show.
+    if (Platform.isIOS) return;
+
     _notifications.show(
       notification.hashCode,
       notification.title,
       notification.body,
-      const NotificationDetails(
+      NotificationDetails(
         android: AndroidNotificationDetails(
-          'scheduled_orders',
-          'Scheduled Orders',
-          channelDescription: 'Notifications for upcoming scheduled orders',
+          _channel.id,
+          _channel.name,
+          channelDescription: _channel.description,
           importance: Importance.high,
           priority: Priority.high,
+          playSound: true,
         ),
-        iOS: DarwinNotificationDetails(),
       ),
     );
   }

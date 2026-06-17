@@ -95,6 +95,14 @@ export async function sendPushNotification(
 		tokens,
 		notification: { title: payload.title, body: payload.body },
 		data: payload.data,
+		// Play the default notification sound (bell) on both platforms.
+		apns: {
+			payload: { aps: { sound: "default" } },
+		},
+		android: {
+			priority: "high",
+			notification: { sound: "default", channelId: "high_importance_channel" },
+		},
 	};
 
 	try {
