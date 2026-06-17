@@ -25,8 +25,16 @@ class FcmService {
       alert: true,
       badge: true,
       sound: true,
+      provisional: false,
     );
     log('FCM permission: ${permission.authorizationStatus}');
+
+    // On iOS, explicitly wait for APNs token
+    try {
+      await _messaging.getAPNSToken();
+    } catch (e) {
+      log('APNs token not yet available: $e');
+    }
 
     // Initialize local notifications channel
     const androidSettings =
@@ -43,14 +51,10 @@ class FcmService {
       ),
     );
 
-    // Get the current token
-    _currentToken = await _messaging.getToken();
-    log('FCM token: $_currentToken');
-
-    // Listen for token refresh
+    // Listen for token refresh (fires once APNs token is ready on iOS)
     _messaging.onTokenRefresh.listen((token) {
       _currentToken = token;
-      log('FCM token refreshed: $token');
+      log('FCM token: $token');
       _registerToken();
     });
 
@@ -62,10 +66,24 @@ class FcmService {
 
   /// Register the current FCM token with the backend (admin only).
   Future<void> registerToken() async {
-    if (_currentToken == null) {
-      _currentToken = await _messaging.getToken();
+    if (_currentToken != null) {
+      await _registerToken();
+      return;
     }
-    await _registerToken();
+    // Retry multiple times with increasing delays
+    for (final delay in [2, 4, 8]) {
+      await Future.delayed(Duration(seconds: delay));
+      try {
+        _currentToken = await _messaging.getToken();
+      } catch (_) {
+        continue;
+      }
+      if (_currentToken != null) {
+        await _registerToken();
+        return;
+      }
+    }
+    log('FCM token unavailable after retries. Will register on refresh.');
   }
 
   Future<void> _registerToken() async {

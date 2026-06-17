@@ -5,7 +5,9 @@
 
 import { ObjectId } from "mongodb";
 import { cartRepository } from "@/repositories/cart.repository";
+import { fcmRepository } from "@/repositories/fcm.repository";
 import { orderRepository } from "@/repositories/order.repository";
+import { sendPushNotification } from "@/services/fcm.service";
 import { stockService } from "@/services/stock.service";
 import { userWalletService } from "@/services/userWallet.service";
 import { walletService } from "@/services/wallet.service";
@@ -84,6 +86,40 @@ async function settleWallets(
 		await walletService.recordPayment(orderId, cafeteriaDelta);
 	} else if (cafeteriaDelta < 0) {
 		await walletService.recordReversal(orderId, -cafeteriaDelta);
+	}
+}
+
+/**
+ * Push a "new order" notification to every registered staff device.
+ * Best-effort: any failure is logged and swallowed so checkout still succeeds.
+ */
+async function notifyStaffOfNewOrder(
+	order: Order,
+	scheduledFor?: Date,
+): Promise<void> {
+	try {
+		const tokens = await fcmRepository.getAllTokens();
+		if (tokens.length === 0) return;
+
+		const itemCount = order.items.reduce((n, it) => n + it.quantity, 0);
+		const who = order.username ?? "A customer";
+		const when = scheduledFor
+			? ` for ${scheduledFor.toLocaleTimeString("en-US", {
+					hour: "2-digit",
+					minute: "2-digit",
+				})}`
+			: "";
+
+		await sendPushNotification(tokens, {
+			title: "🛎️ New Order",
+			body: `${who} placed an order${when} — ${itemCount} item(s), ${order.totalPrice} EGP.`,
+			data: {
+				orderId: order._id?.toString() ?? "",
+				type: "new_order",
+			},
+		});
+	} catch (err) {
+		console.error("New-order push failed:", err);
 	}
 }
 
@@ -197,6 +233,11 @@ export const orderService = {
 		const createdOrder = await orderRepository.create(order);
 
 		await cartRepository.clearCart(userId);
+
+		// Notify staff that a new order arrived. Fire-and-forget: a push failure
+		// must never break checkout.
+		void notifyStaffOfNewOrder(createdOrder, scheduledFor);
+
 		return createdOrder;
 	},
 

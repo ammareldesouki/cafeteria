@@ -428,12 +428,12 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
             state.analytics.totalOrders.toString(), Icons.check_circle_outline),
         _buildStatCard(
             l10n.rvenue,
-            "\$${state.analytics.totalRevenue.toStringAsFixed(2)}",
+            "${state.analytics.totalRevenue.toStringAsFixed(2)} ${l10n.pound}",
             Icons.attach_money,
             color: TColors.primary),
         _buildStatCard(
             l10n.pendingWallet,
-            "\$${state.analytics.pendingRevenue.toStringAsFixed(2)}",
+            "${state.analytics.pendingRevenue.toStringAsFixed(2)} ${l10n.pound}",
             Icons.money_off,
             color: TColors.secondary),
       ],
