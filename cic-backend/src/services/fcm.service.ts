@@ -4,12 +4,20 @@
  * Setup:
  *   1. Go to Firebase Console → Project Settings → Service Accounts
  *   2. "Generate new private key" → download JSON
- *   3. Save as `cic-backend/firebase-service-account.json`
- *   4. Set `FIREBASE_SERVICE_ACCOUNT_PATH` in .env (defaults to that path)
+ *   3. Deploy: set FIREBASE_SERVICE_ACCOUNT_BASE64 (base64 of that JSON).
+ *      Local dev: save the JSON as `cic-backend/firebase-service-account.json`.
+ *
+ * Uses the modular `firebase-admin/*` entry points (not the default `admin`
+ * import), which resolve correctly under the ESM bundle — the monolithic
+ * default import leaves `admin.credential` undefined once bundled.
  */
-import admin from "firebase-admin";
-import { existsSync } from "node:fs";
+import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
+import {
+	getMessaging,
+	type MulticastMessage,
+} from "firebase-admin/messaging";
 import { FIREBASE_SERVICE_ACCOUNT_PATH } from "@config/env";
 
 let initialized = false;
@@ -47,30 +55,29 @@ function loadServiceAccountFromEnv(): Record<string, unknown> | null {
 
 function init() {
 	if (initialized) return;
-
-	const serviceAccountFromEnv = loadServiceAccountFromEnv();
-	if (serviceAccountFromEnv) {
-		admin.initializeApp({
-			credential: admin.credential.cert(serviceAccountFromEnv as any),
-		});
+	if (getApps().length > 0) {
 		initialized = true;
-		console.log("🔥 Firebase Admin initialized (from env var)");
 		return;
 	}
 
-	const path = resolve(process.cwd(), FIREBASE_SERVICE_ACCOUNT_PATH);
-	if (!existsSync(path)) {
-		console.warn(
-			"⚠️  Firebase service account not found at",
-			path,
-			"— FCM disabled.",
-		);
-		return;
+	let serviceAccount = loadServiceAccountFromEnv();
+
+	if (!serviceAccount) {
+		const path = resolve(process.cwd(), FIREBASE_SERVICE_ACCOUNT_PATH);
+		if (!existsSync(path)) {
+			console.warn(
+				"⚠️  Firebase service account not found at",
+				path,
+				"— FCM disabled.",
+			);
+			return;
+		}
+		serviceAccount = JSON.parse(readFileSync(path, "utf8"));
 	}
-	const serviceAccount = require(path);
-	admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+
+	initializeApp({ credential: cert(serviceAccount as any) });
 	initialized = true;
-	console.log("🔥 Firebase Admin initialized (from file)");
+	console.log("🔥 Firebase Admin initialized");
 }
 
 /**
@@ -84,14 +91,14 @@ export async function sendPushNotification(
 	init();
 	if (!initialized || tokens.length === 0) return;
 
-	const message: admin.messaging.MulticastMessage = {
+	const message: MulticastMessage = {
 		tokens,
 		notification: { title: payload.title, body: payload.body },
 		data: payload.data,
 	};
 
 	try {
-		const response = await admin.messaging().sendEachForMulticast(message);
+		const response = await getMessaging().sendEachForMulticast(message);
 		const failures = response.responses.filter((r) => !r.success).length;
 		if (failures > 0) {
 			console.warn(`FCM: ${failures}/${tokens.length} messages failed`);
