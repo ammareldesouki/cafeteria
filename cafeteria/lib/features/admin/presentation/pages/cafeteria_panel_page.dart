@@ -1504,6 +1504,13 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                                 style: const TextStyle(
                                     fontSize: 12, color: Colors.black),
                               ),
+                            if (item.selectedExtras != null &&
+                                item.selectedExtras!.isNotEmpty)
+                              ...item.selectedExtras!.map((e) => Text(
+                                    "+ ${e.name} (+${e.price.toStringAsFixed(0)} ${l10n.pound})",
+                                    style: const TextStyle(
+                                        fontSize: 11, color: Color(0xFFC07722)),
+                                  )),
                             Text(
                               "${l10n.quantity}: ${item.quantity}",
                               style: const TextStyle(
