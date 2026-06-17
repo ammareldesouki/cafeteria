@@ -930,6 +930,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get goToCart => 'Go to Cart';
 
   @override
+  String get scheduledTime => 'Scheduled';
+
+  @override
   String get asSoonAsPossible => 'As soon as possible';
 
   @override
@@ -943,4 +946,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get orderNotesHint => 'Any special instructions for the cafeteria...';
+
+  @override
+  String get extras => 'Extras';
 }

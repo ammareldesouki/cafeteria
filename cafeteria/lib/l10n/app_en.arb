@@ -325,11 +325,13 @@
   "price": "Price",
   "itemName":"Item Name",
   "goToCart": "Go to Cart",
+  "scheduledTime": "Scheduled",
   "asSoonAsPossible": "As soon as possible",
   "scheduleForLater": "Schedule for later",
   "selectDateTime": "Select date & time",
   "orderNotes": "Order Notes",
-  "orderNotesHint": "Any special instructions for the cafeteria..."
+  "orderNotesHint": "Any special instructions for the cafeteria...",
+  "extras": "Extras"
 
 
 

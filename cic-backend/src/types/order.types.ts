@@ -16,6 +16,11 @@ export enum PaymentStatus {
 	UNPAID = "unpaid",
 }
 
+export interface OrderItemExtra {
+	name: string;
+	price: number;
+}
+
 export interface OrderItem {
 	menuItemId: ObjectId;
 	menuItemName?: string;
@@ -25,6 +30,8 @@ export interface OrderItem {
 	sugar?: number;
 	quantity: number;
 	unitPrice: number;
+	/** Priced extras selected by the customer, copied from cart item. */
+	selectedExtras?: OrderItemExtra[];
 }
 
 export interface Order {

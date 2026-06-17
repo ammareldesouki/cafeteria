@@ -1,4 +1,4 @@
-import { cartRepository } from "@/repositories/cart.repository";
+import { cartRepository, type CartItemSelectedExtra } from "@/repositories/cart.repository";
 import { menuRepository } from "@/repositories/menu.repository";
 import { stockService } from "@/services/stock.service";
 import {
@@ -24,6 +24,10 @@ export interface CartItemResponse {
 	stock: number | null;
 	/** Whether stock is tracked for this item. */
 	trackStock: boolean;
+	/** Priced extras selected by the customer. */
+	selectedExtras?: CartItemSelectedExtra[];
+	/** Sum of all extra option prices for this item (pre-quantity). */
+	extrasTotal: number;
 }
 
 export interface CartResponse {
@@ -60,6 +64,7 @@ export const cartService = {
 		variantName?: string,
 		note?: string,
 		sugar?: number,
+		selectedExtras?: CartItemSelectedExtra[],
 	): Promise<CartItemResponse> {
 		if (!Number.isInteger(quantity) || quantity <= 0) {
 			throw new InvalidQuantityError(quantity, "must be a positive integer");
@@ -122,6 +127,7 @@ export const cartService = {
 			quantity,
 			note,
 			sugar,
+			selectedExtras,
 		);
 
 		const cartItem = await cartRepository.getItem(
@@ -141,6 +147,14 @@ export const cartService = {
 			variantName,
 		);
 
+		const extrasTotal =
+			(cartItem.selectedExtras ?? []).reduce(
+				(sum, e) => sum + e.price,
+				0,
+			);
+		const itemSubtotal =
+			menuItem.price * cartItem.quantity + extrasTotal * cartItem.quantity;
+
 		return {
 			id: cartItem.menuItemId.toString(),
 			menuItemId,
@@ -149,9 +163,14 @@ export const cartService = {
 			...(variantName && { variantName }),
 			...(note && { note }),
 			...(typeof cartItem.sugar === "number" && { sugar: cartItem.sugar }),
+			...(cartItem.selectedExtras &&
+				cartItem.selectedExtras.length > 0 && {
+					selectedExtras: cartItem.selectedExtras,
+				}),
 			quantity: cartItem.quantity,
 			unitPrice: menuItem.price,
-			subtotal: menuItem.price * cartItem.quantity,
+			subtotal: itemSubtotal,
+			extrasTotal,
 			stock: stockInfo.available,
 			trackStock: stockInfo.trackStock,
 		};
@@ -221,6 +240,7 @@ export const cartService = {
 			quantity,
 			unitPrice: menuItem.price,
 			subtotal: menuItem.price * quantity,
+			extrasTotal: 0,
 			stock: stockInfo.available,
 			trackStock: stockInfo.trackStock,
 		};
@@ -287,7 +307,12 @@ export const cartService = {
 			if (!menuItem) continue;
 
 			const unitPrice = menuItem.price;
-			const subtotal = unitPrice * item.quantity;
+			const extrasTotal =
+				(item.selectedExtras ?? []).reduce(
+					(sum, e) => sum + e.price,
+					0,
+				);
+			const subtotal = unitPrice * item.quantity + extrasTotal * item.quantity;
 
 			totalItems += item.quantity;
 			totalPrice += subtotal;
@@ -306,9 +331,14 @@ export const cartService = {
 				...(item.variantName && { variantName: item.variantName }),
 				...(item.note && { note: item.note }),
 				...(typeof item.sugar === "number" && { sugar: item.sugar }),
+				...(item.selectedExtras &&
+					item.selectedExtras.length > 0 && {
+						selectedExtras: item.selectedExtras,
+					}),
 				quantity: item.quantity,
 				unitPrice,
 				subtotal,
+				extrasTotal,
 				stock: stockInfo.available,
 				trackStock: stockInfo.trackStock,
 			});

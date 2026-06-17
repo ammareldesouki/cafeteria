@@ -1,3 +1,10 @@
+class CartItemExtraEntity {
+  final String name;
+  final double price;
+
+  const CartItemExtraEntity({required this.name, required this.price});
+}
+
 class CartItemEntity {
   final String id;
   final String menuItemId;
@@ -16,6 +23,9 @@ class CartItemEntity {
   /// Whether stock is tracked for this item.
   final bool trackStock;
 
+  /// Priced extras selected by the customer.
+  final List<CartItemExtraEntity>? selectedExtras;
+
   const CartItemEntity({
     required this.id,
     required this.menuItemId,
@@ -29,6 +39,7 @@ class CartItemEntity {
     required this.subtotal,
     this.stock,
     this.trackStock = true,
+    this.selectedExtras,
   });
 }
 

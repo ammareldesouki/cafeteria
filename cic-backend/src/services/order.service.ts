@@ -141,6 +141,12 @@ export const orderService = {
 				cartItem.menuItemId.toString(),
 			);
 
+			const extrasTotal =
+				((cartItem as any).selectedExtras ?? []).reduce(
+					(sum: number, e: any) => sum + e.price,
+					0,
+				);
+
 			orderItems.push({
 				menuItemId:
 					typeof res.menuItemId === "string"
@@ -152,11 +158,21 @@ export const orderService = {
 				...(typeof cartItem?.sugar === "number" && { sugar: cartItem.sugar }),
 				quantity: res.quantity,
 				unitPrice: res.unitPrice,
+				...(extrasTotal > 0 && {
+					selectedExtras: (cartItem as any).selectedExtras,
+				}),
 			});
 		}
 
 		const totalPrice = orderItems.reduce(
-			(sum, item) => sum + item.unitPrice * item.quantity,
+			(sum, item) => {
+				const extrasSum =
+					(item.selectedExtras ?? []).reduce(
+						(s, e) => s + e.price,
+						0,
+					);
+				return sum + (item.unitPrice + extrasSum) * item.quantity;
+			},
 			0,
 		);
 

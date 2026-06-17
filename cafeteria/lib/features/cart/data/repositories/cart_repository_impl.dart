@@ -17,6 +17,7 @@ class CartRepositoryImpl implements CartRepository {
     String? variantName,
     String? note,
     int? sugar,
+    List<Map<String, dynamic>>? selectedExtras,
   }) =>
       remoteDataSource.addCartItem(
         menuItemId: menuItemId,
@@ -24,6 +25,7 @@ class CartRepositoryImpl implements CartRepository {
         variantName: variantName,
         note: note,
         sugar: sugar,
+        selectedExtras: selectedExtras,
       );
 
   @override

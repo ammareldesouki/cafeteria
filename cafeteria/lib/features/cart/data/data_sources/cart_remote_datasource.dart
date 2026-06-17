@@ -10,6 +10,7 @@ abstract class CartRemoteDataSource {
     String? variantName,
     String? note,
     int? sugar,
+    List<Map<String, dynamic>>? selectedExtras,
   });
 
   Future<CartItemModel> updateCartItem({
@@ -48,6 +49,7 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
     String? variantName,
     String? note,
     int? sugar,
+    List<Map<String, dynamic>>? selectedExtras,
   }) async {
     final body = {
       'menuItemId': menuItemId,
@@ -55,6 +57,8 @@ class CartRemoteDataSourceImpl implements CartRemoteDataSource {
       if (variantName != null) 'variantName': variantName,
       if (note != null && note.isNotEmpty) 'note': note,
       if (sugar != null) 'sugar': sugar,
+      if (selectedExtras != null && selectedExtras.isNotEmpty)
+        'selectedExtras': selectedExtras,
     };
 
     final response = await _dioHandler.dio.post(

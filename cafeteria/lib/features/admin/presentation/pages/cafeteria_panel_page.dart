@@ -1353,10 +1353,25 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                 const Icon(Icons.access_time_outlined,
                     size: 16, color: Colors.black),
                 const SizedBox(width: 8),
-                Text(DateFormat('hh:mm a').format(order.createdAt),
+                Text(DateFormat('hh:mm a').format(_cairoTime(order.createdAt)),
                     style: const TextStyle(color: Colors.black)),
               ],
             ),
+            if (order.scheduledFor != null) ...[
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(Icons.schedule_outlined,
+                      size: 16, color: Color(0xFFC07722)),
+                  const SizedBox(width: 8),
+                  Text(
+                    '${l10n.scheduledTime}: ${DateFormat('hh:mm a').format(_cairoTime(order.scheduledFor!))}',
+                    style: const TextStyle(
+                        color: Color(0xFFC07722), fontWeight: FontWeight.w500),
+                  ),
+                ],
+              ),
+            ],
             const SizedBox(height: 8),
             Row(
               children: [
@@ -1478,4 +1493,11 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
       _            => Colors.grey,
     };
   }
+}
+
+/// Converts a UTC [DateTime] to Cairo local time.
+/// Egypt: UTC+2 in winter, UTC+3 during DST (~April to October).
+DateTime _cairoTime(DateTime utc) {
+  final offset = utc.month >= 4 && utc.month <= 10 ? 3 : 2;
+  return utc.add(Duration(hours: offset));
 }

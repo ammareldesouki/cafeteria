@@ -12,6 +12,7 @@ class MenuItemModel extends MenuItemEntity {
     required super.inStock,
     super.hasVariants,
     super.variants,
+    super.extras,
     super.hasSugar,
     super.stock,
     super.trackStock,
@@ -37,6 +38,24 @@ class MenuItemModel extends MenuItemEntity {
       variants = null;
     }
 
+    // Parse extras list — API field is "extras": [{"name": "Extra Cheese", "price": 5}]
+    final rawExtras = map['extras'];
+    final List<ExtraOptionEntity>? extras;
+
+    if (rawExtras != null && rawExtras is List && rawExtras.isNotEmpty) {
+      extras = rawExtras.map((e) {
+        if (e is Map<String, dynamic>) {
+          return ExtraOptionEntity(
+            name: e['name']?.toString() ?? '',
+            price: (e['price'] as num?)?.toDouble() ?? 0.0,
+          );
+        }
+        return ExtraOptionEntity(name: e.toString(), price: 0.0);
+      }).toList();
+    } else {
+      extras = null;
+    }
+
     return MenuItemModel(
       id: map['id']?.toString() ?? '',
       mongoId: map['_id']?.toString() ?? '',
@@ -48,6 +67,7 @@ class MenuItemModel extends MenuItemEntity {
       inStock: map['inStock'] ?? map['in_stock'] ?? false,
       hasVariants: map['hasVariants'] ?? false,
       variants: variants,
+      extras: extras,
       hasSugar: map['hasSugar'] ?? false,
       stock: (map['stock'] as num?)?.toInt(),
       trackStock: map['trackStock'] ?? true,

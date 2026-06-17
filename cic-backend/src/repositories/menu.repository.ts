@@ -13,6 +13,11 @@ export interface MenuItemVariant {
 	stock: number;
 }
 
+export interface MenuItemExtra {
+	name: string;
+	price: number;
+}
+
 export interface MenuItem {
 	_id?: ObjectId;
 	id?: string;
@@ -28,6 +33,8 @@ export interface MenuItem {
 	trackStock: boolean;
 	hasVariants: boolean;
 	variants?: MenuItemVariant[];
+	/** Priced extra options customers can add (e.g. extra cheese, whipped cream). */
+	extras?: MenuItemExtra[];
 	/** When true, customers can pick a sugar amount when ordering. */
 	hasSugar?: boolean;
 	category?: string;
@@ -45,6 +52,7 @@ export type CreateMenuItemInput = {
 	trackStock?: boolean;
 	hasVariants: boolean;
 	variants?: MenuItemVariant[];
+	extras?: MenuItemExtra[];
 	hasSugar?: boolean;
 	category?: string;
 	image?: string;
@@ -80,6 +88,7 @@ export const menuRepository = {
 			stock: data.stock ?? 0,
 			trackStock: data.trackStock ?? true,
 			variants: data.hasVariants ? (data.variants ?? []) : undefined,
+			extras: data.extras ?? undefined,
 			hasSugar: data.hasSugar ?? false,
 			in_stock: true,
 			createdAt: now,

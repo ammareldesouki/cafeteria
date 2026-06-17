@@ -324,10 +324,12 @@
   "price": "المبلغ",
   "itemName": "اسم المنتج",
   "goToCart": "اذهب للسلة",
+  "scheduledTime": "مجدول",
   "asSoonAsPossible": "في أقرب وقت",
   "scheduleForLater": "جدولة لوقت لاحق",
   "selectDateTime": "اختر التاريخ والوقت",
   "orderNotes": "ملاحظات الطلب",
-  "orderNotesHint": "أي تعليمات خاصة للكافيتيريا..."
+  "orderNotesHint": "أي تعليمات خاصة للكافيتيريا...",
+  "extras": "إضافات"
 
 }

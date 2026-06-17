@@ -8,6 +8,11 @@ import { ObjectId } from "mongodb";
 
 const collection = mongoose.connection.collection<Cart>("carts");
 
+export interface CartItemSelectedExtra {
+	name: string;
+	price: number;
+}
+
 export interface CartItem {
 	menuItemId: ObjectId;
 	variantName?: string;
@@ -15,6 +20,8 @@ export interface CartItem {
 	/** Selected sugar amount (spoons) for items that offer it. */
 	sugar?: number;
 	quantity: number;
+	/** Priced extras the customer selected (adds to item subtotal). */
+	selectedExtras?: CartItemSelectedExtra[];
 }
 
 export interface Cart {
@@ -70,6 +77,7 @@ export const cartRepository = {
 		quantity: number,
 		note?: string,
 		sugar?: number,
+		selectedExtras?: CartItemSelectedExtra[],
 	): Promise<Cart | null> {
 		const existingItem = await this.getItem(userId, menuItemId, variantName, note);
 
@@ -117,6 +125,7 @@ export const cartRepository = {
 			...(normalizedVariantName && { variantName: normalizedVariantName }),
 			...(note && { note }),
 			...(typeof sugar === "number" && { sugar }),
+			...(selectedExtras && selectedExtras.length > 0 && { selectedExtras }),
 			quantity,
 		};
 

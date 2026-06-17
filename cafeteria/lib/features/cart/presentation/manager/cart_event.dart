@@ -8,6 +8,7 @@ class AddCartItemEvent extends CartEvent {
   final String? variantName;
   final String? note;
   final int? sugar;
+  final List<Map<String, dynamic>>? selectedExtras;
 
   AddCartItemEvent({
     required this.menuItemId,
@@ -15,6 +16,7 @@ class AddCartItemEvent extends CartEvent {
     this.variantName,
     this.note,
     this.sugar,
+    this.selectedExtras,
   });
 }
 

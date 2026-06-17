@@ -928,6 +928,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get goToCart => 'اذهب للسلة';
 
   @override
+  String get scheduledTime => 'مجدول';
+
+  @override
   String get asSoonAsPossible => 'في أقرب وقت';
 
   @override
@@ -941,4 +944,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get orderNotesHint => 'أي تعليمات خاصة للكافيتيريا...';
+
+  @override
+  String get extras => 'إضافات';
 }

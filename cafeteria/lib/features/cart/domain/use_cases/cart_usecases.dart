@@ -18,6 +18,7 @@ class AddCartItemUseCase {
     String? variantName,
     String? note,
     int? sugar,
+    List<Map<String, dynamic>>? selectedExtras,
   }) =>
       _repository.addCartItem(
         menuItemId: menuItemId,
@@ -25,6 +26,7 @@ class AddCartItemUseCase {
         variantName: variantName,
         note: note,
         sugar: sugar,
+        selectedExtras: selectedExtras,
       );
 }
 

@@ -1910,6 +1910,12 @@ abstract class AppLocalizations {
   /// **'Go to Cart'**
   String get goToCart;
 
+  /// No description provided for @scheduledTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Scheduled'**
+  String get scheduledTime;
+
   /// No description provided for @asSoonAsPossible.
   ///
   /// In en, this message translates to:
@@ -1939,6 +1945,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Any special instructions for the cafeteria...'**
   String get orderNotesHint;
+
+  /// No description provided for @extras.
+  ///
+  /// In en, this message translates to:
+  /// **'Extras'**
+  String get extras;
 }
 
 class _AppLocalizationsDelegate

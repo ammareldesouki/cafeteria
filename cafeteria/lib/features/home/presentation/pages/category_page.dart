@@ -566,6 +566,7 @@ late int _quantity;
 late String? _selectedVariant;
 late int _sugar;
 late final TextEditingController _noteController;
+final Set<int> _selectedExtras = {};
 
 @override
 void initState() {
@@ -585,7 +586,15 @@ item.variants!.isNotEmpty;
 
 bool get _canAddToCart => !_hasVariants || _selectedVariant != null;
 
-double get _totalPrice => item.price * _quantity;
+double get _extrasPrice {
+if (item.extras == null || _selectedExtras.isEmpty) return 0;
+return _selectedExtras.fold<double>(
+  0,
+  (sum, i) => sum + (item.extras![i].price),
+);
+}
+
+double get _totalPrice => (item.price + _extrasPrice) * _quantity;
 
 int get _maxQuantity {
 if (!item.trackStock) return 99;
@@ -628,6 +637,13 @@ backgroundColor: Color(0xFF3B1A08),
 return;
 }
 
+final extrasPayload = item.extras != null && _selectedExtras.isNotEmpty
+? _selectedExtras.map((i) {
+final e = item.extras![i];
+return {'name': e.name, 'price': e.price};
+}).toList()
+    : null;
+
 context.read<CartBloc>().add(
 AddCartItemEvent(
 menuItemId: item.mongoId,
@@ -637,6 +653,7 @@ note: _noteController.text.trim().isNotEmpty
 ? _noteController.text.trim()
     : null,
 sugar: item.hasSugar ? _sugar : null,
+selectedExtras: extrasPayload,
 ),
 );
 }
@@ -996,6 +1013,64 @@ onTap:
 _sugar < 10 ? () => setState(() => _sugar++) : null,
 ),
 ],
+),
+],
+if (item.extras != null && item.extras!.isNotEmpty) ...[
+const SizedBox(height: 22),
+Text(
+AppLocalizations.of(context)!.extras,
+style: const TextStyle(
+fontWeight: FontWeight.bold,
+fontSize: 15,
+color: Color(0xFF3B1A08),
+),
+),
+const SizedBox(height: 12),
+Wrap(
+spacing: 10,
+runSpacing: 10,
+children: item.extras!.asMap().entries.map((entry) {
+final index = entry.key;
+final extra = entry.value;
+final isSelected = _selectedExtras.contains(index);
+
+return GestureDetector(
+onTap: () => setState(() {
+if (isSelected) {
+_selectedExtras.remove(index);
+} else {
+_selectedExtras.add(index);
+}
+}),
+child: AnimatedContainer(
+duration: const Duration(milliseconds: 200),
+padding: const EdgeInsets.symmetric(
+horizontal: 18, vertical: 10),
+decoration: BoxDecoration(
+color: isSelected
+? const Color(0xFF3B1A08)
+    : Colors.white,
+borderRadius: BorderRadius.circular(22),
+border: Border.all(
+color: isSelected
+? const Color(0xFF3B1A08)
+    : const Color(0xFFD9C7B8),
+width: 1.5,
+),
+),
+child: Text(
+'${extra.name} (+${extra.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound})',
+style: TextStyle(
+fontSize: 14,
+fontWeight: FontWeight.w600,
+color: isSelected
+? Colors.white
+    : const Color(0xFF3B1A08),
+),
+),
+),
+);
+}).toList(),
 ),
 ],
 const SizedBox(height: 22),

@@ -10,6 +10,16 @@ class VariantEntity extends Equatable {
   List<Object?> get props => [name, stock];
 }
 
+class ExtraOptionEntity extends Equatable {
+  final String name;
+  final double price;
+
+  const ExtraOptionEntity({required this.name, required this.price});
+
+  @override
+  List<Object?> get props => [name, price];
+}
+
 class MenuItemEntity extends Equatable {
   final String id;
   final String mongoId;
@@ -21,6 +31,9 @@ class MenuItemEntity extends Equatable {
   final bool inStock;
   final bool hasVariants;
   final List<VariantEntity>? variants;
+
+  /// Priced extra options customers can add (e.g. extra cheese, whipped cream).
+  final List<ExtraOptionEntity>? extras;
 
   /// When true, the customer can pick a sugar amount when ordering.
   final bool hasSugar;
@@ -43,6 +56,7 @@ class MenuItemEntity extends Equatable {
     required this.inStock,
     this.hasVariants = false,
     this.variants,
+    this.extras,
     this.hasSugar = false,
     this.stock,
     this.trackStock = true,

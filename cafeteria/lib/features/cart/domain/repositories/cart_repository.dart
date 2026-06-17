@@ -9,6 +9,7 @@ abstract class CartRepository {
     String? variantName,
     String? note,
     int? sugar,
+    List<Map<String, dynamic>>? selectedExtras,
   });
 
   Future<CartItemEntity> updateCartItem({
