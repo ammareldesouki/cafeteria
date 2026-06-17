@@ -48,6 +48,7 @@ class CreateMenuItemEvent extends AdminEvent {
   final int stock;
   final List<VariantEntity>? variants;
   final bool hasSugar;
+  final List<ExtraOptionEntity>? extras;
 
   CreateMenuItemEvent({
     required this.name,
@@ -59,6 +60,7 @@ class CreateMenuItemEvent extends AdminEvent {
     required this.stock,
     this.variants,
     this.hasSugar = false,
+    this.extras,
   });
 }
 
@@ -72,6 +74,7 @@ class UpdateMenuItemEvent extends AdminEvent {
   final bool? hasVariants;
   final List<VariantEntity>? variants;
   final bool? hasSugar;
+  final List<ExtraOptionEntity>? extras;
 
   UpdateMenuItemEvent({
     required this.itemId,
@@ -83,6 +86,7 @@ class UpdateMenuItemEvent extends AdminEvent {
     this.hasVariants,
     this.variants,
     this.hasSugar,
+    this.extras,
   });
 }
 
@@ -128,6 +132,21 @@ class RemoveVariantEvent extends AdminEvent {
   final String variantName;
 
   RemoveVariantEvent({required this.itemId, required this.variantName});
+}
+
+class AddExtraEvent extends AdminEvent {
+  final String itemId;
+  final String name;
+  final double price;
+
+  AddExtraEvent({required this.itemId, required this.name, required this.price});
+}
+
+class RemoveExtraEvent extends AdminEvent {
+  final String itemId;
+  final String extraName;
+
+  RemoveExtraEvent({required this.itemId, required this.extraName});
 }
 
 class FetchPendingUsersEvent extends AdminEvent {}

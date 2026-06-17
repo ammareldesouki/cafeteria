@@ -770,6 +770,17 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
       }
     }
 
+    // Extra rows follow the same pattern as variants.
+    final extraNameControllers = <TextEditingController>[];
+    final extraPriceControllers = <TextEditingController>[];
+    if (item?.extras != null) {
+      for (final e in item!.extras!) {
+        extraNameControllers.add(TextEditingController(text: e.name));
+        extraPriceControllers.add(
+            TextEditingController(text: e.price.toStringAsFixed(0)));
+      }
+    }
+
     final categoryItems = [
       DropdownMenuItem(value: 'cold', child: Text(l10n.coldDrinks)),
       DropdownMenuItem(value: 'hot', child: Text(l10n.hotDrinks)),
@@ -927,6 +938,65 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                         ),
                       ),
                     ],
+                    const SizedBox(height: 16),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(l10n.extras,
+                          style: Theme.of(stfContext).textTheme.titleMedium),
+                    ),
+                    const SizedBox(height: 10),
+                    ...List.generate(extraNameControllers.length, (i) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              flex: 3,
+                              child: TextFormField(
+                                controller: extraNameControllers[i],
+                                decoration: InputDecoration(
+                                  labelText: 'Extra name',
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              flex: 2,
+                              child: TextFormField(
+                                controller: extraPriceControllers[i],
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  labelText: l10n.price,
+                                  border: const OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              tooltip: l10n.remove,
+                              onPressed: () => setState(() {
+                                extraNameControllers.removeAt(i);
+                                extraPriceControllers.removeAt(i);
+                              }),
+                              icon: const Icon(Icons.delete_outline,
+                                  color: Colors.red),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton.icon(
+                        onPressed: () => setState(() {
+                          extraNameControllers.add(TextEditingController());
+                          extraPriceControllers.add(
+                              TextEditingController(text: '0'));
+                        }),
+                        icon: const Icon(Icons.add),
+                        label: Text('Add Extra'),
+                      ),
+                    ),
                     const SizedBox(height: 24),
                     SizedBox(
                       width: double.infinity,
@@ -955,6 +1025,17 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                             return;
                           }
 
+                          // Collect non-empty extra rows.
+                          final extras = List.generate(
+                            extraNameControllers.length,
+                            (i) => ExtraOptionEntity(
+                              name: extraNameControllers[i].text.trim(),
+                              price: double.tryParse(
+                                      extraPriceControllers[i].text) ??
+                                  0,
+                            ),
+                          ).where((e) => e.name.isNotEmpty).toList();
+
                           if (item == null) {
                             adminBloc.add(CreateMenuItemEvent(
                               name: nameController.text,
@@ -969,6 +1050,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                                   : (int.tryParse(stockController.text) ?? 0),
                               variants: hasVariants ? variants : null,
                               hasSugar: hasSugar,
+                              extras: extras.isNotEmpty ? extras : null,
                             ));
                           } else {
                             adminBloc.add(UpdateMenuItemEvent(
@@ -982,6 +1064,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                               // Replace the whole variants array on the server.
                               variants: hasVariants ? variants : <VariantEntity>[],
                               hasSugar: hasSugar,
+                              extras: extras.isNotEmpty ? extras : null,
                             ));
                           }
                           Navigator.pop(ctx);

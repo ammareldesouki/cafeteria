@@ -3,7 +3,7 @@
  * Orchestrates menu operations. Calls repositories for data.
  * Add filtering, caching, validation rules here.
  */
-import { menuRepository, CreateMenuItemInput, UpdateMenuItemInput, MenuItemVariant } from "@/repositories/menu.repository";
+import { menuRepository, CreateMenuItemInput, UpdateMenuItemInput, MenuItemVariant, MenuItemExtra } from "@/repositories/menu.repository";
 
 export const menuService = {
 	// ─── Public read ──────────────────────────────────────────────────────────
@@ -117,6 +117,34 @@ export const menuService = {
 
 		const updated = await menuRepository.removeVariant(itemId, variantName);
 		if (!updated) throw new Error("Failed to remove variant");
+		return updated;
+	},
+
+	// ─── Extra management ──────────────────────────────────────────────────
+
+	async addExtra(itemId: string, extra: MenuItemExtra) {
+		const existing = await menuRepository.findById(itemId);
+		if (!existing) throw new Error("Menu item not found");
+
+		// Check for duplicate extra names (case-insensitive)
+		const duplicate = (existing.extras ?? []).find(
+			(e) => e.name.toLowerCase() === extra.name.toLowerCase(),
+		);
+		if (duplicate) {
+			throw new Error(`Extra "${extra.name}" already exists.`);
+		}
+
+		const updated = await menuRepository.addExtra(itemId, extra);
+		if (!updated) throw new Error("Failed to add extra");
+		return updated;
+	},
+
+	async removeExtra(itemId: string, extraName: string) {
+		const existing = await menuRepository.findById(itemId);
+		if (!existing) throw new Error("Menu item not found");
+
+		const updated = await menuRepository.removeExtra(itemId, extraName);
+		if (!updated) throw new Error("Failed to remove extra");
 		return updated;
 	},
 

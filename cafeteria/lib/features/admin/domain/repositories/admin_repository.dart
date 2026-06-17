@@ -40,6 +40,7 @@ abstract class AdminRepository {
     required int stock,
     List<VariantEntity>? variants,
     bool? hasSugar,
+    List<ExtraOptionEntity>? extras,
   });
 
   Future<MenuItemEntity> updateMenuItem({
@@ -52,6 +53,7 @@ abstract class AdminRepository {
     bool? hasVariants,
     List<VariantEntity>? variants,
     bool? hasSugar,
+    List<ExtraOptionEntity>? extras,
   });
 
   Future<void> deleteMenuItem(String itemId);
@@ -76,5 +78,16 @@ abstract class AdminRepository {
   Future<MenuItemEntity> removeVariant({
     required String itemId,
     required String variantName,
+  });
+
+  Future<MenuItemEntity> addExtra({
+    required String itemId,
+    required String name,
+    required double price,
+  });
+
+  Future<MenuItemEntity> removeExtra({
+    required String itemId,
+    required String extraName,
   });
 }

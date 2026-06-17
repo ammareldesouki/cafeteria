@@ -188,6 +188,51 @@ export const menuRepository = {
 	},
 
 	/**
+	 * Add an extra option to a menu item
+	 */
+	async addExtra(
+		itemId: string,
+		extra: MenuItemExtra,
+	): Promise<MenuItem | null> {
+		const result = await collection.findOneAndUpdate(
+			{ _id: new ObjectId(itemId) },
+			[
+				{
+					$set: {
+						extras: {
+							$concatArrays: [
+								{ $ifNull: ["$extras", []] },
+								[extra],
+							],
+						},
+						updatedAt: new Date(),
+					},
+				},
+			] as any,
+			{ returnDocument: "after" },
+		);
+		return result;
+	},
+
+	/**
+	 * Remove an extra option from a menu item by name
+	 */
+	async removeExtra(
+		itemId: string,
+		extraName: string,
+	): Promise<MenuItem | null> {
+		const result = await collection.findOneAndUpdate(
+			{ _id: new ObjectId(itemId) },
+			{
+				$pull: { extras: { name: { $regex: new RegExp(`^${extraName}$`, "i") } } } as any,
+				$set: { updatedAt: new Date() },
+			},
+			{ returnDocument: "after" },
+		);
+		return result;
+	},
+
+	/**
 	 * Remove a variant from a variant item by name
 	 */
 	async removeVariant(

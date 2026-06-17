@@ -9,6 +9,8 @@ import {
 	adminSetVariantStock,
 	adminAddVariant,
 	adminRemoveVariant,
+	adminAddExtra,
+	adminRemoveExtra,
 } from "@/controllers/menu.controller";
 import {
 	getAllOrders,
@@ -57,6 +59,16 @@ router.delete(
 	"/menu/:id/variants/:variantName",
 	requireAdmin,
 	adminRemoveVariant,
+);
+router.post(
+	"/menu/:id/extras",
+	requireAdmin,
+	adminAddExtra,
+);
+router.delete(
+	"/menu/:id/extras/:extraName",
+	requireAdmin,
+	adminRemoveExtra,
 );
 
 // Admin order management

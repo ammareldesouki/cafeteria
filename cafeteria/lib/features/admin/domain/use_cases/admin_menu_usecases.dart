@@ -24,6 +24,7 @@ class CreateMenuItemUseCase {
     required int stock,
     List<VariantEntity>? variants,
     bool? hasSugar,
+    List<ExtraOptionEntity>? extras,
   }) => _repository.createMenuItem(
     name: name,
     price: price,
@@ -34,6 +35,7 @@ class CreateMenuItemUseCase {
     stock: stock,
     variants: variants,
     hasSugar: hasSugar,
+    extras: extras,
   );
 }
 
@@ -52,6 +54,7 @@ class UpdateMenuItemUseCase {
     bool? hasVariants,
     List<VariantEntity>? variants,
     bool? hasSugar,
+    List<ExtraOptionEntity>? extras,
   }) => _repository.updateMenuItem(
     itemId: itemId,
     name: name,
@@ -62,6 +65,7 @@ class UpdateMenuItemUseCase {
     hasVariants: hasVariants,
     variants: variants,
     hasSugar: hasSugar,
+    extras: extras,
   );
 }
 
@@ -119,4 +123,27 @@ class RemoveVariantUseCase {
     required String itemId,
     required String variantName,
   }) => _repository.removeVariant(itemId: itemId, variantName: variantName);
+}
+
+class AddExtraUseCase {
+  final AdminRepository _repository;
+
+  AddExtraUseCase(this._repository);
+
+  Future<MenuItemEntity> call({
+    required String itemId,
+    required String name,
+    required double price,
+  }) => _repository.addExtra(itemId: itemId, name: name, price: price);
+}
+
+class RemoveExtraUseCase {
+  final AdminRepository _repository;
+
+  RemoveExtraUseCase(this._repository);
+
+  Future<MenuItemEntity> call({
+    required String itemId,
+    required String extraName,
+  }) => _repository.removeExtra(itemId: itemId, extraName: extraName);
 }

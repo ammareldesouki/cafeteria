@@ -176,6 +176,60 @@ export const adminSetVariantStock = async (
 	}
 };
 
+// ─── Extra management ─────────────────────────────────────────────────────────
+
+/**
+ * POST /admin/menu/:id/extras
+ * Add an extra option to an existing item
+ */
+export const adminAddExtra = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const id = String((req.params as any).id);
+		const { name, price } = req.body as { name: string; price: number };
+		const updated = await menuService.addExtra(id, { name, price });
+		res.status(201).json(updated);
+	} catch (err: any) {
+		if (
+			err.message === "Menu item not found" ||
+			err.message?.includes("already exists")
+		) {
+			res.status(400).json({ message: err.message });
+			return;
+		}
+		next(err);
+	}
+};
+
+/**
+ * DELETE /admin/menu/:id/extras/:extraName
+ * Remove an extra option from an item
+ */
+export const adminRemoveExtra = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const id = String((req.params as any).id);
+		const extraName = String((req.params as any).extraName);
+		const updated = await menuService.removeExtra(id, extraName);
+		res.json(updated);
+	} catch (err: any) {
+		if (
+			err.message === "Menu item not found" ||
+			err.message === "Failed to remove extra"
+		) {
+			res.status(400).json({ message: err.message });
+			return;
+		}
+		next(err);
+	}
+};
+
 // ─── Variant management ───────────────────────────────────────────────────────
 
 /**

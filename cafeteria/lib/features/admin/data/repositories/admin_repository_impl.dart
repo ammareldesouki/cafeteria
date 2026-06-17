@@ -68,6 +68,7 @@ class AdminRepositoryImpl implements AdminRepository {
     required int stock,
     List<VariantEntity>? variants,
     bool? hasSugar,
+    List<ExtraOptionEntity>? extras,
   }) => remoteDataSource.createMenuItem(
     name: name,
     price: price,
@@ -80,6 +81,9 @@ class AdminRepositoryImpl implements AdminRepository {
         ?.map((v) => {'name': v.name, 'stock': v.stock ?? 0})
         .toList(),
     hasSugar: hasSugar,
+    extras: extras
+        ?.map((e) => {'name': e.name, 'price': e.price})
+        .toList(),
   );
 
   @override
@@ -93,6 +97,7 @@ class AdminRepositoryImpl implements AdminRepository {
     bool? hasVariants,
     List<VariantEntity>? variants,
     bool? hasSugar,
+    List<ExtraOptionEntity>? extras,
   }) => remoteDataSource.updateMenuItem(
     itemId: itemId,
     name: name,
@@ -105,6 +110,9 @@ class AdminRepositoryImpl implements AdminRepository {
         ?.map((v) => {'name': v.name, 'stock': v.stock ?? 0})
         .toList(),
     hasSugar: hasSugar,
+    extras: extras
+        ?.map((e) => {'name': e.name, 'price': e.price})
+        .toList(),
   );
 
   @override
@@ -141,4 +149,18 @@ class AdminRepositoryImpl implements AdminRepository {
     required String variantName,
   }) =>
       remoteDataSource.removeVariant(itemId: itemId, variantName: variantName);
+
+  @override
+  Future<MenuItemEntity> addExtra({
+    required String itemId,
+    required String name,
+    required double price,
+  }) => remoteDataSource.addExtra(itemId: itemId, name: name, price: price);
+
+  @override
+  Future<MenuItemEntity> removeExtra({
+    required String itemId,
+    required String extraName,
+  }) =>
+      remoteDataSource.removeExtra(itemId: itemId, extraName: extraName);
 }

@@ -22,6 +22,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   final SetVariantStockUseCase setVariantStock;
   final AddVariantUseCase addVariant;
   final RemoveVariantUseCase removeVariant;
+  final AddExtraUseCase addExtra;
+  final RemoveExtraUseCase removeExtra;
 
   AdminDashboardLoaded? _lastLoadedState;
   AdminMenuLoaded? _lastMenuState;
@@ -45,6 +47,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     required this.setVariantStock,
     required this.addVariant,
     required this.removeVariant,
+    required this.addExtra,
+    required this.removeExtra,
   }) : super(AdminInitial()) {
     on<LoadDashboardDataEvent>(_onLoadDashboardData);
     on<FetchAdminOrdersEvent>(_onFetchAdminOrders);
@@ -63,6 +67,8 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
     on<SetVariantStockEvent>(_onSetVariantStock);
     on<AddVariantEvent>(_onAddVariant);
     on<RemoveVariantEvent>(_onRemoveVariant);
+    on<AddExtraEvent>(_onAddExtra);
+    on<RemoveExtraEvent>(_onRemoveExtra);
   }
 
   String _friendlyError(Object e) {
@@ -289,6 +295,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         stock: event.stock,
         variants: event.variants,
         hasSugar: event.hasSugar,
+        extras: event.extras,
       );
       add(FetchAdminMenuEvent());
     } catch (e) {
@@ -312,6 +319,7 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
         hasVariants: event.hasVariants,
         variants: event.variants,
         hasSugar: event.hasSugar,
+        extras: event.extras,
       );
       add(FetchAdminMenuEvent());
     } catch (e) {
@@ -386,6 +394,36 @@ class AdminBloc extends Bloc<AdminEvent, AdminState> {
   ) async {
     try {
       await removeVariant(itemId: event.itemId, variantName: event.variantName);
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onAddExtra(
+    AddExtraEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await addExtra(
+        itemId: event.itemId,
+        name: event.name,
+        price: event.price,
+      );
+      add(FetchAdminMenuEvent());
+    } catch (e) {
+      emit(AdminError(_friendlyError(e)));
+      if (_lastMenuState != null) emit(_lastMenuState!);
+    }
+  }
+
+  Future<void> _onRemoveExtra(
+    RemoveExtraEvent event,
+    Emitter<AdminState> emit,
+  ) async {
+    try {
+      await removeExtra(itemId: event.itemId, extraName: event.extraName);
       add(FetchAdminMenuEvent());
     } catch (e) {
       emit(AdminError(_friendlyError(e)));
