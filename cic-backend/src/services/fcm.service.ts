@@ -16,6 +16,20 @@ let initialized = false;
 
 function init() {
 	if (initialized) return;
+
+	const envJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
+	if (envJson) {
+		try {
+			const serviceAccount = JSON.parse(envJson);
+			admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+			initialized = true;
+			console.log("🔥 Firebase Admin initialized (from env var)");
+			return;
+		} catch (err) {
+			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON", err);
+		}
+	}
+
 	const path = resolve(process.cwd(), FIREBASE_SERVICE_ACCOUNT_PATH);
 	if (!existsSync(path)) {
 		console.warn(
@@ -28,7 +42,7 @@ function init() {
 	const serviceAccount = require(path);
 	admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 	initialized = true;
-	console.log("🔥 Firebase Admin initialized");
+	console.log("🔥 Firebase Admin initialized (from file)");
 }
 
 /**
