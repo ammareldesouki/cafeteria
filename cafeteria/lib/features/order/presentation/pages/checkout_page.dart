@@ -221,6 +221,25 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                                   ),
                                                 ),
                                               ],
+                                              if (item.selectedExtras != null &&
+                                                  item.selectedExtras!
+                                                      .isNotEmpty)
+                                                ...item.selectedExtras!.map(
+                                                    (e) => Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  top: 2),
+                                                          child: Text(
+                                                            '+ ${e.name} (+${e.price.toStringAsFixed(0)} ${l10n.pound})',
+                                                            style:
+                                                                const TextStyle(
+                                                              fontSize: 11,
+                                                              color: Color(
+                                                                  0xFFC07722),
+                                                            ),
+                                                          ),
+                                                        )),
                                               if (item.note != null) ...[
                                                 const SizedBox(height: 2),
                                                 Text(

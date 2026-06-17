@@ -34,12 +34,13 @@ export const addCartItem = async (
 			res.status(401).json({ error: { code: 401, message: "Unauthorized" } });
 			return;
 		}
-		const { menuItemId, variantName, quantity, note, sugar } = req.body as {
+		const { menuItemId, variantName, quantity, note, sugar, selectedExtras } = req.body as {
 			menuItemId: string;
 			variantName?: string;
 			quantity: number;
 			note?: string;
 			sugar?: number;
+			selectedExtras?: { name: string; price: number }[];
 		};
 		const item = await cartService.addItem(
 			userId,
@@ -48,6 +49,7 @@ export const addCartItem = async (
 			variantName,
 			note,
 			sugar,
+			selectedExtras,
 		);
 		res
 			.status(201)

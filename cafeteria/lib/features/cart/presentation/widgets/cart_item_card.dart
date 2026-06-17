@@ -149,6 +149,17 @@ class _CartItemCardState extends State<CartItemCard> {
                               color: Color(0xFF8B7355),
                             ),
                           ),
+                          if (widget.item.selectedExtras != null &&
+                              widget.item.selectedExtras!.isNotEmpty) ...[
+                            const SizedBox(height: 4),
+                            ...widget.item.selectedExtras!.map((e) => Text(
+                                  '+ ${e.name} (${AppLocalizations.of(context)!.pound}${e.price.toStringAsFixed(2)})',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFFC07722),
+                                  ),
+                                )),
+                          ],
                         ],
                       ),
                     ),

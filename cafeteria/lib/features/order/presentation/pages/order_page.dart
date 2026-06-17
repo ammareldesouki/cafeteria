@@ -207,6 +207,15 @@ class _OrderCard extends StatelessWidget {
                               color: Color(0xFF8B7355),
                             ),
                           ),
+                        if (item.selectedExtras != null &&
+                            item.selectedExtras!.isNotEmpty)
+                          ...item.selectedExtras!.map((e) => Text(
+                                '+ ${e.name} (+${e.price.toStringAsFixed(0)} ${AppLocalizations.of(context)!.pound})',
+                                style: const TextStyle(
+                                  fontSize: 11,
+                                  color: Color(0xFFC07722),
+                                ),
+                              )),
                         if (item.note != null && item.note!.isNotEmpty)
                           Text(
                             '${l10n.specialInstructions}: ${item.note}',

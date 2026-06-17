@@ -1,5 +1,15 @@
 import '../../domain/entities/order_entity.dart';
 
+class OrderItemExtraModel extends OrderItemExtraEntity {
+  const OrderItemExtraModel({required super.name, required super.price});
+
+  factory OrderItemExtraModel.fromJson(Map<String, dynamic> json) =>
+      OrderItemExtraModel(
+        name: json['name'] as String,
+        price: (json['price'] as num).toDouble(),
+      );
+}
+
 class OrderItemModel extends OrderItemEntity {
   const OrderItemModel({
     required super.menuItemId,
@@ -9,17 +19,27 @@ class OrderItemModel extends OrderItemEntity {
     super.sugar,
     required super.quantity,
     required super.unitPrice,
+    super.selectedExtras,
   });
 
-  factory OrderItemModel.fromJson(Map<String, dynamic> json) => OrderItemModel(
-        menuItemId: json['menuItemId']?.toString() ?? '',
-        menuItemName: json['menuItemName'] as String?,
-        variantName: json['variantName'] as String?,
-        note: json['note'] as String?,
-        sugar: (json['sugar'] as num?)?.toInt(),
-        quantity: (json['quantity'] as num).toInt(),
-        unitPrice: (json['unitPrice'] as num).toDouble(),
-      );
+  factory OrderItemModel.fromJson(Map<String, dynamic> json) {
+    final rawExtras = json['selectedExtras'] as List<dynamic>?;
+    return OrderItemModel(
+      menuItemId: json['menuItemId']?.toString() ?? '',
+      menuItemName: json['menuItemName'] as String?,
+      variantName: json['variantName'] as String?,
+      note: json['note'] as String?,
+      sugar: (json['sugar'] as num?)?.toInt(),
+      quantity: (json['quantity'] as num).toInt(),
+      unitPrice: (json['unitPrice'] as num).toDouble(),
+      selectedExtras: rawExtras != null && rawExtras.isNotEmpty
+          ? rawExtras
+              .map((e) =>
+                  OrderItemExtraModel.fromJson(e as Map<String, dynamic>))
+              .toList()
+          : null,
+    );
+  }
 }
 
 class OrderModel extends OrderEntity {

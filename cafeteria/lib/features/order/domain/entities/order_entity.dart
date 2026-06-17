@@ -1,3 +1,10 @@
+class OrderItemExtraEntity {
+  final String name;
+  final double price;
+
+  const OrderItemExtraEntity({required this.name, required this.price});
+}
+
 class OrderItemEntity {
   final String menuItemId;
   final String? menuItemName;
@@ -6,6 +13,7 @@ class OrderItemEntity {
   final int? sugar;
   final int quantity;
   final double unitPrice;
+  final List<OrderItemExtraEntity>? selectedExtras;
 
   const OrderItemEntity({
     required this.menuItemId,
@@ -15,9 +23,13 @@ class OrderItemEntity {
     this.sugar,
     required this.quantity,
     required this.unitPrice,
+    this.selectedExtras,
   });
 
-  double get subtotal => unitPrice * quantity;
+  double get extrasTotal =>
+      (selectedExtras ?? []).fold<double>(0, (s, e) => s + e.price);
+
+  double get subtotal => (unitPrice + extrasTotal) * quantity;
 }
 
 class OrderEntity {
