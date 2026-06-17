@@ -1,6 +1,7 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import '../../core/network/dio_handler.dart';
+import '../../core/services/fcm_service.dart';
 
 import '../../core/constants/image_strings.dart';
 import '../../core/route/route_name.dart';
@@ -30,6 +31,7 @@ class _LoadingPageState extends State<LoadingPage> {
         final handler = NetworkDioHandler();
         final role = handler.currentRole;
         if (role == 'admin') {
+          FcmService.instance.registerToken();
           Navigator.pushNamedAndRemoveUntil(
               context, RouteNames.cafeteriaPanel, (route) => false);
         } else {

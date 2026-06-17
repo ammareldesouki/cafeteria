@@ -9,9 +9,11 @@ import "@config/env";
 import app from "./app";
 import { connectDB } from "@config/db";
 import { PORT } from "@config/env";
+import { startCronJobs } from "@/services/cron.service";
 
 const start = async () => {
 	await connectDB();
+	startCronJobs();
 
 	const server = app.listen(PORT || 3001, () => {
 		console.log(`🚀 Server running on port ${PORT || 3001}`);

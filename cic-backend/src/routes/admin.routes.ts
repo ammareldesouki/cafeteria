@@ -27,6 +27,7 @@ import {
 	validateOrderFilters,
 	validateAdminOrderUpdate,
 } from "@/middlewares/validation";
+import { registerFcmToken, unregisterFcmToken } from "@/controllers/fcm.controller";
 import walletRoutes from "./wallet.routes";
 import analyticsRoutes from "./analytics.routes";
 
@@ -89,6 +90,10 @@ router.patch(
 // Pending revenue (debt) management
 router.get("/pending-users", requireAdmin, getPendingUsers);
 router.post("/users/:userId/settle", requireAdmin, settleUserDebt);
+
+// Admin FCM token management
+router.post("/fcm-token", requireAdmin, registerFcmToken);
+router.delete("/fcm-token", requireAdmin, unregisterFcmToken);
 
 // Mount sub-routes
 router.use(walletRoutes);

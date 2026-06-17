@@ -50,6 +50,10 @@ export const SMTP_USER = rawEnv.SMTP_USER;
 export const SMTP_PASS = rawEnv.SMTP_PASS;
 export const SMTP_FROM = rawEnv.SMTP_FROM;
 
+// Firebase Admin SDK
+export const FIREBASE_SERVICE_ACCOUNT_PATH =
+	rawEnv.FIREBASE_SERVICE_ACCOUNT_PATH || "./firebase-service-account.json";
+
 // Provide CORS origins as an array (empty if not set)
 export const CORS_ORIGIN_LIST =
 	rawEnv.CORS_ORIGINS?.split(",")

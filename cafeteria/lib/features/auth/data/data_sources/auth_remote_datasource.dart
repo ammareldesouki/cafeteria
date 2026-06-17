@@ -4,6 +4,7 @@ import 'package:cafeteria/core/constants/api.dart';
 import 'package:dio/dio.dart';
 import '../../../../core/failure/server_failure.dart';
 import '../../../../core/network/dio_handler.dart';
+import '../../../../core/services/fcm_service.dart';
 import '../models/auth_response_model.dart';
 import '../models/user_model.dart';
 
@@ -180,6 +181,8 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     } catch (e) {
       log("Sign out request failed, but clearing local session anyway: $e");
     } finally {
+      // Unregister FCM token if this was an admin
+      await FcmService.instance.unregisterToken();
       // ALWAYS clear the local token so the user can log in again
       await _dioHandler.clearAuthToken();
     }
