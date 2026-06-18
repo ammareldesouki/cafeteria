@@ -221,6 +221,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get itemNoLongerAvailable => 'This item is no longer available';
 
   @override
+  String get pickDate => 'Pick a date';
+
+  @override
   String get sugar => 'Sugar';
 
   @override

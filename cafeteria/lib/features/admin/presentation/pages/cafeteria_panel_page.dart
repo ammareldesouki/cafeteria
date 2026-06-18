@@ -160,6 +160,25 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                   _fetchFilteredOrders();
                 },
               ),
+              ListTile(
+                leading: const Icon(Icons.calendar_today_outlined),
+                title: Text(l10n.pickDate),
+                onTap: () async {
+                  Navigator.pop(ctx);
+                  final now = DateTime.now();
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: now,
+                    firstDate: DateTime(now.year - 1),
+                    lastDate: now,
+                  );
+                  if (picked != null && mounted) {
+                    _selectedDateRange =
+                        DateFormat('yyyy-MM-dd').format(picked);
+                    _fetchFilteredOrders();
+                  }
+                },
+              ),
             ],
           ),
         );
@@ -245,7 +264,12 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          return SingleChildScrollView(
+          return RefreshIndicator(
+            onRefresh: () async {
+              _fetchFilteredOrders();
+            },
+            child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -290,6 +314,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                 const SizedBox(height: 48),
               ],
             ),
+          ),
           );
         },
       ),
@@ -487,6 +512,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                     },
                   ),
             hintText: hint,
+            hintStyle: Theme.of(context).textTheme.bodyMedium,
             filled: true,
             fillColor: Colors.grey.shade100,
             contentPadding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1436,7 +1462,9 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                 const Icon(Icons.access_time_outlined,
                     size: 16, color: Colors.black),
                 const SizedBox(width: 8),
-                Text(DateFormat('hh:mm a').format(_cairoTime(order.createdAt)),
+                Text(
+                    DateFormat('MMM d, yyyy · hh:mm a')
+                        .format(_cairoTime(order.createdAt)),
                     style: const TextStyle(color: Colors.black)),
               ],
             ),

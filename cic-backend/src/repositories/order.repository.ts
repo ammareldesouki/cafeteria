@@ -45,6 +45,17 @@ function buildFilterQuery(filters: OrderFilters): any {
 		} else if (filters.dateRange === "month") {
 			start.setMonth(now.getMonth() - 1);
 			query.createdAt = { $gte: start };
+		} else {
+			// Otherwise treat the value as a specific day (YYYY-MM-DD) and filter
+			// orders created within that single calendar day.
+			const day = new Date(filters.dateRange);
+			if (!Number.isNaN(day.getTime())) {
+				const dayStart = new Date(day);
+				dayStart.setHours(0, 0, 0, 0);
+				const dayEnd = new Date(day);
+				dayEnd.setHours(23, 59, 59, 999);
+				query.createdAt = { $gte: dayStart, $lte: dayEnd };
+			}
 		}
 	}
 	

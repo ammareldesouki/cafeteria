@@ -75,6 +75,7 @@
   "variantName": "اسم النوع",
   "sugarOption": "يوفر سكر",
   "itemNoLongerAvailable": "هذا الصنف لم يعد متاحًا",
+  "pickDate": "اختر تاريخًا",
   "sugar": "السكر",
   "sugarSpoons": "{count} ملعقة",
   "@sugarSpoons": {

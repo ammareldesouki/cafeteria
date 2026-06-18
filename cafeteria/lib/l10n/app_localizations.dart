@@ -518,6 +518,12 @@ abstract class AppLocalizations {
   /// **'This item is no longer available'**
   String get itemNoLongerAvailable;
 
+  /// No description provided for @pickDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date'**
+  String get pickDate;
+
   /// No description provided for @sugar.
   ///
   /// In en, this message translates to:

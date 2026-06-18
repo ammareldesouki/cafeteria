@@ -71,6 +71,7 @@
   "variantName": "Variant Name",
   "sugarOption": "Offers sugar",
   "itemNoLongerAvailable": "This item is no longer available",
+  "pickDate": "Pick a date",
   "sugar": "Sugar",
   "sugarSpoons": "{count} spoon(s)",
   "@sugarSpoons": {

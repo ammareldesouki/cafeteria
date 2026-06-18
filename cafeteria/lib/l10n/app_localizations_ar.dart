@@ -221,6 +221,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get itemNoLongerAvailable => 'هذا الصنف لم يعد متاحًا';
 
   @override
+  String get pickDate => 'اختر تاريخًا';
+
+  @override
   String get sugar => 'السكر';
 
   @override
