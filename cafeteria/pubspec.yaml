@@ -42,8 +42,11 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/icons/logo.png"
-  adaptive_icon_background: "assets/icons/logo.png"
-  adaptive_icon_foreground: "assets/icons/logo.png"
+  # White background (like iOS) with a padded logo that fits the adaptive
+  # safe zone, so Android no longer crops/zooms the logo.
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icons/logo_adaptive_fg.png"
+  remove_alpha_ios: true
   image_path_ios: "assets/icons/logo.png"
 
 flutter:
