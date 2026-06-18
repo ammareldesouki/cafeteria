@@ -24,6 +24,7 @@ dependencies:
   aad_oauth: ^1.0.1
   flutter_bloc: ^9.1.1
   intl: ^0.20.2
+  url_launcher: ^6.3.0
   mocktail: ^1.0.4
   animate_do: ^4.2.0
   firebase_core: ^4.7.0

@@ -275,13 +275,13 @@ abstract class AppLocalizations {
   /// No description provided for @varaity.
   ///
   /// In en, this message translates to:
-  /// **'Varaity'**
+  /// **'Variety'**
   String get varaity;
 
   /// No description provided for @varaityIsRequired.
   ///
   /// In en, this message translates to:
-  /// **'Varaity is required'**
+  /// **'Variety is required'**
   String get varaityIsRequired;
 
   /// No description provided for @add.
@@ -523,6 +523,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Pick a date'**
   String get pickDate;
+
+  /// No description provided for @call.
+  ///
+  /// In en, this message translates to:
+  /// **'Call'**
+  String get call;
+
+  /// No description provided for @couldNotCall.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not place the call'**
+  String get couldNotCall;
 
   /// No description provided for @sugar.
   ///

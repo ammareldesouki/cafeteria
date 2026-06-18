@@ -96,10 +96,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pound => 'L.E';
 
   @override
-  String get varaity => 'Varaity';
+  String get varaity => 'Variety';
 
   @override
-  String get varaityIsRequired => 'Varaity is required';
+  String get varaityIsRequired => 'Variety is required';
 
   @override
   String get add => 'add';
@@ -222,6 +222,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pickDate => 'Pick a date';
+
+  @override
+  String get call => 'Call';
+
+  @override
+  String get couldNotCall => 'Could not place the call';
 
   @override
   String get sugar => 'Sugar';

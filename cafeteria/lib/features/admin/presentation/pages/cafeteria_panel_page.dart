@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/constants/colors.dart';
 import '../../../home/domain/entities/menu_item_entity.dart';
@@ -382,6 +383,25 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
     final state = context.read<AdminBloc>().state;
     if (state is AdminMenuLoaded) return state;
     return context.read<AdminBloc>().lastMenuState;
+  }
+
+  /// Open the phone dialer pre-filled with the customer's number.
+  Future<void> _callPhone(String phone) async {
+    final uri = Uri(scheme: 'tel', path: phone.trim());
+    try {
+      final ok = await launchUrl(uri);
+      if (!ok && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.couldNotCall)),
+        );
+      }
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(AppLocalizations.of(context)!.couldNotCall)),
+        );
+      }
+    }
   }
 
   void _adminListener(BuildContext context, AdminState state) {
@@ -1451,8 +1471,36 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                   const Icon(Icons.phone_outlined,
                       size: 16, color: Colors.black),
                   const SizedBox(width: 8),
-                  Text(order.userPhone!,
-                      style: const TextStyle(color: Colors.black)),
+                  Expanded(
+                    child: Text(order.userPhone!,
+                        style: const TextStyle(color: Colors.black)),
+                  ),
+                  InkWell(
+                    onTap: () => _callPhone(order.userPhone!),
+                    borderRadius: BorderRadius.circular(20),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2E7D32),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.call, size: 15, color: Colors.white),
+                          const SizedBox(width: 6),
+                          Text(
+                            AppLocalizations.of(context)!.call,
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ],

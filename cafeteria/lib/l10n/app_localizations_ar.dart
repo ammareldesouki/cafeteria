@@ -224,6 +224,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pickDate => 'اختر تاريخًا';
 
   @override
+  String get call => 'اتصال';
+
+  @override
+  String get couldNotCall => 'تعذّر إجراء المكالمة';
+
+  @override
   String get sugar => 'السكر';
 
   @override

@@ -76,6 +76,8 @@
   "sugarOption": "يوفر سكر",
   "itemNoLongerAvailable": "هذا الصنف لم يعد متاحًا",
   "pickDate": "اختر تاريخًا",
+  "call": "اتصال",
+  "couldNotCall": "تعذّر إجراء المكالمة",
   "sugar": "السكر",
   "sugarSpoons": "{count} ملعقة",
   "@sugarSpoons": {
