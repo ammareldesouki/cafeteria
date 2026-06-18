@@ -75,6 +75,7 @@ class AppRouter {
         return _buildRoute(
           MultiBlocProvider(
             providers: [
+              BlocProvider.value(value: sl<HomeBloc>()),
               BlocProvider.value(value: sl<FavouriteBloc>()),
               BlocProvider.value(value: sl<CartBloc>()),
             ],

@@ -10,6 +10,13 @@ class FetchMenuEvent extends HomeEvent {
   const FetchMenuEvent();
 }
 
+/// Re-fetch the menu silently (no loading spinner), keeping current data on
+/// screen. Used by pull-to-refresh, app resume, and background polling so the
+/// customer view stays live with admin changes.
+class RefreshMenuEvent extends HomeEvent {
+  const RefreshMenuEvent();
+}
+
 class SearchQueryChanged extends HomeEvent {
   final String query;
   const SearchQueryChanged(this.query);

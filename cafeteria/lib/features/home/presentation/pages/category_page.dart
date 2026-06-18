@@ -11,6 +11,7 @@ import '../../../favourite/presentation/manager/favourite_state.dart';
 import '../../../favourite/presentation/widgets/favourite_toggle_button.dart';
 import '../../domain/entities/menu_item_entity.dart';
 
+import '../manager/home_bloc.dart';
 // ── Cart imports ──────────────────────────────────────────────────────────────
 import '../../../cart/presentation/manager/cart_bloc.dart';
 import '../../../cart/presentation/manager/cart_event.dart';
@@ -97,13 +98,32 @@ item.description.toLowerCase().contains(_query))
     .toList();
 }
 
+List<MenuItemEntity> _itemsForCategory(HomeLoaded s, String key) {
+switch (key) {
+case 'cold':
+return s.coldDrinks;
+case 'hot':
+return s.hotDrinks;
+case 'side':
+return s.sideItems;
+default:
+return s.allItems;
+}
+}
+
 @override
 Widget build(BuildContext context) {
 final args =
 ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 final String category = args['category'] as String;
-final List<MenuItemEntity> products =
-args['products'] as List<MenuItemEntity>;
+final String categoryKey = args['categoryKey'] as String? ?? '';
+// Prefer live data from HomeBloc (kept fresh by polling / pull-to-refresh)
+// so admin add/edit/stock changes show without leaving this screen; fall
+// back to the snapshot passed in via route arguments.
+final homeState = context.watch<HomeBloc>().state;
+final List<MenuItemEntity> products = homeState is HomeLoaded
+? _itemsForCategory(homeState, categoryKey)
+: (args['products'] as List<MenuItemEntity>);
 final List<MenuItemEntity> filtered = _filter(products);
 
 return Scaffold(

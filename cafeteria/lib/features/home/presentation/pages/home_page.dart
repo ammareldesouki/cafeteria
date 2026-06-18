@@ -25,16 +25,33 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     context.read<HomeBloc>().add(const FetchMenuEvent());
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Refresh the menu when the app comes back to the foreground so the
+    // customer sees the latest admin changes.
+    if (state == AppLifecycleState.resumed && mounted) {
+      context.read<HomeBloc>().add(const RefreshMenuEvent());
+    }
   }
 
   void _onCategoryTap(
       BuildContext context,
       String category,
+      String categoryKey,
       List<MenuItemEntity> products,
       ) {
     Navigator.pushNamed(
@@ -42,6 +59,7 @@ class _HomePageState extends State<HomePage> {
       RouteNames.category,
       arguments: {
         'category': category,
+        'categoryKey': categoryKey,
         'products': products,
       },
     );
@@ -59,8 +77,18 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            return SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<HomeBloc>().add(const RefreshMenuEvent());
+                await context
+                    .read<HomeBloc>()
+                    .stream
+                    .firstWhere((s) => s is HomeLoaded || s is HomeError)
+                    .timeout(const Duration(seconds: 5),
+                        onTimeout: () => state);
+              },
+              child: SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
                 child: Column(
@@ -116,6 +144,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () => _onCategoryTap(
                               context,
                               AppLocalizations.of(context)!.coldDrinks,
+                              'cold',
                               state.coldDrinks,
                             ),
                             gradientColors: const [
@@ -133,6 +162,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () => _onCategoryTap(
                               context,
                               AppLocalizations.of(context)!.hotDrinks,
+                              'hot',
                               state.hotDrinks,
                             ),
                             gradientColors: const [
@@ -150,6 +180,7 @@ class _HomePageState extends State<HomePage> {
                             onTap: () => _onCategoryTap(
                               context,
                               AppLocalizations.of(context)!.sides,
+                              'side',
                               state.sideItems,
                             ),
                             gradientColors: const [
@@ -171,6 +202,7 @@ class _HomePageState extends State<HomePage> {
                   ],
                 ),
               ),
+            ),
             );
           },
         ),
