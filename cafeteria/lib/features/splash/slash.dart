@@ -30,8 +30,10 @@ class _LoadingPageState extends State<LoadingPage> {
       if (isLoggedIn) {
         final handler = NetworkDioHandler();
         final role = handler.currentRole;
+        // Register this device for push notifications regardless of role:
+        // staff get new-order/scheduled alerts, customers get order-tracking.
+        FcmService.instance.registerToken();
         if (role == 'admin') {
-          FcmService.instance.registerToken();
           Navigator.pushNamedAndRemoveUntil(
               context, RouteNames.cafeteriaPanel, (route) => false);
         } else {

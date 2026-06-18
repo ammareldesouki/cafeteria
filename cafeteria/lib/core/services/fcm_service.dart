@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../network/dio_handler.dart';
 
 class FcmService {
@@ -113,9 +114,11 @@ class FcmService {
   Future<void> _registerToken() async {
     if (_currentToken == null) return;
     try {
+      final prefs = await SharedPreferences.getInstance();
+      final lang = prefs.getString('locale_code') ?? 'en';
       await NetworkDioHandler().dio.post(
-        '/admin/fcm-token',
-        data: {'token': _currentToken},
+        '/fcm-token',
+        data: {'token': _currentToken, 'lang': lang},
       );
       log('FCM token registered with backend');
     } catch (e) {
@@ -128,7 +131,7 @@ class FcmService {
     if (_currentToken == null) return;
     try {
       await NetworkDioHandler().dio.delete(
-        '/admin/fcm-token',
+        '/fcm-token',
         data: {'token': _currentToken},
       );
       log('FCM token unregistered');

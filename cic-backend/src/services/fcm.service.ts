@@ -19,6 +19,11 @@ import {
 	type MulticastMessage,
 } from "firebase-admin/messaging";
 import { FIREBASE_SERVICE_ACCOUNT_PATH } from "@config/env";
+import {
+	type NotifContent,
+	type NotifLang,
+	normalizeLang,
+} from "@/utils/notificationMessages";
 
 let initialized = false;
 
@@ -113,5 +118,29 @@ export async function sendPushNotification(
 		}
 	} catch (err) {
 		console.error("FCM send error:", err);
+	}
+}
+
+/**
+ * Send a notification to a set of token docs, localizing the copy per device
+ * language. Tokens are grouped by `lang` so each recipient gets text in their
+ * own language.
+ */
+export async function sendLocalizedNotification(
+	tokenDocs: { token: string; lang?: string }[],
+	build: (lang: NotifLang) => NotifContent,
+	data?: Record<string, string>,
+): Promise<void> {
+	const byLang = new Map<NotifLang, string[]>();
+	for (const doc of tokenDocs) {
+		const lang = normalizeLang(doc.lang);
+		const list = byLang.get(lang) ?? [];
+		list.push(doc.token);
+		byLang.set(lang, list);
+	}
+
+	for (const [lang, tokens] of byLang) {
+		const { title, body } = build(lang);
+		await sendPushNotification(tokens, { title, body, data });
 	}
 }

@@ -19,6 +19,7 @@ import '../order/presentation/manager/order_bloc.dart';
 import '../order/presentation/manager/order_event.dart';
 import '../order/presentation/pages/order_page.dart';
 import '../../core/route/route_name.dart';
+import '../../core/services/fcm_service.dart';
 import '../auth/presentation/manager/auth_bloc.dart';
 import '../auth/domain/entities/user_entity.dart';
 import 'widgets/profile_header.dart';
@@ -47,6 +48,8 @@ class CBottomNavigationBarState extends State<CBottomNavigationBar> {
   void initState() {
     super.initState();
     context.read<AuthBloc>().add(const GetUserInfoEvent());
+    // Register this device so the customer receives order-tracking pushes.
+    FcmService.instance.registerToken();
   }
 
   /// Public method to switch tab programmatically (e.g., from success page)

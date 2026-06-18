@@ -8,7 +8,8 @@
 import cron from "node-cron";
 import mongoose from "mongoose";
 import { fcmRepository } from "@/repositories/fcm.repository";
-import { sendPushNotification } from "@/services/fcm.service";
+import { sendLocalizedNotification } from "@/services/fcm.service";
+import { scheduledReminderNotification } from "@/utils/notificationMessages";
 
 /** Set of order IDs we've already notified about (in-memory dedup). */
 const notified = new Set<string>();
@@ -42,8 +43,8 @@ async function checkScheduledOrders() {
 
 	if (upcoming.length === 0) return;
 
-	const tokens = await fcmRepository.getAllTokens();
-	if (tokens.length === 0) return;
+	const tokenDocs = await fcmRepository.getStaffTokenDocs();
+	if (tokenDocs.length === 0) return;
 
 	for (const order of upcoming) {
 		const orderId = (order as any)._id?.toString() ?? "";
@@ -57,10 +58,14 @@ async function checkScheduledOrders() {
 			minute: "2-digit",
 		});
 
-		await sendPushNotification(tokens, {
-			title: "🕐 Upcoming Scheduled Order",
-			body: `Order #${orderId.slice(-6)} scheduled at ${scheduledTime} is due in ~10 minutes.`,
-			data: { orderId, type: "scheduled_order_reminder" },
-		});
+		await sendLocalizedNotification(
+			tokenDocs,
+			(lang) =>
+				scheduledReminderNotification(lang, {
+					orderShort: orderId.slice(-6),
+					time: scheduledTime,
+				}),
+			{ orderId, type: "scheduled_order_reminder" },
+		);
 	}
 }

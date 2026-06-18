@@ -4,6 +4,10 @@ export interface FcmTokenDoc {
 	_id?: mongoose.Types.ObjectId;
 	userId: string;
 	token: string;
+	/** Device UI language ("en" | "ar") — used to localize push copy. */
+	lang?: string;
+	/** Account role ("admin" | "user") — used to target staff-only alerts. */
+	role?: string;
 	createdAt: Date;
 }
 
@@ -14,9 +18,20 @@ export const fcmRepository = {
 	 * Register (or re-register) an FCM token for a user.
 	 * Removes any existing row for this token first (upsert pattern).
 	 */
-	async registerToken(userId: string, token: string): Promise<void> {
+	async registerToken(
+		userId: string,
+		token: string,
+		lang?: string,
+		role?: string,
+	): Promise<void> {
 		await collection.deleteMany({ token });
-		await collection.insertOne({ userId, token, createdAt: new Date() });
+		await collection.insertOne({
+			userId,
+			token,
+			lang: lang === "ar" ? "ar" : "en",
+			role: role === "admin" ? "admin" : "user",
+			createdAt: new Date(),
+		});
 	},
 
 	/**
@@ -33,13 +48,13 @@ export const fcmRepository = {
 		await collection.deleteMany({ userId });
 	},
 
-	/**
-	 * Get all FCM tokens for all admin users (called by the cron).
-	 * In a more granular setup you'd filter by role; here we simply
-	 * return every registered token.
-	 */
-	async getAllTokens(): Promise<string[]> {
-		const docs = await collection.find({}).toArray();
-		return docs.map((d) => d.token);
+	/** Token docs for all cafeteria staff (admins) — staff broadcasts. */
+	async getStaffTokenDocs(): Promise<FcmTokenDoc[]> {
+		return collection.find({ role: "admin" }).toArray();
+	},
+
+	/** Token docs belonging to a single user — order-tracking notifications. */
+	async getUserTokenDocs(userId: string): Promise<FcmTokenDoc[]> {
+		return collection.find({ userId }).toArray();
 	},
 };

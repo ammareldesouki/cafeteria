@@ -57,7 +57,9 @@ npm run lint       # Biome lint only
 
 **Auth**: uses [`better-auth`](https://better-auth.com) plus custom routes; the app and better-auth share a single Mongo connection (`config/env.ts`). The Flutter app authenticates against this and stores the JWT (see SharedPreferences `auth_token`). Deployed on Railway/PM2 (`ecosystem.config.js`, `railway.json`).
 
-**Wallet / order settlement** (non-obvious domain logic, spans `order.service.ts` + `wallet.service.ts` + `userWallet.service.ts`): orders are placed unpaid with **no** wallet movement. Money moves only on the `delivered`/`paid` transitions, computed as the **delta** between the order's before/after `(status, paymentStatus)` in `order.service.ts → settleWallets`. There are two wallets — a **per-user debt ledger** (`user_wallets`, negative = customer owes) and the **singleton cafeteria wallet** (`cafeteria_wallets`, realized revenue). Balance + ledger writes are atomic via `utils/walletTransaction.ts`. Full model in `src/docs/WALLET_SYSTEM_EXPLAINED.md`.
+**Wallet / order settlement** (non-obvious domain logic, spans `order.service.ts` + `wallet.service.ts` + `userWallet.service.ts`): orders are placed unpaid with **no** wallet movement. Money moves only on the `delivered`/`paid` transitions, computed as the **delta** between the order's before/after `(status, paymentStatus)` in `order.service.ts → settleWallets`. There are two wallets — a **per-user debt ledger** (`
+
+_wallets`, negative = customer owes) and the **singleton cafeteria wallet** (`cafeteria_wallets`, realized revenue). Balance + ledger writes are atomic via `utils/walletTransaction.ts`. Full model in `src/docs/WALLET_SYSTEM_EXPLAINED.md`.
 
 ---
 

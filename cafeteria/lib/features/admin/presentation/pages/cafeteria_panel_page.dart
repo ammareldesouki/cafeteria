@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../../core/services/fcm_service.dart';
+
 import '../../../../core/constants/colors.dart';
 import '../../../home/domain/entities/menu_item_entity.dart';
 import '../../../order/domain/entities/order_entity.dart';
@@ -36,6 +38,8 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
   void initState() {
     super.initState();
     context.read<AdminBloc>().add(LoadDashboardDataEvent());
+    // Ensure this staff device is registered for new-order/scheduled alerts.
+    FcmService.instance.registerToken();
   }
 
   @override

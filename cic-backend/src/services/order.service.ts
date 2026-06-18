@@ -7,8 +7,12 @@ import { ObjectId } from "mongodb";
 import { cartRepository } from "@/repositories/cart.repository";
 import { fcmRepository } from "@/repositories/fcm.repository";
 import { orderRepository } from "@/repositories/order.repository";
-import { sendPushNotification } from "@/services/fcm.service";
+import { sendLocalizedNotification } from "@/services/fcm.service";
 import { stockService } from "@/services/stock.service";
+import {
+	newOrderNotification,
+	orderStatusNotification,
+} from "@/utils/notificationMessages";
 import { userWalletService } from "@/services/userWallet.service";
 import { walletService } from "@/services/wallet.service";
 import {
@@ -98,28 +102,59 @@ async function notifyStaffOfNewOrder(
 	scheduledFor?: Date,
 ): Promise<void> {
 	try {
-		const tokens = await fcmRepository.getAllTokens();
-		if (tokens.length === 0) return;
+		const tokenDocs = await fcmRepository.getStaffTokenDocs();
+		if (tokenDocs.length === 0) return;
 
 		const itemCount = order.items.reduce((n, it) => n + it.quantity, 0);
 		const who = order.username ?? "A customer";
-		const when = scheduledFor
-			? ` for ${scheduledFor.toLocaleTimeString("en-US", {
+		const scheduledTime = scheduledFor
+			? scheduledFor.toLocaleTimeString("en-US", {
 					hour: "2-digit",
 					minute: "2-digit",
-				})}`
-			: "";
+				})
+			: undefined;
 
-		await sendPushNotification(tokens, {
-			title: "🛎️ New Order",
-			body: `${who} placed an order${when} — ${itemCount} item(s), ${order.totalPrice} EGP.`,
-			data: {
-				orderId: order._id?.toString() ?? "",
-				type: "new_order",
-			},
-		});
+		await sendLocalizedNotification(
+			tokenDocs,
+			(lang) =>
+				newOrderNotification(lang, {
+					who,
+					count: itemCount,
+					total: order.totalPrice,
+					scheduledTime,
+				}),
+			{ orderId: order._id?.toString() ?? "", type: "new_order" },
+		);
 	} catch (err) {
 		console.error("New-order push failed:", err);
+	}
+}
+
+/**
+ * Notify the customer that their order's status changed (confirmed / ready /
+ * delivered / cancelled). Best-effort and localized per the device language.
+ */
+async function notifyCustomerOfStatus(order: Order): Promise<void> {
+	try {
+		const orderId = order._id?.toString() ?? "";
+		const orderShort = orderId.slice(-6);
+		const sample = orderStatusNotification(order.status, "en", { orderShort });
+		if (!sample) return; // status we don't notify on (e.g. pending)
+
+		const tokenDocs = await fcmRepository.getUserTokenDocs(order.userId);
+		if (tokenDocs.length === 0) return;
+
+		await sendLocalizedNotification(
+			tokenDocs,
+			(lang) =>
+				orderStatusNotification(order.status, lang, { orderShort }) as {
+					title: string;
+					body: string;
+				},
+			{ orderId, type: "order_status", status: order.status },
+		);
+	} catch (err) {
+		console.error("Order-status push failed:", err);
 	}
 }
 
@@ -487,6 +522,12 @@ export const orderService = {
 		// pay-now/pay-later (user credit + cafeteria revenue), reversal, and
 		// cancellation (nets out whatever was previously applied) uniformly.
 		await settleWallets(finalOrder.userId, orderId, order, finalOrder);
+
+		// Tell the customer when their order's status changes
+		// (confirmed / ready / delivered / cancelled). Fire-and-forget.
+		if (updates.status !== undefined && updates.status !== originalStatus) {
+			void notifyCustomerOfStatus(finalOrder);
+		}
 
 		return finalOrder;
 	},

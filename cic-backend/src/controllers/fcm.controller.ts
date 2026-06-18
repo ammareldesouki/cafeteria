@@ -16,13 +16,16 @@ export const registerFcmToken = async (
 			res.status(401).json({ message: "Unauthorized" });
 			return;
 		}
-		const { token } = req.body as { token: string };
+		const { token, lang } = req.body as { token: string; lang?: string };
 		if (!token) {
 			res.status(400).json({ message: "token is required" });
 			return;
 		}
 
-		await fcmRepository.registerToken(userId, token);
+		// Role comes from the authenticated session (not the client) so staff
+		// alerts can't be spoofed.
+		const role = (req as any).user?.role;
+		await fcmRepository.registerToken(userId, token, lang, role);
 		res.status(201).json({ success: true });
 	} catch (err) {
 		next(err);

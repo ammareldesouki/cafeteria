@@ -123,7 +123,7 @@ class _SignInPageState extends State<SignInPage> {
                       // ── Email ──────────────────────────────────────────
                       AppTextField(
                         label: AppLocalizations.of(context)!.email,
-                        hint: 'you@example.com',
+                        hint: 'you@cic-cairo.edu.com',
                         controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
 

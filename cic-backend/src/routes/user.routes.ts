@@ -9,6 +9,10 @@ import {
 	updateName,
 	updatePhone,
 } from "@/controllers/user.controller";
+import {
+	registerFcmToken,
+	unregisterFcmToken,
+} from "@/controllers/fcm.controller";
 import { requireAuth } from "@/middlewares/auth/requireAuth.middleware";
 import { requireAuthNameMiddleware } from "@/middlewares/auth/updateUsername.middleware";
 import {
@@ -39,5 +43,10 @@ router.post(
 	validateUpdatePhone,
 	updatePhone,
 );
+
+// FCM token registration for ANY authenticated user (customers + staff), so
+// customers can receive order-tracking notifications.
+router.post("/fcm-token", requireAuth, registerFcmToken);
+router.delete("/fcm-token", requireAuth, unregisterFcmToken);
 
 export default router;
