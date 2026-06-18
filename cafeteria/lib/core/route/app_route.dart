@@ -59,8 +59,12 @@ class AppRouter {
       case RouteNames.home:
           final args = settings.arguments as Map<String, String>? ?? {};
   return MaterialPageRoute(
-    builder: (_) => BlocProvider.value(
-      value: sl<HomeBloc>(),
+    builder: (_) => MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: sl<HomeBloc>()),
+        BlocProvider.value(value: sl<FavouriteBloc>()),
+        BlocProvider.value(value: sl<CartBloc>()),
+      ],
       child: HomePage(
         userName: args['userName'] ?? 'User',
         userId: args['userId'] ?? '',

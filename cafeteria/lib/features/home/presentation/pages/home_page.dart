@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/menu_item_entity.dart';
 import '../manager/home_bloc.dart';
+import 'category_page.dart' show showCustomizeSheet;
 import '../widgets/category_card.dart';
 import '../widgets/home_search_bar.dart';
 import '../widgets/home_skeleton.dart';
@@ -46,7 +47,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
   void _onItemTap(MenuItemEntity item) {
-    Navigator.pushNamed(context, '/item-detail', arguments: item);
+    // Open the same customize sheet used on the category page, instead of
+    // navigating to a (non-existent) item-detail route.
+    showCustomizeSheet(context, item);
   }
 
   @override
