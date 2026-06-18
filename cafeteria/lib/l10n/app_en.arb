@@ -74,6 +74,9 @@
   "pickDate": "Pick a date",
   "call": "Call",
   "couldNotCall": "Could not place the call",
+  "addPhoneTitle": "Add your phone number",
+  "addPhoneSubtitle": "We need your number so the cafeteria can reach you about your orders.",
+  "couldNotSavePhone": "Could not save your phone number. Please try again.",
   "sugar": "Sugar",
   "sugarSpoons": "{count} spoon(s)",
   "@sugarSpoons": {

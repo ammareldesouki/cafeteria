@@ -230,6 +230,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotCall => 'Could not place the call';
 
   @override
+  String get addPhoneTitle => 'Add your phone number';
+
+  @override
+  String get addPhoneSubtitle =>
+      'We need your number so the cafeteria can reach you about your orders.';
+
+  @override
+  String get couldNotSavePhone =>
+      'Could not save your phone number. Please try again.';
+
+  @override
   String get sugar => 'Sugar';
 
   @override

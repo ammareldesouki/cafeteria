@@ -16,4 +16,15 @@ export const userService = {
 		await auth.api.updateUser(context);
 		return { name };
 	},
+
+	async updateUserPhone(phoneNumber: string, headers: IncomingHttpHeaders) {
+		const context = {
+			method: "POST" as const,
+			body: { phoneNumber },
+			headers,
+		};
+
+		await auth.api.updateUser(context);
+		return { phoneNumber };
+	},
 };

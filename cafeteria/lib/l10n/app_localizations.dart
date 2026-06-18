@@ -536,6 +536,24 @@ abstract class AppLocalizations {
   /// **'Could not place the call'**
   String get couldNotCall;
 
+  /// No description provided for @addPhoneTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your phone number'**
+  String get addPhoneTitle;
+
+  /// No description provided for @addPhoneSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We need your number so the cafeteria can reach you about your orders.'**
+  String get addPhoneSubtitle;
+
+  /// No description provided for @couldNotSavePhone.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not save your phone number. Please try again.'**
+  String get couldNotSavePhone;
+
   /// No description provided for @sugar.
   ///
   /// In en, this message translates to:

@@ -7,11 +7,13 @@ import {
 	getMyWalletDetails,
 	getUserProfile,
 	updateName,
+	updatePhone,
 } from "@/controllers/user.controller";
 import { requireAuth } from "@/middlewares/auth/requireAuth.middleware";
 import { requireAuthNameMiddleware } from "@/middlewares/auth/updateUsername.middleware";
 import {
 	validateUpdateName,
+	validateUpdatePhone,
 	validateWalletPagination,
 } from "@/middlewares/validation";
 
@@ -30,6 +32,12 @@ router.post(
 	requireAuthNameMiddleware,
 	validateUpdateName,
 	updateName,
+);
+router.post(
+	"/user/phone",
+	requireAuthNameMiddleware,
+	validateUpdatePhone,
+	updatePhone,
 );
 
 export default router;

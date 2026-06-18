@@ -78,6 +78,9 @@
   "pickDate": "اختر تاريخًا",
   "call": "اتصال",
   "couldNotCall": "تعذّر إجراء المكالمة",
+  "addPhoneTitle": "أضف رقم هاتفك",
+  "addPhoneSubtitle": "نحتاج رقمك حتى تتمكن الكافتيريا من التواصل معك بشأن طلباتك.",
+  "couldNotSavePhone": "تعذّر حفظ رقم الهاتف. حاول مرة أخرى.",
   "sugar": "السكر",
   "sugarSpoons": "{count} ملعقة",
   "@sugarSpoons": {

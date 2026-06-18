@@ -29,3 +29,26 @@ export const validateUpdateName = (
 
 	next();
 };
+
+/**
+ * Validate user phone number update
+ */
+export const validateUpdatePhone = (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	const { phoneNumber } = req.body;
+
+	if (!phoneNumber || typeof phoneNumber !== "string") {
+		return res.status(400).json({ message: "Invalid phone number" });
+	}
+
+	const trimmed = phoneNumber.trim();
+	// Optional leading +, then 7–15 digits.
+	if (!/^\+?[0-9]{7,15}$/.test(trimmed)) {
+		return res.status(400).json({ message: "Enter a valid phone number" });
+	}
+
+	next();
+};

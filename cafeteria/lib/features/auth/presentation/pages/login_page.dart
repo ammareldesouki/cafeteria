@@ -9,6 +9,7 @@ import '../manager/auth_bloc.dart';
 import '../widgets/app_text_field.dart';
 import '../widgets/buttons.dart';
 import '../widgets/language_theme_toggles.dart';
+import '../widgets/phone_setup_dialog.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -47,9 +48,15 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
+      listener: (context, state) async {
         if (state is AuthSuccess) {
-          final role = state.response.user.role;
+          final user = state.response.user;
+          // Customers must have a phone (e.g. Google sign-in may lack one) so
+          // the cafeteria can call about orders. Blocks until provided.
+          final ok = await ensurePhoneNumber(context, user);
+          if (!ok || !context.mounted) return;
+
+          final role = user.role;
           final targetRoute =
               role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
 
@@ -57,10 +64,10 @@ class _SignInPageState extends State<SignInPage> {
             context,
             targetRoute,
             arguments: {
-              'userName': state.response.user.name.isNotEmpty
-                  ? state.response.user.name
-                  : state.response.user.email.split('@').first,
-              'userId': state.response.user.id,
+              'userName': user.name.isNotEmpty
+                  ? user.name
+                  : user.email.split('@').first,
+              'userId': user.id,
               'role': role,
             },
           );

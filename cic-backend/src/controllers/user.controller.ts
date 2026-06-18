@@ -124,3 +124,27 @@ export const updateName = async (
 		}
 	}
 };
+
+/**
+ * Update user phone number
+ * POST /user/phone
+ */
+export const updatePhone = async (
+	req: Request,
+	res: Response,
+	next: NextFunction,
+) => {
+	try {
+		const { phoneNumber } = req.body;
+
+		const result = await userService.updateUserPhone(phoneNumber, req.headers);
+
+		res.json({ success: true, phoneNumber: result.phoneNumber });
+	} catch (err) {
+		try {
+			handleServiceError(err, res);
+		} catch (unhandledErr) {
+			next(unhandledErr);
+		}
+	}
+};

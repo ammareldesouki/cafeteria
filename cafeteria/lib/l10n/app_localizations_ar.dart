@@ -230,6 +230,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get couldNotCall => 'تعذّر إجراء المكالمة';
 
   @override
+  String get addPhoneTitle => 'أضف رقم هاتفك';
+
+  @override
+  String get addPhoneSubtitle =>
+      'نحتاج رقمك حتى تتمكن الكافتيريا من التواصل معك بشأن طلباتك.';
+
+  @override
+  String get couldNotSavePhone => 'تعذّر حفظ رقم الهاتف. حاول مرة أخرى.';
+
+  @override
   String get sugar => 'السكر';
 
   @override
