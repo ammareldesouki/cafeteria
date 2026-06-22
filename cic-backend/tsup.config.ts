@@ -10,6 +10,5 @@ export default defineConfig({
 	target: "es2020", // Transpile target
 	minify: false, // Minify JS files to reduce size
 	treeshake: true, // Remove unused code (default true, explicit)
-	// alias, swc options apply automatically from tsconfig.json
-	// external: [], // Exclude node_modules when needed
+	external: ["firebase-admin"], // native deps must resolve at runtime
 });
