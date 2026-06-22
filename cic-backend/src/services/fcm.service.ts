@@ -1,5 +1,4 @@
-import { cert, initializeApp, getApps } from "firebase-admin/app";
-import { getMessaging } from "firebase-admin/messaging";
+import { GoogleAuth } from "google-auth-library";
 import type {
 	NotifContent,
 	NotifLang,
@@ -13,21 +12,11 @@ const REAP_ERRORS = new Set([
 	"messaging/invalid-registration-token",
 ]);
 
-let initialized = false;
+let auth: GoogleAuth | null = null;
+let projectId: string | null = null;
 
 function init() {
-	if (initialized) return;
-
-	const existing = getApps();
-	if (existing.length > 0) {
-		initialized = true;
-		console.log(
-			"🔥 Firebase Admin already initialized (existing apps:",
-			existing.map((a) => a.name).join(", "),
-			")",
-		);
-		return;
-	}
+	if (auth) return;
 
 	const raw = process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON;
 	if (!raw) {
@@ -40,14 +29,29 @@ function init() {
 		if (sa.private_key) {
 			sa.private_key = sa.private_key.replace(/\\n/g, "\n");
 		}
-		initializeApp({
-			credential: cert(sa),
-			projectId: sa.project_id,
+		projectId = sa.project_id;
+		auth = new GoogleAuth({
+			credentials: sa,
+			scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
 		});
-		initialized = true;
-		console.log("🔥 Firebase Admin initialized for project:", sa.project_id);
+		console.log("🔥 FCM ready for project:", projectId);
 	} catch (err) {
-		console.error("Firebase Admin init error:", err);
+		console.error("FCM init error:", err);
+	}
+}
+
+async function getBearerToken(): Promise<string | null> {
+	if (!auth) return null;
+	try {
+		const token = await auth.getAccessToken();
+		if (!token) {
+			console.warn("FCM: GoogleAuth.getAccessToken() returned null");
+			return null;
+		}
+		return token;
+	} catch (err) {
+		console.error("FCM: failed to get access token:", err);
+		return null;
 	}
 }
 
@@ -56,37 +60,71 @@ export async function sendPushNotification(
 	payload: { title: string; body: string; data?: Record<string, string> },
 ): Promise<void> {
 	init();
-	if (tokens.length === 0) return;
+	if (!auth || !projectId || tokens.length === 0) return;
 
-	try {
-		const messaging = getMessaging();
-		const result = await messaging.sendEachForMulticast({
-			tokens,
-			notification: { title: payload.title, body: payload.body },
-			data: payload.data,
-			android: {
-				priority: "high",
-				notification: { sound: "default", channelId: "high_importance_channel" },
-			},
-			apns: { payload: { aps: { sound: "default" } } },
-		});
+	const bearer = await getBearerToken();
+	if (!bearer) {
+		console.warn("FCM: no bearer token — skipping send");
+		return;
+	}
 
-		for (let i = 0; i < result.responses.length; i++) {
-			const r = result.responses[i];
-			if (!r.success) {
-				const code = r.error?.code ?? "unknown";
-				const msg = r.error?.message ?? "";
-				console.warn(`FCM: token ${i} failed — ${code}: ${msg}`);
+	const fcmUrl = `https://fcm.googleapis.com/v1/projects/${projectId}/messages:send`;
 
-				if (REAP_ERRORS.has(code)) {
-					fcmRepository.unregisterToken(tokens[i]).catch((e) =>
-						console.error("FCM: failed to remove dead token:", e),
+	for (let i = 0; i < tokens.length; i++) {
+		try {
+			const body = JSON.stringify({
+				message: {
+					token: tokens[i],
+					notification: { title: payload.title, body: payload.body },
+					data: payload.data,
+					android: {
+						priority: "high",
+						notification: { sound: "default", channelId: "high_importance_channel" },
+					},
+					apns: { payload: { aps: { sound: "default" } } },
+				},
+			});
+
+			const res = await fetch(fcmUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${bearer}`,
+				},
+				body,
+			});
+
+			if (!res.ok) {
+				const text = await res.text();
+				let code = "unknown";
+				try {
+					const parsed = JSON.parse(text);
+					code =
+						parsed.error?.details?.[0]?.errorCode ??
+						parsed.error?.status ??
+						"unknown";
+				} catch {}
+
+				console.warn(`FCM: token ${i} failed — ${res.status}: ${code}`);
+
+				if (res.status === 401) {
+					console.error(
+						"FCM 401 UNAUTHENTICATED — the bearer token was rejected. Token prefix:",
+						bearer.substring(0, 20) + "...",
 					);
 				}
+
+				if (res.status === 400 || res.status === 404) {
+					if (REAP_ERRORS.has(`messaging/${code.toLowerCase()}`)) {
+						fcmRepository.unregisterToken(tokens[i]).catch((e) =>
+							console.error("FCM: failed to remove dead token:", e),
+						);
+					}
+				}
 			}
+		} catch (err) {
+			console.error(`FCM: token ${i} network error:`, err);
 		}
-	} catch (err) {
-		console.error("FCM send error:", err);
 	}
 }
 
