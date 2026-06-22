@@ -7,7 +7,7 @@
 		"node": ">=20"
 	},
 	"scripts": {
-		"start": "cross-env NODE_ENV=production node dist/server.js",
+		"start": "node -e \"process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON && require('fs').writeFileSync('firebase-sa.json', process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON)\" && cross-env NODE_ENV=production GOOGLE_APPLICATION_CREDENTIALS=firebase-sa.json node dist/server.js",
 		"dev": "cross-env NODE_ENV=development nodemon",
 		"dev:watch": "tsx watch src/server.ts",
 		"build": "tsup --config tsup.config.ts",
