@@ -1,9 +1,9 @@
 /**
  * FCM Service — sends push notifications via Firebase Admin SDK.
  *
- * Uses GOOGLE_APPLICATION_CREDENTIALS (set via start script) for auth.
+ * Reads service account from FIREBASE_SERVICE_ACCOUNT_RAW_JSON env var.
  */
-import { applicationDefault, initializeApp, getApps } from "firebase-admin/app";
+import { cert, initializeApp, getApps } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
 import type {
 	NotifContent,
@@ -19,10 +19,16 @@ function init() {
 		initialized = true;
 		return;
 	}
+	const raw = process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON;
+	if (!raw) {
+		console.warn("FIREBASE_SERVICE_ACCOUNT_RAW_JSON not set — FCM disabled.");
+		return;
+	}
 	try {
-		initializeApp({ credential: applicationDefault() });
+		const sa = JSON.parse(raw);
+		initializeApp({ credential: cert(sa) });
 		initialized = true;
-		console.log("🔥 Firebase Admin initialized via ADC");
+		console.log("🔥 Firebase Admin initialized for project:", (sa as any).project_id);
 	} catch (err) {
 		console.error("Firebase Admin init error:", err);
 	}
