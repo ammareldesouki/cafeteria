@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../network/dio_handler.dart';
@@ -89,8 +90,15 @@ class FcmService {
 
   String? get currentToken => _currentToken;
 
+  static const _installChannel = MethodChannel('firebase_installations');
+
   /// Register the current FCM token with the backend (admin only).
   Future<void> registerToken() async {
+    // Force-delete the entire Firebase Installation (iOS keychain and all)
+    // so the SDK creates a fresh one bound to the current sender ID.
+    try {
+      await _installChannel.invokeMethod('deleteInstallationId');
+    } catch (_) {}
     // Retry getToken() with increasing delays
     for (final delay in [0, 2, 4, 8]) {
       if (delay > 0) await Future.delayed(Duration(seconds: delay));

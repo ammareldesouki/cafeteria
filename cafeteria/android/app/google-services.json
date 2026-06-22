@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "1058634289271-4spod6qs50s70037kg52i6c0p8onddfo.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ammar.cafeteria",
+            "certificate_hash": "38fa604d7dad2a2d7107a6571cfd1b05cc509d28"
+          }
+        },
+        {
           "client_id": "1058634289271-6gm6151g6h5gaep6osljdarhrfl4lbkl.apps.googleusercontent.com",
           "client_type": 3
         }
@@ -31,10 +39,10 @@
               "client_type": 3
             },
             {
-              "client_id": "1058634289271-ggp90jn6oaa1pkq742a48qh3bn7q7qfa.apps.googleusercontent.com",
+              "client_id": "1058634289271-bgg7a6d5t7j5lf1up27u4qmmrsuhjr9e.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.cafeteria"
+                "bundle_id": "com.ammar.cafeteria"
               }
             }
           ]

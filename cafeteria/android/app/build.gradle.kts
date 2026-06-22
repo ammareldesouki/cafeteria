@@ -51,4 +51,6 @@ flutter {
 dependencies {
     // Core library desugaring runtime — required by flutter_local_notifications.
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
+    // Required by MainActivity.kt for FirebaseInstallations.getInstance().delete()
+    implementation("com.google.firebase:firebase-installations")
 }
