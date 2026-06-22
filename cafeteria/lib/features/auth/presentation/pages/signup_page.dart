@@ -73,9 +73,10 @@ class _SignupPageState extends State<SignupPage> {
           final targetRoute =
               role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
 
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
             targetRoute,
+            (route) => false,
             arguments: {
               'userName': user.name.isNotEmpty
                   ? user.name

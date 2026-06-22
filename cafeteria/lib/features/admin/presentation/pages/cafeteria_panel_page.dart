@@ -291,7 +291,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                       child: _buildSearchBar(
                         _searchController,
                         _onSearchChanged,
-                        l10n.searchPlaceholder,
+                        l10n.searchOrders,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -1542,7 +1542,7 @@ class _CafeteriaPanelPageState extends State<CafeteriaPanelPage> {
                     size: 16, color: Colors.grey),
                 const SizedBox(width: 8),
                 Text(
-                  "\$${order.totalPrice.toStringAsFixed(2)}",
+                  "${order.totalPrice.toStringAsFixed(2)} ${l10n.pound}",
                   style: const TextStyle(
                       color: Colors.black, fontWeight: FontWeight.bold),
                 ),

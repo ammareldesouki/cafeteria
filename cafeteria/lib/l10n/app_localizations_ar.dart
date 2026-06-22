@@ -263,6 +263,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchPlaceholder => 'ابحث عن طعام أو مشروبات...';
 
   @override
+  String get searchOrders => 'ابحث عن الطلبات...';
+
+  @override
   String get popular => 'الأكثر شيوعًا';
 
   @override

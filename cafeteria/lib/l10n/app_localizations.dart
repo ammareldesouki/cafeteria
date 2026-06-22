@@ -596,6 +596,12 @@ abstract class AppLocalizations {
   /// **'Search for food or drinks...'**
   String get searchPlaceholder;
 
+  /// No description provided for @searchOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'Search orders...'**
+  String get searchOrders;
+
   /// No description provided for @popular.
   ///
   /// In en, this message translates to:

@@ -53,9 +53,10 @@ class _SignInPageAsStaffState extends State<SignInPageAsStaff> {
           final targetRoute =
           role == 'admin' ? RouteNames.cafeteriaPanel : RouteNames.layout;
 
-          Navigator.pushReplacementNamed(
+          Navigator.pushNamedAndRemoveUntil(
             context,
             targetRoute,
+            (route) => false,
             arguments: {
               'userName': state.response.user.name.isNotEmpty
                   ? state.response.user.name

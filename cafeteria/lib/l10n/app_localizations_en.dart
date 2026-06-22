@@ -264,6 +264,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchPlaceholder => 'Search for food or drinks...';
 
   @override
+  String get searchOrders => 'Search orders...';
+
+  @override
   String get popular => 'Popular';
 
   @override

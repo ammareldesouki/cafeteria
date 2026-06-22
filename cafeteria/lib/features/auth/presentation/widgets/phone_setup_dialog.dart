@@ -3,9 +3,7 @@ import '../../../../core/network/dio_handler.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../domain/entities/user_entity.dart';
 
-/// Blocking dialog that collects a phone number for accounts that don't have
-/// one (e.g. Google sign-in). It saves directly to `POST /user/phone` and can
-/// only be dismissed by saving a valid number.
+
 class PhoneSetupDialog extends StatefulWidget {
   const PhoneSetupDialog({super.key});
 
@@ -136,8 +134,7 @@ class _PhoneSetupDialogState extends State<PhoneSetupDialog> {
   }
 }
 
-/// Ensures a customer has a phone number before proceeding past sign-in.
-/// Admins are exempt. Returns true once a number exists (or was just saved).
+
 Future<bool> ensurePhoneNumber(BuildContext context, UserEntity user) async {
   if (user.role == 'admin' || user.phoneNumber.trim().isNotEmpty) return true;
   final saved = await showDialog<bool>(
