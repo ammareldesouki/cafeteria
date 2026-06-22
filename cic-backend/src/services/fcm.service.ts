@@ -6,18 +6,10 @@
  *   2. "Generate new private key" → download JSON
  *   3. Deploy: set FIREBASE_SERVICE_ACCOUNT_BASE64 (base64 of that JSON).
  *      Local dev: save the JSON as `cic-backend/firebase-service-account.json`.
- *
- * Uses the modular `firebase-admin/*` entry points (not the default `admin`
- * import), which resolve correctly under the ESM bundle — the monolithic
- * default import leaves `admin.credential` undefined once bundled.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import {
-	getMessaging,
-	type MulticastMessage,
-} from "firebase-admin/messaging";
+import admin from "firebase-admin";
 import { FIREBASE_SERVICE_ACCOUNT_PATH } from "@config/env";
 import {
 	type NotifContent,
@@ -70,7 +62,7 @@ function loadServiceAccountFromEnv(): Record<string, unknown> | null {
 
 function init() {
 	if (initialized) return;
-	if (getApps().length > 0) {
+	if (admin.apps.length > 0) {
 		initialized = true;
 		return;
 	}
@@ -90,7 +82,7 @@ function init() {
 		serviceAccount = JSON.parse(readFileSync(path, "utf8"));
 	}
 
-	initializeApp({ credential: cert(serviceAccount as any) });
+	initializeApp({ credential: admin.credential.cert(serviceAccount as any) });
 	initialized = true;
 	console.log(
 		"🔥 Firebase Admin initialized for project:",
@@ -109,7 +101,7 @@ export async function sendPushNotification(
 	init();
 	if (!initialized || tokens.length === 0) return;
 
-	const message: MulticastMessage = {
+	const message: admin.messaging.MulticastMessage = {
 		tokens,
 		notification: { title: payload.title, body: payload.body },
 		data: payload.data,
@@ -124,7 +116,7 @@ export async function sendPushNotification(
 	};
 
 	try {
-		const response = await getMessaging().sendEachForMulticast(message);
+		const response = await admin.messaging().sendEachForMulticast(message);
 		for (let i = 0; i < response.responses.length; i++) {
 			const r = response.responses[i];
 			if (!r.success) {
