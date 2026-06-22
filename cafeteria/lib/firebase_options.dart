@@ -51,7 +51,7 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyDk7wo9-W-SD6CehyJy4xFvHZUKrwfxjiA',
-    appId: '1:1058634289271:android:f0a58d442782c547747672',
+    appId: '1:1058634289271:android:f6a1c4b46392f1b6747672',
     messagingSenderId: '1058634289271',
     projectId: 'cafetria-2104b',
     storageBucket: 'cafetria-2104b.firebasestorage.app',
@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyB8YMA-bqWHwLVtKW44xrRbeKH0pzwp8ps',
-    appId: '1:1058634289271:ios:e6f7f632cf1e08f8747672',
+    appId: '1:1058634289271:ios:fc01612c973bde60747672',
     messagingSenderId: '1058634289271',
     projectId: 'cafetria-2104b',
     storageBucket: 'cafetria-2104b.firebasestorage.app',
-    iosBundleId: 'com.example.cafeteria',
+    iosBundleId: 'com.ammar.cafeteria',
   );
 }
