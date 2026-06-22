@@ -6,10 +6,10 @@ import type {
 import { normalizeLang } from "@/utils/notificationMessages";
 import { fcmRepository } from "@/repositories/fcm.repository";
 
-const REAP_ERRORS = new Set([
-	"messaging/registration-token-not-registered",
-	"messaging/invalid-argument",
-	"messaging/invalid-registration-token",
+const REAP_CODES = new Set([
+	"UNREGISTERED",
+	"INVALID_ARGUMENT",
+	"THIRD_PARTY_AUTH_ERROR",
 ]);
 
 let auth: GoogleAuth | null = null;
@@ -108,14 +108,24 @@ export async function sendPushNotification(
 				console.warn(`FCM: token ${i} failed — ${res.status}: ${code}`);
 
 				if (res.status === 401) {
-					console.error(
-						"FCM 401 UNAUTHENTICATED — the bearer token was rejected. Token prefix:",
-						bearer.substring(0, 20) + "...",
-					);
+					if (code === "THIRD_PARTY_AUTH_ERROR") {
+						console.warn(
+							`FCM: token ${i} is from a different Firebase project — removing from DB`,
+						);
+					} else {
+						console.error(
+							"FCM 401 UNAUTHENTICATED — the bearer token was rejected. Token prefix:",
+							bearer.substring(0, 20) + "...",
+						);
+					}
 				}
 
-				if (res.status === 400 || res.status === 404) {
-					if (REAP_ERRORS.has(`messaging/${code.toLowerCase()}`)) {
+				if (
+					res.status === 400 ||
+					res.status === 404 ||
+					(res.status === 401 && code === "THIRD_PARTY_AUTH_ERROR")
+				) {
+					if (REAP_CODES.has(code)) {
 						fcmRepository.unregisterToken(tokens[i]).catch((e) =>
 							console.error("FCM: failed to remove dead token:", e),
 						);
