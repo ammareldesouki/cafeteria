@@ -1,8 +1,3 @@
-/**
- * FCM Service — sends push notifications via Firebase Admin SDK.
- *
- * Reads service account from FIREBASE_SERVICE_ACCOUNT_RAW_JSON env var.
- */
 import { cert, initializeApp, getApps } from "firebase-admin/app";
 import { getMessaging } from "firebase-admin/messaging";
 import type {
@@ -10,25 +5,47 @@ import type {
 	NotifLang,
 } from "@/utils/notificationMessages";
 import { normalizeLang } from "@/utils/notificationMessages";
+import { fcmRepository } from "@/repositories/fcm.repository";
+
+const REAP_ERRORS = new Set([
+	"messaging/registration-token-not-registered",
+	"messaging/invalid-argument",
+	"messaging/invalid-registration-token",
+]);
 
 let initialized = false;
 
 function init() {
 	if (initialized) return;
-	if (getApps().length > 0) {
+
+	const existing = getApps();
+	if (existing.length > 0) {
 		initialized = true;
+		console.log(
+			"🔥 Firebase Admin already initialized (existing apps:",
+			existing.map((a) => a.name).join(", "),
+			")",
+		);
 		return;
 	}
+
 	const raw = process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON;
 	if (!raw) {
 		console.warn("FIREBASE_SERVICE_ACCOUNT_RAW_JSON not set — FCM disabled.");
 		return;
 	}
+
 	try {
 		const sa = JSON.parse(raw);
-		initializeApp({ credential: cert(sa) });
+		if (sa.private_key) {
+			sa.private_key = sa.private_key.replace(/\\n/g, "\n");
+		}
+		initializeApp({
+			credential: cert(sa),
+			projectId: sa.project_id,
+		});
 		initialized = true;
-		console.log("🔥 Firebase Admin initialized for project:", (sa as any).project_id);
+		console.log("🔥 Firebase Admin initialized for project:", sa.project_id);
 	} catch (err) {
 		console.error("Firebase Admin init error:", err);
 	}
@@ -40,6 +57,7 @@ export async function sendPushNotification(
 ): Promise<void> {
 	init();
 	if (tokens.length === 0) return;
+
 	try {
 		const messaging = getMessaging();
 		const result = await messaging.sendEachForMulticast({
@@ -52,10 +70,19 @@ export async function sendPushNotification(
 			},
 			apns: { payload: { aps: { sound: "default" } } },
 		});
+
 		for (let i = 0; i < result.responses.length; i++) {
 			const r = result.responses[i];
 			if (!r.success) {
-				console.warn(`FCM: token ${i} failed — ${r.error?.code}: ${r.error?.message}`);
+				const code = r.error?.code ?? "unknown";
+				const msg = r.error?.message ?? "";
+				console.warn(`FCM: token ${i} failed — ${code}: ${msg}`);
+
+				if (REAP_ERRORS.has(code)) {
+					fcmRepository.unregisterToken(tokens[i]).catch((e) =>
+						console.error("FCM: failed to remove dead token:", e),
+					);
+				}
 			}
 		}
 	} catch (err) {

@@ -10,5 +10,5 @@ export default defineConfig({
 	target: "es2020", // Transpile target
 	minify: false, // Minify JS files to reduce size
 	treeshake: true, // Remove unused code (default true, explicit)
-	external: ["firebase-admin", "google-auth-library"], // native deps resolve at runtime
+	external: ["firebase-admin"], // native deps resolve at runtime
 });

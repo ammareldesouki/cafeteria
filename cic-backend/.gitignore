@@ -65,3 +65,4 @@ ecosystem.config.js.bak
 
 # Firebase service account
 firebase-service-account.json
+firebase-sa.json
