@@ -9,7 +9,9 @@
  */
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import admin from "firebase-admin";
+import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { getMessaging } from "firebase-admin/messaging";
+import type { MulticastMessage } from "firebase-admin/lib/messaging/messaging-api";
 import { FIREBASE_SERVICE_ACCOUNT_PATH } from "@config/env";
 import {
 	type NotifContent,
@@ -62,7 +64,7 @@ function loadServiceAccountFromEnv(): Record<string, unknown> | null {
 
 function init() {
 	if (initialized) return;
-	if (admin.apps.length > 0) {
+	if (getApps().length > 0) {
 		initialized = true;
 		return;
 	}
@@ -82,7 +84,7 @@ function init() {
 		serviceAccount = JSON.parse(readFileSync(path, "utf8"));
 	}
 
-	initializeApp({ credential: admin.credential.cert(serviceAccount as any) });
+	initializeApp({ credential: cert(serviceAccount as any) });
 	initialized = true;
 	console.log(
 		"🔥 Firebase Admin initialized for project:",
@@ -101,7 +103,7 @@ export async function sendPushNotification(
 	init();
 	if (!initialized || tokens.length === 0) return;
 
-	const message: admin.messaging.MulticastMessage = {
+	const message: MulticastMessage = {
 		tokens,
 		notification: { title: payload.title, body: payload.body },
 		data: payload.data,
@@ -116,7 +118,7 @@ export async function sendPushNotification(
 	};
 
 	try {
-		const response = await admin.messaging().sendEachForMulticast(message);
+		const response = await getMessaging().sendEachForMulticast(message);
 		for (let i = 0; i < response.responses.length; i++) {
 			const r = response.responses[i];
 			if (!r.success) {
