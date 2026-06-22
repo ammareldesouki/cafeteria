@@ -34,6 +34,16 @@ let initialized = false;
  * falls back to FIREBASE_SERVICE_ACCOUNT_JSON.
  */
 function loadServiceAccountFromEnv(): Record<string, unknown> | null {
+	// Prefer raw JSON var (full content via --stdin), then base64, then legacy JSON.
+	const raw = process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON;
+	if (raw) {
+		try {
+			return JSON.parse(raw);
+		} catch (err) {
+			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_RAW_JSON", err);
+		}
+	}
+
 	const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
 	if (b64) {
 		try {
@@ -82,7 +92,10 @@ function init() {
 
 	initializeApp({ credential: cert(serviceAccount as any) });
 	initialized = true;
-	console.log("🔥 Firebase Admin initialized");
+	console.log(
+		"🔥 Firebase Admin initialized for project:",
+		(serviceAccount as any).project_id ?? "unknown",
+	);
 }
 
 /**
