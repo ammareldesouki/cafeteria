@@ -91,13 +91,17 @@ class FcmService {
 
   /// Register the current FCM token with the backend (admin only).
   Future<void> registerToken() async {
-    if (_currentToken != null) {
-      await _registerToken();
-      return;
+    // Delete any stale cached token (e.g. from a previous Firebase project)
+    // so getToken() below generates a fresh one tied to the current project.
+    // Safe: deleteToken() only invalidates this device's token server-side.
+    try {
+      await _messaging.deleteToken();
+    } catch (_) {
+      // Ignore — offline or already deleted.
     }
-    // Retry multiple times with increasing delays
-    for (final delay in [2, 4, 8]) {
-      await Future.delayed(Duration(seconds: delay));
+    // Retry getToken() with increasing delays
+    for (final delay in [0, 2, 4, 8]) {
+      if (delay > 0) await Future.delayed(Duration(seconds: delay));
       try {
         _currentToken = await _messaging.getToken();
       } catch (_) {
