@@ -112,9 +112,13 @@ export async function sendPushNotification(
 
 	try {
 		const response = await getMessaging().sendEachForMulticast(message);
-		const failures = response.responses.filter((r) => !r.success).length;
-		if (failures > 0) {
-			console.warn(`FCM: ${failures}/${tokens.length} messages failed`);
+		for (let i = 0; i < response.responses.length; i++) {
+			const r = response.responses[i];
+			if (!r.success) {
+				const code = (r.error as any)?.code ?? "unknown";
+				const msg = (r.error as any)?.message ?? r.error?.toString();
+				console.warn(`FCM: token ${i} failed — ${code}: ${msg}`);
+			}
 		}
 	} catch (err) {
 		console.error("FCM send error:", err);
