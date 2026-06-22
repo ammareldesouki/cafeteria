@@ -1,5 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
+import 'package:firebase_installations/firebase_installations.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,11 +92,10 @@ class FcmService {
 
   /// Register the current FCM token with the backend (admin only).
   Future<void> registerToken() async {
-    // Delete any stale cached token (e.g. from a previous Firebase project)
-    // so getToken() below generates a fresh one tied to the current project.
-    // Safe: deleteToken() only invalidates this device's token server-side.
+    // Delete the entire Firebase Installation to force a fresh Instance ID
+    // and FCM token tied to the current Firebase project's sender ID.
     try {
-      await _messaging.deleteToken();
+      await FirebaseInstallations.deleteInstallationId();
     } catch (_) {
       // Ignore — offline or already deleted.
     }
