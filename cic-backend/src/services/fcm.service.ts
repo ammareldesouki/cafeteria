@@ -1,17 +1,12 @@
 /**
- * FCM Service — sends push notifications via Firebase Admin SDK.
+ * FCM Service — sends push notifications via FCM HTTP v1 API.
  *
- * Setup:
- *   1. Go to Firebase Console → Project Settings → Service Accounts
- *   2. "Generate new private key" → download JSON
- *   3. Deploy: set FIREBASE_SERVICE_ACCOUNT_BASE64 (base64 of that JSON).
- *      Local dev: save the JSON as `cic-backend/firebase-service-account.json`.
+ * Uses google-auth-library directly instead of firebase-admin to avoid
+ * bundling issues and credential problems with firebase-admin v14.
  */
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { cert, getApps, initializeApp } from "firebase-admin/app";
-import { getMessaging } from "firebase-admin/messaging";
-import type { MulticastMessage } from "firebase-admin/lib/messaging/messaging-api";
+import { GoogleAuth } from "google-auth-library";
 import { FIREBASE_SERVICE_ACCOUNT_PATH } from "@config/env";
 import {
 	type NotifContent,
@@ -19,124 +14,115 @@ import {
 	normalizeLang,
 } from "@/utils/notificationMessages";
 
-let initialized = false;
+const FCM_SEND_URL = "https://fcm.googleapis.com/v1/projects/cafetria-2104b/messages:send";
 
-/**
- * Resolve the service-account credentials from the environment.
- * Prefers FIREBASE_SERVICE_ACCOUNT_BASE64 (a single base64 line — immune to the
- * newline/quote mangling that breaks raw multi-line JSON in env vars), then
- * falls back to FIREBASE_SERVICE_ACCOUNT_JSON.
- */
-function loadServiceAccountFromEnv(): Record<string, unknown> | null {
-	// Prefer raw JSON var (full content via --stdin), then base64, then legacy JSON.
+let auth: GoogleAuth | null = null;
+let projectId: string | null = null;
+
+function loadServiceAccount() {
 	const raw = process.env.FIREBASE_SERVICE_ACCOUNT_RAW_JSON;
 	if (raw) {
-		try {
-			return JSON.parse(raw);
-		} catch (err) {
-			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_RAW_JSON", err);
-		}
+		try { return JSON.parse(raw); } catch { /* fall through */ }
 	}
-
 	const b64 = process.env.FIREBASE_SERVICE_ACCOUNT_BASE64;
 	if (b64) {
 		try {
-			const decoded = Buffer.from(b64.trim(), "base64").toString("utf8");
-			return JSON.parse(decoded);
-		} catch (err) {
-			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_BASE64", err);
-		}
+			return JSON.parse(Buffer.from(b64.trim(), "base64").toString("utf8"));
+		} catch { /* fall through */ }
 	}
-
 	const envJson = process.env.FIREBASE_SERVICE_ACCOUNT_JSON;
 	if (envJson) {
 		try {
-			// Tolerate a value accidentally wrapped in surrounding quotes.
-			const trimmed = envJson.trim().replace(/^['"]|['"]$/g, "");
-			return JSON.parse(trimmed);
-		} catch (err) {
-			console.warn("⚠️  Failed to parse FIREBASE_SERVICE_ACCOUNT_JSON", err);
-		}
+			return JSON.parse(envJson.trim().replace(/^['"]|['"]$/g, ""));
+		} catch { /* fall through */ }
 	}
-
+	const path = resolve(process.cwd(), FIREBASE_SERVICE_ACCOUNT_PATH);
+	if (existsSync(path)) {
+		return JSON.parse(readFileSync(path, "utf8"));
+	}
 	return null;
 }
 
 function init() {
-	if (initialized) return;
-	if (getApps().length > 0) {
-		initialized = true;
+	if (auth) return;
+	const sa = loadServiceAccount();
+	if (!sa) {
+		console.warn("⚠️  Firebase service account not found — FCM disabled.");
+		return;
+	}
+	projectId = (sa as any).project_id;
+	auth = new GoogleAuth({
+		credentials: sa,
+		scopes: ["https://www.googleapis.com/auth/firebase.messaging"],
+	});
+	console.log("🔥 FCM ready for project:", projectId);
+}
+
+async function getAccessToken(): Promise<string | null> {
+	if (!auth) return null;
+	try {
+		const client = await auth.getClient();
+		const token = await client.getAccessToken();
+		return token?.token ?? null;
+	} catch (err) {
+		console.error("FCM getAccessToken error:", err);
+		return null;
+	}
+}
+
+type FcmPayload = { title: string; body: string; data?: Record<string, string> };
+
+function buildMessage(token: string, payload: FcmPayload) {
+	return {
+		message: {
+			token,
+			notification: { title: payload.title, body: payload.body },
+			data: payload.data,
+			android: {
+				priority: "high" as const,
+				notification: { sound: "default", channelId: "high_importance_channel" },
+			},
+			apns: {
+				payload: { aps: { sound: "default" } },
+			},
+		},
+	};
+}
+
+export async function sendPushNotification(
+	tokens: string[],
+	payload: FcmPayload,
+): Promise<void> {
+	init();
+	if (!auth || !projectId || tokens.length === 0) return;
+
+	const accessToken = await getAccessToken();
+	if (!accessToken) {
+		console.warn("FCM: no access token available");
 		return;
 	}
 
-	let serviceAccount = loadServiceAccountFromEnv();
-
-	if (!serviceAccount) {
-		const path = resolve(process.cwd(), FIREBASE_SERVICE_ACCOUNT_PATH);
-		if (!existsSync(path)) {
-			console.warn(
-				"⚠️  Firebase service account not found at",
-				path,
-				"— FCM disabled.",
-			);
-			return;
-		}
-		serviceAccount = JSON.parse(readFileSync(path, "utf8"));
-	}
-
-	initializeApp({ credential: cert(serviceAccount as any) });
-	initialized = true;
-	console.log(
-		"🔥 Firebase Admin initialized for project:",
-		(serviceAccount as any).project_id ?? "unknown",
-	);
-}
-
-/**
- * Send a push notification to one or more FCM tokens.
- * Silently skips if Firebase is not configured.
- */
-export async function sendPushNotification(
-	tokens: string[],
-	payload: { title: string; body: string; data?: Record<string, string> },
-): Promise<void> {
-	init();
-	if (!initialized || tokens.length === 0) return;
-
-	const message: MulticastMessage = {
-		tokens,
-		notification: { title: payload.title, body: payload.body },
-		data: payload.data,
-		// Play the default notification sound (bell) on both platforms.
-		apns: {
-			payload: { aps: { sound: "default" } },
-		},
-		android: {
-			priority: "high",
-			notification: { sound: "default", channelId: "high_importance_channel" },
-		},
-	};
-
-	try {
-		const response = await getMessaging().sendEachForMulticast(message);
-		for (let i = 0; i < response.responses.length; i++) {
-			const r = response.responses[i];
-			if (!r.success) {
-				const code = (r.error as any)?.code ?? "unknown";
-				const msg = (r.error as any)?.message ?? r.error?.toString();
-				console.warn(`FCM: token ${i} failed — ${code}: ${msg}`);
+	for (let i = 0; i < tokens.length; i++) {
+		try {
+			const body = JSON.stringify(buildMessage(tokens[i], payload));
+			const res = await fetch(FCM_SEND_URL, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					Authorization: `Bearer ${accessToken}`,
+				},
+				body,
+			});
+			if (!res.ok) {
+				const text = await res.text();
+				console.warn(`FCM: token ${i} failed — ${res.status}: ${text}`);
 			}
+		} catch (err) {
+			console.error(`FCM: token ${i} error:`, err);
 		}
-	} catch (err) {
-		console.error("FCM send error:", err);
 	}
 }
 
-/**
- * Send a notification to a set of token docs, localizing the copy per device
- * language. Tokens are grouped by `lang` so each recipient gets text in their
- * own language.
- */
 export async function sendLocalizedNotification(
 	tokenDocs: { token: string; lang?: string }[],
 	build: (lang: NotifLang) => NotifContent,
