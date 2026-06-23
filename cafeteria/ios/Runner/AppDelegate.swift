@@ -9,26 +9,29 @@ import FirebaseInstallations
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    let controller = window?.rootViewController as! FlutterViewController
-    let channel = FlutterMethodChannel(name: "firebase_installations",
-                                       binaryMessenger: controller.binaryMessenger)
-    channel.setMethodCallHandler { (call, result) in
-      if call.method == "deleteInstallationId" {
-        Installations.installations().delete { error in
-          if let error = error {
-            result(FlutterError(code: "DELETE_FAILED",
-                                message: error.localizedDescription,
-                                details: nil))
-          } else {
-            result(true)
+    GeneratedPluginRegistrant.register(with: self)
+    let result = super.application(application, didFinishLaunchingWithOptions: launchOptions)
+
+    if let registrar = self.registrar(forPlugin: "FirebaseInstallations") {
+      let channel = FlutterMethodChannel(
+        name: "firebase_installations",
+        binaryMessenger: registrar.messenger())
+      channel.setMethodCallHandler { (call, result) in
+        if call.method == "deleteInstallationId" {
+          Installations.installations().delete { error in
+            if let error = error {
+              result(FlutterError(code: "DELETE_FAILED",
+                                  message: error.localizedDescription,
+                                  details: nil))
+            } else {
+              result(true)
+            }
           }
+        } else {
+          result(FlutterMethodNotImplemented)
         }
-      } else {
-        result(FlutterMethodNotImplemented)
       }
     }
-
-    GeneratedPluginRegistrant.register(with: self)
-    return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    return result
   }
 }
