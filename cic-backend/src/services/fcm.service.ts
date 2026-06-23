@@ -81,7 +81,14 @@ export async function sendPushNotification(
 						priority: "high",
 						notification: { sound: "default", channelId: "high_importance_channel" },
 					},
-					apns: { payload: { aps: { sound: "default" } } },
+					apns: {
+						payload: {
+							aps: {
+								alert: { title: payload.title, body: payload.body },
+								sound: "default",
+							},
+						},
+					},
 				},
 			});
 

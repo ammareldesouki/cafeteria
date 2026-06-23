@@ -98,13 +98,33 @@ class FcmService {
     // so the SDK creates a fresh one bound to the current sender ID.
     try {
       await _installChannel.invokeMethod('deleteInstallationId');
-    } catch (_) {}
+      log('Installation ID deleted successfully');
+    } catch (e) {
+      log('deleteInstallationId failed: $e');
+    }
+    // On iOS, explicitly wait for APNs token before getToken
+    if (Platform.isIOS) {
+      for (final delay in [0, 1, 2, 4]) {
+        if (delay > 0) await Future.delayed(Duration(seconds: delay));
+        try {
+          final apns = await _messaging.getAPNSToken();
+          if (apns != null) {
+            log('APNs token obtained: ${apns.substring(0, 10)}...');
+            break;
+          }
+        } catch (e) {
+          log('APNs token attempt failed: $e');
+        }
+      }
+    }
     // Retry getToken() with increasing delays
     for (final delay in [0, 2, 4, 8]) {
       if (delay > 0) await Future.delayed(Duration(seconds: delay));
       try {
         _currentToken = await _messaging.getToken();
-      } catch (_) {
+        log('FCM token obtained: ${_currentToken?.substring(0, 20)}...');
+      } catch (e) {
+        log('getToken attempt failed: $e');
         continue;
       }
       if (_currentToken != null) {
