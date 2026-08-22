@@ -16,7 +16,7 @@ module.exports = {
 			log_date_format: "YYYY-MM-DD HH:mm:ss.SSS",
 			node_args: "--enable-source-maps",
 			env: {
-				PORT: 3000,
+				PORT: 3001,
 				NODE_ENV: "production",
 			},
 			// env_production: { ... }
@@ -41,7 +41,7 @@ module.exports = {
 			merge_logs: true,
 			time: true,
 			env: {
-				PORT: 3000,
+				PORT: 3001,
 				NODE_ENV: "development",
 			},
 		},

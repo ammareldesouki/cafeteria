@@ -20,7 +20,7 @@ const rawEnv = process.env;
 
 export const NODE_ENV =
 	(rawEnv.NODE_ENV as "development" | "production" | "test") || "development";
-export const PORT = rawEnv.PORT ? Number(rawEnv.PORT) : undefined; // app.ts falls back to 3000
+export const PORT = rawEnv.PORT ? Number(rawEnv.PORT) : undefined; // server.ts falls back to 3001
 export const SECRET_KEY = rawEnv.SECRET_KEY || "secret";
 
 export const LOG_FORMAT = rawEnv.LOG_FORMAT; // app.ts falls back to 'dev'

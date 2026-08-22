@@ -6,6 +6,7 @@ import {
 	DATABASE_URL,
 	BETTER_AUTH_URL,
 	BETTER_AUTH_SECRET,
+	CORS_ORIGIN_LIST,
 	SMTP_HOST,
 	SMTP_PORT,
 	SMTP_USER,
@@ -22,7 +23,8 @@ export const auth = betterAuth({
 	baseURL: BETTER_AUTH_URL,
 	basePath: "/api/v1/auth",
 	secret: BETTER_AUTH_SECRET,
-	trustedOrigins: ["http://localhost:3000"],
+	trustedOrigins:
+		CORS_ORIGIN_LIST.length > 0 ? CORS_ORIGIN_LIST : ["http://localhost:3000"],
 	appName: "default",
 
 	/* email and password */
