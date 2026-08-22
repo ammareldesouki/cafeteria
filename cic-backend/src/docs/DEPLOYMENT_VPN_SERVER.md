@@ -8,7 +8,7 @@ This backend used to run on Railway (public HTTPS URL, automatic TLS, automatic 
 
 - **No automatic deploy.** Railway rebuilt and redeployed on every git push. Here, you `git pull` (or copy the build) onto the server yourself and restart the process manually.
 - **No automatic TLS.** Railway terminated HTTPS at its edge (`app.set("trust proxy", 1)` in `app.ts` exists because of this). The Node process itself only ever spoke plain HTTP. On the new server you either serve plain HTTP over the VPN tunnel (the VPN's own encryption covers transport), or put a reverse proxy (nginx) in front with a cert if you want `https://` end to end.
-- **No managed process supervisor.** Railway kept the process alive. Here you need **pm2**, which this repo already ships config for: [`ecosystem.config.js`](../../ecosystem.config.js) and the `deploy:prod` / `deploy:dev` npm scripts.
+- **No managed process supervisor.** Railway kept the process alive. Here you need **pm2**, which this repo already ships config for: [`ecosystem.config.cjs`](../../ecosystem.config.cjs) and the `deploy:prod` / `deploy:dev` npm scripts.
 - **Env vars live in a real `.env` file on the server**, not a dashboard.
 
 ## One-time server setup (on `Mobile-Student`, over RDP)
@@ -20,7 +20,7 @@ This backend used to run on Railway (public HTTPS URL, automatic TLS, automatic 
    - `DATABASE_URL` — the org's MongoDB server address, reachable from this host
    - `BETTER_AUTH_URL` — `http://10.10.13.3:3001` (or `https://...` if you set up a reverse proxy with TLS)
    - `CORS_ORIGINS` — comma-separated origins that will call this API (the Flutter app doesn't send an `Origin` header, so this mainly matters if/when there's a web admin panel)
-   - `PORT` — `3001` (matches `ecosystem.config.js` and the code's default — keep these in sync if you ever change it)
+   - `PORT` — `3001` (matches `ecosystem.config.cjs` and the code's default — keep these in sync if you ever change it)
 5. `npm install && npm run build`
 6. Open the port to other machines on the network — from an elevated PowerShell:
    ```powershell
@@ -32,7 +32,7 @@ This backend used to run on Railway (public HTTPS URL, automatic TLS, automatic 
 `pm2 startup` only generates init scripts for Linux/macOS (systemd, launchd, etc.) — it's a no-op on Windows. To keep the app running after you log off RDP or the machine reboots, install pm2 as an actual Windows Service instead:
 
 ```powershell
-npm run deploy:prod              # pm2 start ecosystem.config.js --only prod — confirm it runs first
+npm run deploy:prod              # pm2 start ecosystem.config.cjs --only prod — confirm it runs first
 npm install -g pm2-windows-service
 pm2-service-install               # installs pm2 itself as a Windows Service; say yes when it asks to run `pm2 save`
 pm2 save                          # persists prod as the process list the service resurrects on boot
@@ -42,9 +42,9 @@ After this, the `prod` app survives RDP logoff and machine reboot, since it's ow
 
 Useful pm2 commands while iterating: `pm2 status`, `pm2 logs prod`, `pm2 restart prod`, `pm2 reload prod` (zero-downtime, since `exec_mode: "cluster"` is set).
 
-To redeploy after a code change: `git pull && npm install && npm run build && pm2 reload ecosystem.config.js --only prod`.
+To redeploy after a code change: `git pull && npm install && npm run build && pm2 reload ecosystem.config.cjs --only prod`.
 
-The `deploy.production` block at the bottom of `ecosystem.config.js` is written for `pm2 deploy` over SSH (Linux-style) and doesn't fit an RDP/Windows target — ignore it, or delete it, and just run the steps above by hand / via a small PowerShell script on the machine.
+The `deploy.production` block at the bottom of `ecosystem.config.cjs` is written for `pm2 deploy` over SSH (Linux-style) and doesn't fit an RDP/Windows target — ignore it, or delete it, and just run the steps above by hand / via a small PowerShell script on the machine.
 
 ## Pointing the Flutter app at the new server
 

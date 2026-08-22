@@ -16,8 +16,8 @@
 		"format": "biome format . --write",
 		"start:tsup": "node -r tsconfig-paths/register dist/server.js",
 		"build:tsup": "tsup --config tsup.config.ts",
-		"deploy:prod": "pm2 start ecosystem.config.js --only prod",
-		"deploy:dev": "pm2 start ecosystem.config.js --only dev"
+		"deploy:prod": "pm2 start ecosystem.config.cjs --only prod",
+		"deploy:dev": "pm2 start ecosystem.config.cjs --only dev"
 	},
 	"dependencies": {
 		"better-auth": "^1.4.13",
